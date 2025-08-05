@@ -1,7 +1,6 @@
 package org.roxy.reminder.bot.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 
 @Data

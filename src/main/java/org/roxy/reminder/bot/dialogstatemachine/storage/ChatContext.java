@@ -7,16 +7,19 @@ import org.roxy.reminder.bot.dialogstatemachine.enums.DialogStatus;
 
 public class ChatContext {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private DialogStatus status = DialogStatus.NEW;
     @Getter
     private String city;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String street;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Long lastBotMessageId;
 
     public void setCity(String city) {
-        this.city = city.replaceAll("CALLBACK_",city);
+        this.city = city.replaceAll("CALLBACK_", city);
     }
 }

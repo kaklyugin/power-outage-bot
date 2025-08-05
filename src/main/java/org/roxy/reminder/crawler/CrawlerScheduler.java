@@ -3,11 +3,11 @@ package org.roxy.reminder.crawler;
 import org.roxy.reminder.crawler.dto.PowerOutageItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.net.URI;
 import java.util.List;
@@ -34,8 +34,8 @@ public class CrawlerScheduler {
 
     @Scheduled(cron = "0/5 * * * * ?")
     private void crawl() throws ExecutionException, InterruptedException {
-      CompletableFuture<String> future1 =
-        httpClient.getPageContentAsync(URI.create(powerOutageUrls[0]));
+        CompletableFuture<String> future1 =
+                httpClient.getPageContentAsync(URI.create(powerOutageUrls[0]));
         String result = future1.get();
         log.info("Crawling " + result);
         List<PowerOutageItem> parsedItems = htmlParser.parsePage(result);

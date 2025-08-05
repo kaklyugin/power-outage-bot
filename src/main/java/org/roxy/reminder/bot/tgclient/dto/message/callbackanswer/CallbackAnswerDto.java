@@ -9,9 +9,9 @@ import lombok.Data;
 public class CallbackAnswerDto {
 
     @JsonProperty("callback_query_id")
-    private String  callbackQueryId;
-    private String  text;
+    private String callbackQueryId;
+    private String text;
     @JsonProperty("show_alert")
-    private boolean  showAlert;
+    private boolean showAlert;
 
 }

@@ -28,7 +28,7 @@ public class UpdatesPollingService {
     private final ObjectMapper objectMapper;
     private final UpdateResponseMapper mapper;
     private final ExecutorService executor;
-    private final int MAX_THREAD_COUNT = 1 ;
+    private final int MAX_THREAD_COUNT = 1;
 
     public UpdatesPollingService(HttpBotClient httpBotClient,
                                  ChatStore chatStore,

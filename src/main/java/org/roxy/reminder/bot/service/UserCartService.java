@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserCartService {
-     private UserCartRepository userCartRepository;
+    private UserCartRepository userCartRepository;
 
     public UserCartService(UserCartRepository userCartRepository) {
         this.userCartRepository = userCartRepository;

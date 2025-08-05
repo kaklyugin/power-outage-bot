@@ -5,6 +5,8 @@ import org.roxy.reminder.bot.tgclient.dto.message.response.SendMessageResponseDt
 
 public interface BotClient {
     SendMessageResponseDto sendMessage(MessageDto message);
+
     String getUpdates();
+
     void answerCallbackQuery(String callbackQueryId);
 }

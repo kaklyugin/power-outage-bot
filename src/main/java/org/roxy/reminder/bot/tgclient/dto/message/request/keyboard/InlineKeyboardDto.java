@@ -42,9 +42,7 @@ public class InlineKeyboardDto {
         }
 
 
-
-        public InlineKeyboardDto build()
-        {
+        public InlineKeyboardDto build() {
             return new InlineKeyboardDto(this);
         }
 

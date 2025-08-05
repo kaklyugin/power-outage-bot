@@ -33,15 +33,15 @@ public class StartMessageHandler implements UpdateHandler {
                 .replyMarkup(
                         new InlineKeyboardDto.KeyboardBuilder()
                                 .addRow()
-                                .addButton("Ростов","CALLBACK_ROSTOV")
-                                .addButton("Аксай","CALLBACK_AKSAI")
+                                .addButton("Ростов", "CALLBACK_ROSTOV")
+                                .addButton("Аксай", "CALLBACK_AKSAI")
                                 .addRow()
-                                .addButton("Новочеркасск","CALLBACK_NOVOCHERKASSK")
+                                .addButton("Новочеркасск", "CALLBACK_NOVOCHERKASSK")
                                 .build())
                 .build();
-            Long messageId = botClient.sendMessage(selectCityMessage).getMessageId();
-            context.setLastBotMessageId(messageId);
-            context.setStatus(DialogStatus.WAITING_FOR_CITY_INPUT);
-            log.info("Status = {}",context.getStatus());
+        Long messageId = botClient.sendMessage(selectCityMessage).getMessageId();
+        context.setLastBotMessageId(messageId);
+        context.setStatus(DialogStatus.WAITING_FOR_CITY_INPUT);
+        log.info("Status = {}", context.getStatus());
     }
 }

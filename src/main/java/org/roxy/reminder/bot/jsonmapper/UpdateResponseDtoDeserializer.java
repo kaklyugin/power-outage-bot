@@ -38,8 +38,7 @@ public class UpdateResponseDtoDeserializer extends StdDeserializer<UpdateRespons
             resultUpdateResponseDto.setDate(node.at("/message/date").asLong());
             resultUpdateResponseDto.setUserResponse(node.at("/message/text").asText());
 
-        }
-        else if (node.has("message") && node.at("/message").has("entities")) {
+        } else if (node.has("message") && node.at("/message").has("entities")) {
 
             JsonNode entity = StreamSupport
                     .stream(node.at("/message/entities").spliterator(), false)
@@ -53,8 +52,7 @@ public class UpdateResponseDtoDeserializer extends StdDeserializer<UpdateRespons
                 resultUpdateResponseDto.setUserResponse(node.at("/message/text").asText());
 
             }
-        }
-        else if (node.has("callback_query")) {
+        } else if (node.has("callback_query")) {
 
             resultUpdateResponseDto.setUpdateType(UpdateType.CALLBACK);
             resultUpdateResponseDto.setFromId(node.at("/callback_query/message/from/id").asLong());
@@ -64,8 +62,8 @@ public class UpdateResponseDtoDeserializer extends StdDeserializer<UpdateRespons
             resultUpdateResponseDto.setSourceMessageId(node.at("/callback_query/message/message_id").asLong());
             resultUpdateResponseDto.setCallbackQueryId(node.at("/callback_query/id").asText());
 
-        }  else
-                throw new JsonParseException("Cannot define update type");
+        } else
+            throw new JsonParseException("Cannot define update type");
         return resultUpdateResponseDto;
     }
 }

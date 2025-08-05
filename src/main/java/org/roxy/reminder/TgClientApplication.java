@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 public class TgClientApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TgClientApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TgClientApplication.class, args);
+    }
 
 }

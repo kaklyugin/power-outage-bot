@@ -6,5 +6,5 @@ import org.roxy.reminder.bot.tgclient.dto.updates.UpdateResponseDto;
 
 @Mapper(componentModel = "spring")
 public interface UpdateResponseMapper {
-   UpdateDto mapUpdateResponseToUpdateDto(UpdateResponseDto updateResponseDto);
+    UpdateDto mapUpdateResponseToUpdateDto(UpdateResponseDto updateResponseDto);
 }

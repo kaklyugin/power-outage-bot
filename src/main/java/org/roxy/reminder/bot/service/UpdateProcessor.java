@@ -26,13 +26,12 @@ public class UpdateProcessor {
     @SneakyThrows
     @RabbitListener(queues = "${rabbitmq.updates.queue.name}")
     public void handleMessage(String message, Channel channel,
-                              @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag)  {
+                              @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) {
         try {
             var update = objectMapper.readValue(message, UpdateDto.class);
             updateHandler.handle(update);
             channel.basicAck(deliveryTag, false);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("RabbitMQ message processor failed. Could not process update {}", e.getMessage());
             channel.basicReject(deliveryTag, false);
         }
