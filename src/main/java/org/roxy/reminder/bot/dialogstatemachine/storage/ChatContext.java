@@ -4,18 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 import org.roxy.reminder.bot.dialogstatemachine.enums.DialogStatus;
 
-
+@Getter
 public class ChatContext {
 
-    @Getter
     @Setter
     private DialogStatus status = DialogStatus.NEW;
-    @Getter
+
     private String city;
-    @Getter
+
     @Setter
     private String street;
-    @Getter
+
     @Setter
     private Long lastBotMessageId;
 
