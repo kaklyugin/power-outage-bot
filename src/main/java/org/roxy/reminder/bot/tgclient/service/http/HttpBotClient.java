@@ -31,7 +31,6 @@ public class HttpBotClient implements BotClient {
     private static final String SEND_MESSAGE_ENDPOINT = "/sendMessage";
     private static final String GET_UPDATES_MESSAGE_ENDPOINT = "/getUpdates";
     private static final String ANSWER_CALLBACK_QUERY = "/answerCallbackQuery";
-    private static final String LONG_POLLING_TIMEOUT_SECONDS = "0";
 
     private final String botBaseUrl;
     private final HttpClient client;
