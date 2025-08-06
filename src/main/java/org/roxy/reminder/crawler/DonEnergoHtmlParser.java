@@ -15,9 +15,9 @@ import java.util.List;
 @Component
 public class DonEnergoHtmlParser {
 
-    private final ZoneId zoneId = ZoneId.of("Europe/Moscow");
+    private static final ZoneId zoneId = ZoneId.of("Europe/Moscow");
 
-    public List<PowerOutageItem> parsePage(String html) {
+    public static List<PowerOutageItem> parsePage(String html) {
         System.out.println("started parsing " + Thread.currentThread().getName());
         List<PowerOutageItem> items = new ArrayList<>();
         Document doc = Jsoup.parse(html);
@@ -36,6 +36,10 @@ public class DonEnergoHtmlParser {
             ));
         });
         return items;
+    }
+
+    private static List<String> getStreets (String items) {
+        return List.of(items.split(";"));
     }
 
 }

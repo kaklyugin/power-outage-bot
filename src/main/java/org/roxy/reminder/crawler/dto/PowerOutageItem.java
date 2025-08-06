@@ -12,11 +12,12 @@ public class PowerOutageItem {
     private final int id;
     private final String location;
     private final String address;
-    private final ZonedDateTime startDateTime;
-    private final ZonedDateTime endDateTime;
+    private final ZonedDateTime dateTimeOff;
+    private final ZonedDateTime dateTimeOn;
     private final String powerOutageReason;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yy");
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH=mm");
+
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yy");
+    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH=mm");
 
     public PowerOutageItem(String id,
                            String location,
@@ -26,12 +27,13 @@ public class PowerOutageItem {
                            String startTime,
                            String endTime,
                            String powerOutageReason,
-                           ZoneId zoneId) {
+                           ZoneId zoneId
+    ) {
         this.id = Integer.parseInt(id);
         this.location = location;
         this.address = address;
-        this.startDateTime = convertDateTime(startDate, startTime, zoneId);
-        this.endDateTime = convertDateTime(endDate, endTime, zoneId);
+        this.dateTimeOff = convertDateTime(startDate, startTime, zoneId);
+        this.dateTimeOn = convertDateTime(endDate, endTime, zoneId);
         this.powerOutageReason = powerOutageReason;
     }
 

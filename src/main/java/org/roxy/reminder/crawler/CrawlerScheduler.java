@@ -34,12 +34,10 @@ public class CrawlerScheduler {
 
     @Scheduled(cron = "0/5 * * * * ?")
     private void crawl() throws ExecutionException, InterruptedException {
-        CompletableFuture<String> future1 =
-                httpClient.getPageContentAsync(URI.create(powerOutageUrls[0]));
-        String result = future1.get();
+        CompletableFuture<List<PowerOutageItem>> future1 =
+                httpClient.getPageContentAsync(URI.create(powerOutageUrls[0]))
+                        .thenApplyAsync(DonEnergoHtmlParser::parsePage);
+        List<PowerOutageItem> result = future1.get();
         log.info("Crawling " + result);
-        List<PowerOutageItem> parsedItems = htmlParser.parsePage(result);
-        String joinedResult = parsedItems.stream().map(PowerOutageItem::toString).collect(Collectors.joining(";"));
-        joinedResult.hashCode();
     }
 }
