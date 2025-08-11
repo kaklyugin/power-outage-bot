@@ -35,7 +35,8 @@ public class PowerOutageMessageConsumer {
         try {
             log.info("Received PowerOutageMessage: {}", message);
             var powerOutageInfo = objectMapper.readValue(message, PowerOutageDto.class);
-            repository.save(mapper.mapDtoToEntity(powerOutageInfo));
+            // FIXME
+            // repository.save(mapper.mapDtoToEntity(powerOutageInfo));
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
             log.error("RabbitMQ message processor failed. Could not process update {}", e.getMessage());
