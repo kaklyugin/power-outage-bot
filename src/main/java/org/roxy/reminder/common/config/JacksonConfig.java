@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.jsonmapper;
+package org.roxy.reminder.common.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;

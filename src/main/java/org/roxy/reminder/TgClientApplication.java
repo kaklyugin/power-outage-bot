@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync
-@EnableJpaAuditing
+//@EnableJpaAuditing
 public class TgClientApplication {
 
     public static void main(String[] args) {

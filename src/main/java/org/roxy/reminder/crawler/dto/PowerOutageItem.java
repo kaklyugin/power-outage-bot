@@ -15,6 +15,7 @@ public class PowerOutageItem {
     private final ZonedDateTime dateTimeOff;
     private final ZonedDateTime dateTimeOn;
     private final String powerOutageReason;
+    private final Integer hashCode;
 
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yy");
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH=mm");
@@ -34,11 +35,17 @@ public class PowerOutageItem {
         this.address = address;
         this.dateTimeOff = convertDateTime(startDate, startTime, zoneId);
         this.dateTimeOn = convertDateTime(endDate, endTime, zoneId);
+        this.hashCode = calculateHashForPowerOutageRecord(location,address,dateTimeOff,dateTimeOn);
         this.powerOutageReason = powerOutageReason;
     }
 
     private ZonedDateTime convertDateTime(String date, String time, ZoneId zoneId) {
         LocalDateTime ldt = LocalDateTime.of(LocalDate.parse(date, dateFormatter), LocalTime.parse(time, timeFormatter));
         return ldt.atZone(zoneId);
+    }
+
+    private int calculateHashForPowerOutageRecord(String location, String address, ZonedDateTime powerOffDateTime,ZonedDateTime powerOnDateTime )
+    {
+        return (location + address + powerOnDateTime +powerOnDateTime).toLowerCase().hashCode();
     }
 }

@@ -18,28 +18,27 @@ public class DonEnergoHtmlParser {
     private static final ZoneId zoneId = ZoneId.of("Europe/Moscow");
 
     public static List<PowerOutageItem> parsePage(String html) {
-        System.out.println("started parsing " + Thread.currentThread().getName());
+        System.out.println("Started parsing " + Thread.currentThread().getName());
         List<PowerOutageItem> items = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements tbodyAll = doc.select("table.table_site1 tr:gt(1)");
         tbodyAll.forEach(row -> {
-            items.add(new PowerOutageItem(
-                    row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(0).text(),
-                    row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(1).text(),
-                    row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(2).text(),
-                    row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(3).text(),
-                    row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(4).text(),
-                    row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(5).text(),
-                    row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(6).text(),
-                    row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(7).text(),
-                    zoneId
-            ));
+            String id = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(0).text().trim();
+            String location = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(1).text().trim();
+            String[] addresses = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(2).text().split(";");
+            String powerOffDate = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(3).text().trim();
+            String powerOnDate = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(4).text().trim();
+            String powerOffTime = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(5).text().trim();
+            String powerOnTime = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(6).text().trim();
+            String reason = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(7).text().trim();
+            for (String address : addresses) {
+                String trimmedAddress = address.trim();
+                items.add(new PowerOutageItem(id, location, trimmedAddress, powerOffDate, powerOnDate, powerOffTime, powerOnTime, reason, zoneId));
+            }
         });
         return items;
     }
-
-    private static List<String> getStreets (String items) {
+    private static List<String> getStreets(String items) {
         return List.of(items.split(";"));
     }
-
 }

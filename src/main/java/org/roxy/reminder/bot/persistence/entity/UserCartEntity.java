@@ -3,6 +3,8 @@ package org.roxy.reminder.bot.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Data
 @Table(name = "user_cart")
@@ -21,6 +23,9 @@ public class UserCartEntity {
 
     @Column(name = "street")
     private String street;
+
+    @OneToMany(mappedBy = "userCart")
+    private List<PowerOutageNotificationEntity> notifications;
 // TODO
 // @Column(name = "last_notified_at")
 // private ZonedDateTime lastNotifiedAt;
