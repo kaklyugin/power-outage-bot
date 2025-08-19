@@ -8,7 +8,6 @@ import org.roxy.reminder.bot.dialogstatemachine.handlers.StreetInputUpdateHandle
 import org.roxy.reminder.bot.dialogstatemachine.handlers.UpdateHandler;
 import org.springframework.stereotype.Component;
 
-
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 

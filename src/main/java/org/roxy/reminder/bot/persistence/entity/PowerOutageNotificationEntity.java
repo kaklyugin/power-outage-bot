@@ -3,7 +3,6 @@ package org.roxy.reminder.bot.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.User;
 
 import java.time.ZonedDateTime;
 

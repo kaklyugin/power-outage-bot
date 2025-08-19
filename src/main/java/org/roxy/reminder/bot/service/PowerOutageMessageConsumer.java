@@ -8,7 +8,6 @@ import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageNotificationRepository;
 import org.roxy.reminder.common.dto.PowerOutageDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
