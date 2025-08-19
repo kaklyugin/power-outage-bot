@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.service;
+package org.roxy.reminder.bot.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;

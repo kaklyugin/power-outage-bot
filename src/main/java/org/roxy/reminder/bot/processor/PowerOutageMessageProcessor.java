@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.service;
+package org.roxy.reminder.bot.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
@@ -14,13 +14,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class PowerOutageMessageConsumer {
+public class PowerOutageMessageProcessor {
 
     private final ObjectMapper objectMapper;
     private final PowerOutageNotificationRepository repository;
     private final PowerOutageMessageMapper mapper;
 
-    public PowerOutageMessageConsumer(ObjectMapper objectMapper, PowerOutageNotificationRepository repository, PowerOutageMessageMapper mapper) {
+    public PowerOutageMessageProcessor(ObjectMapper objectMapper, PowerOutageNotificationRepository repository, PowerOutageMessageMapper mapper) {
         this.objectMapper = objectMapper;
         this.repository = repository;
         this.mapper = mapper;
