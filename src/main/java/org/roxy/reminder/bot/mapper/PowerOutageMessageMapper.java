@@ -14,13 +14,12 @@ import java.time.ZonedDateTime;
 
 @Mapper(componentModel = "spring")
 public interface PowerOutageMessageMapper {
-    @Mapping(target = "reasonMessageHashCode", source = "powerOutageDtoSource.hashCode")
-    @Mapping(target = "notification_text", qualifiedByName = "powerOutageDtoSource.creteNotificationText")
-    @Mapping(target = "userCart", source = "userCartSource")
-    PowerOutageNotificationEntity mapDtoToEntity(PowerOutageDto powerOutageDtoSource, UserCartEntity userCartSource);
+    @Mapping(target = "reasonMessageHashCode", source = "source.hashCode")
+    @Mapping(target = "notificationText", source = "source", qualifiedByName = "createNotificationText")
+    PowerOutageNotificationEntity mapDtoToEntity(PowerOutageDto source);
 
-    @Named("creteNotificationText")
-    default String creteNotificationText(PowerOutageDto source) {
+    @Named("createNotificationText")
+    default String createNotificationText(PowerOutageDto source) {
         return "Отключение света по адресу " +
                 source.getLocation() + " "+
                 source.getAddress() + " " +

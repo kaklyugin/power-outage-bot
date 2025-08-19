@@ -2,11 +2,13 @@ package org.roxy.reminder.bot.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "user_cart")
 public class UserCartEntity {
 

@@ -5,6 +5,7 @@ import lombok.ToString;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 @Getter
 @ToString
@@ -18,7 +19,7 @@ public class PowerOutageItem {
     private final Integer hashCode;
 
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yy");
-    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH=mm");
+    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH['=']['-']mm");
 
     public PowerOutageItem(String id,
                            String location,
