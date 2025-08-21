@@ -14,15 +14,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class PowerOutageMessageProcessor {
+public class PowerOutageMessageConsumer {
 
     private final ObjectMapper objectMapper;
-    private final PowerOutageNotificationRepository repository;
+    private final PowerOutageNotificationRepository notificationRepository;
     private final PowerOutageMessageMapper mapper;
 
-    public PowerOutageMessageProcessor(ObjectMapper objectMapper, PowerOutageNotificationRepository repository, PowerOutageMessageMapper mapper) {
+    public PowerOutageMessageConsumer(ObjectMapper objectMapper, PowerOutageNotificationRepository notificationRepository, PowerOutageMessageMapper mapper) {
         this.objectMapper = objectMapper;
-        this.repository = repository;
+        this.notificationRepository = notificationRepository;
         this.mapper = mapper;
     }
 
@@ -35,7 +35,7 @@ public class PowerOutageMessageProcessor {
             log.info("Received PowerOutageMessage: {}", message);
             var powerOutageInfo = objectMapper.readValue(message, PowerOutageDto.class);
             // FIXME
-            // repository.save(mapper.mapDtoToEntity(powerOutageInfo));
+             notificationRepository.save(mapper.mapDtoToEntity(powerOutageInfo));
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
             log.error("RabbitMQ message processor failed. Could not process update {}", e.getMessage());

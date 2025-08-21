@@ -35,9 +35,7 @@ public class StreetInputUpdateHandler implements UpdateHandler {
                 .build();
 
         return HandlerResponse.builder()
-                .event(Event.REPLY_RECEIVED)
                 .message(registrationCompleted)
                 .build();
-
     }
 }

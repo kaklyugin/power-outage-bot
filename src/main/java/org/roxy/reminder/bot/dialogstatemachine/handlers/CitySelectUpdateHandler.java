@@ -21,7 +21,6 @@ public class CitySelectUpdateHandler implements UpdateHandler {
                 .text("Введите улицу")
                 .build();
         return HandlerResponse.builder()
-                .event(Event.REPLY_RECEIVED)
                 .message(cityInputMessage)
                 .build();
     }
