@@ -15,57 +15,52 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StateMachineGraph {
 
     private final ConcurrentHashMap<State, StateDescriptor> states = new ConcurrentHashMap<>();
-    private final StartMessageHandler startMessageHandler;
-    private final CitySelectUpdateHandler citySelectUpdateHandler;
-    private final StreetInputUpdateHandler streetInputUpdateHandler;
 
+    public StateMachineGraph(StartMessageHandler startMessageHandler,
+                             CitySelectUpdateHandler citySelectUpdateHandler,
+                             StreetInputUpdateHandler streetInputUpdateHandler) {
 
-    public StateMachineGraph(StartMessageHandler startMessageHandler, CitySelectUpdateHandler citySelectUpdateHandler, StreetInputUpdateHandler streetInputUpdateHandler) {
-        this.startMessageHandler = startMessageHandler;
-        this.citySelectUpdateHandler = citySelectUpdateHandler;
-        this.streetInputUpdateHandler = streetInputUpdateHandler;
-
-        StateDescriptor newState =
+        StateDescriptor citySelect =
                 StateDescriptor.builder()
-                        .status(State.NEW)
-                        .handlers(
-                                new ConcurrentHashMap<>() {{
-                                    put(Event.START_COMMAND_RECEIVED, startMessageHandler);
-                                }})
-                        .transitions(new ConcurrentHashMap<>() {{
-                            put(Event.START_COMMAND_RECEIVED, State.WAITING_FOR_CITY_INPUT);
-                        }})
-                        .build();
-        StateDescriptor waitingForCityInputState =
-                StateDescriptor.builder()
-                        .status(State.WAITING_FOR_CITY_INPUT)
+                        .status(State.CITY_SELECT)
                         .handlers(
                                 new ConcurrentHashMap<>() {{
                                     put(Event.REPLY_RECEIVED, citySelectUpdateHandler);
                                     put(Event.START_COMMAND_RECEIVED, startMessageHandler);
                                 }})
                         .transitions(new ConcurrentHashMap<>() {{
-                            put(Event.REPLY_RECEIVED, State.WAITING_FOR_STREET_INPUT);
-                            put(Event.START_COMMAND_RECEIVED, State.NEW);
+                            put(Event.REPLY_RECEIVED, State.STREET_INPUT);
+                            put(Event.START_COMMAND_RECEIVED, State.CITY_SELECT);
                         }})
                         .build();
-        StateDescriptor waitingForStreetInputState =
+        StateDescriptor streetInput =
                 StateDescriptor.builder()
-                        .status(State.WAITING_FOR_STREET_INPUT)
+                        .status(State.STREET_INPUT)
                         .handlers(
                                 new ConcurrentHashMap<>() {{
                                     put(Event.REPLY_RECEIVED, streetInputUpdateHandler);
                                     put(Event.START_COMMAND_RECEIVED, startMessageHandler);
                                 }})
                         .transitions(new ConcurrentHashMap<>() {{
-                            put(Event.REPLY_RECEIVED, State.DONE);
-                            put(Event.START_COMMAND_RECEIVED, State.NEW);
+                            put(Event.REPLY_RECEIVED, State.COMPLETED);
+                            put(Event.START_COMMAND_RECEIVED, State.CITY_SELECT);
+                        }})
+                        .build();
+        StateDescriptor completed =
+                StateDescriptor.builder()
+                        .status(State.COMPLETED)
+                        .handlers(
+                                new ConcurrentHashMap<>() {{
+                                    put(Event.START_COMMAND_RECEIVED, startMessageHandler);
+                                }})
+                        .transitions(new ConcurrentHashMap<>() {{
+                            put(Event.START_COMMAND_RECEIVED, State.CITY_SELECT);
                         }})
                         .build();
 
-        states.put(State.NEW, newState);
-        states.put(State.WAITING_FOR_CITY_INPUT, waitingForCityInputState);
-        states.put(State.WAITING_FOR_STREET_INPUT, waitingForStreetInputState);
+        states.put(State.CITY_SELECT, citySelect);
+        states.put(State.STREET_INPUT, streetInput);
+        states.put(State.COMPLETED, completed);
     }
 
     public State getNextState(State state, Event currentEvent) {

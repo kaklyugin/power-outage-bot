@@ -37,8 +37,9 @@ public class TgUpdateHandler {
     public void handle(UpdateDto update) {
         try {
             StateMachineEntity currentState = stateMachineRepository.findById(update.getChatId())
-                    .orElse(new StateMachineEntity(update.getChatId()));
-            DialogContextEntity dialogContext = dialogContextRepository.findById(update.getChatId()).orElse(new DialogContextEntity(update.getChatId()));
+                    .orElse(new StateMachineEntity(update.getChatId(), State.CITY_SELECT));
+            DialogContextEntity dialogContext = dialogContextRepository.findById(update.getChatId())
+                    .orElse(new DialogContextEntity(update.getChatId()));
             Event event = getEventFromUpdate(update);
             UpdateHandler updateHandler = stateMachineGraph.getHandler(currentState.getState(), event);
             HandlerResponse handlerResponse = updateHandler.handleUpdate(update, dialogContext);

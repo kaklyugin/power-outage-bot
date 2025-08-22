@@ -15,6 +15,7 @@ public class CitySelectUpdateHandler implements UpdateHandler {
     @Override
     public HandlerResponse handleUpdate(UpdateDto update, DialogContextEntity context) {
         log.info("Handling update = {}", update);
+        context.clear();
         context.setCity(update.getUserResponse());
         MessageDto cityInputMessage =  MessageDto.builder()
                 .chatId(String.valueOf(update.getChatId()))

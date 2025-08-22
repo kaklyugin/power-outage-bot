@@ -17,8 +17,8 @@ public class StateMachineEntity {
     @Enumerated(EnumType.STRING)
     private State state;
 
-    public StateMachineEntity(Long chatId) {
+    public StateMachineEntity(Long chatId, State state) {
         this.chatId = chatId;
-        this.state = State.NEW;
+        this.state = state;
     }
 }

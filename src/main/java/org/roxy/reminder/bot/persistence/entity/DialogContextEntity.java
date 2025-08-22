@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Entity
@@ -25,9 +26,17 @@ public class DialogContextEntity {
 
     @Column(columnDefinition = "jsonb", name = "last_update_raw")
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, Object> lastUpdateRaw;
+    private Map<String, Object> lastUpdateRaw = new HashMap<>();
 
     public DialogContextEntity(Long chatId) {
         this.chatId = chatId;
+    }
+
+    public void clear()
+    {
+        lastUpdateRaw.clear();
+        setLastBotMessageId(null);
+        setCity(null);
+        setStreet(null);
     }
 }
