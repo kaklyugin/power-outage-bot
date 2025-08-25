@@ -34,6 +34,7 @@ public class StartMessageHandler implements UpdateHandler {
         return
                 HandlerResponse.builder()
                         .message(citySelectMessage)
+                        .event(Event.REPLY_RECEIVED)
                         .build();
     }
 }

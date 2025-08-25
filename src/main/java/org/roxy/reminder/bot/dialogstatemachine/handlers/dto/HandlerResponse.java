@@ -9,4 +9,5 @@ import org.roxy.reminder.bot.tgclient.dto.message.request.MessageDto;
 @Builder
 public class HandlerResponse {
     private MessageDto message;
+    private Event event;
 }

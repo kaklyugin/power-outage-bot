@@ -6,36 +6,65 @@ import org.roxy.reminder.bot.dialogstatemachine.handlers.dto.HandlerResponse;
 import org.roxy.reminder.bot.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.entity.DialogContextEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
+import org.roxy.reminder.bot.persistence.repository.StreetRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.tgclient.dto.message.request.MessageDto;
+import org.roxy.reminder.bot.tgclient.dto.message.request.keyboard.InlineKeyboardDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Slf4j
 @Component
 public class StreetInputUpdateHandler implements UpdateHandler {
 
     @Autowired
-    private UserCartRepository userCartRepository;
+    private StreetRepository streetRepository;
 
     @Override
-    public HandlerResponse handleUpdate(UpdateDto update, DialogContextEntity context) {
+    public HandlerResponse handleUpdate(UpdateDto update, DialogContextEntity context)  {
         log.info("Handling message = {}", update);
-        context.setStreet(update.getUserResponse());
+        List<String> streets = streetRepository.findFuzzyByName(update.getUserResponse());
+        if (streets.isEmpty()) {
+            var response =
+                    MessageDto.builder()
+                            .chatId(String.valueOf(update.getChatId()))
+                            .text("Не удалось найти улицу. Может быть Вы ошиблись или у нас устаревший справочник :(")
+                            .build();
+            return HandlerResponse.builder()
+                    .message(response)
+                    .event(Event.RETRY)
+                    .build();
+        }
+        if (streets.size() > 10) {
+            var response =
+                    MessageDto.builder()
+                            .chatId(String.valueOf(update.getChatId()))
+                            .text(String.format("Мы нашли более 10 улиц с текстом %s. Пожалуйста, уточните имя улицы", update.getUserResponse()))
+                            .build();
+            return HandlerResponse.builder()
+                    .message(response)
+                    .event(Event.RETRY)
+                    .build();
+        }
 
-        UserCartEntity userCart = new UserCartEntity();
-        userCart.setChatId(context.getChatId());
-        userCart.setCity(context.getCity());
-        userCart.setStreet(context.getStreet());
-        userCartRepository.save(userCart);
+        InlineKeyboardDto.KeyboardBuilder keyboardOfStreetsBuilder = new InlineKeyboardDto.KeyboardBuilder();
+        for (String street : streets) {
+            keyboardOfStreetsBuilder.addRow().addButton(street, street);
+        }
+        InlineKeyboardDto keyboardOfStreets = keyboardOfStreetsBuilder.build();
 
-        MessageDto registrationCompleted = MessageDto.builder()
-                .chatId(String.valueOf(update.getChatId()))
-                .text("Всё получилось. Мы отправим уведомление, если на вашей улице будет запланировано отключение света.")
-                .build();
+        var response =
+                MessageDto.builder()
+                        .chatId(String.valueOf(update.getChatId()))
+                        .text("Выберите улицу")
+                        .replyMarkup(keyboardOfStreets)
+                        .build();
 
         return HandlerResponse.builder()
-                .message(registrationCompleted)
+                .message(response)
+                .event(Event.REPLY_RECEIVED)
                 .build();
     }
 }

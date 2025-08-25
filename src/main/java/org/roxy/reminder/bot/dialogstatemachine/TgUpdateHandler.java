@@ -15,7 +15,6 @@ import org.roxy.reminder.bot.tgclient.dto.updates.UpdateType;
 import org.roxy.reminder.bot.tgclient.service.http.BotClient;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -26,7 +25,11 @@ public class TgUpdateHandler {
     private final DialogContextRepository dialogContextRepository;
     private final BotClient botClient;
 
-    public TgUpdateHandler(StateMachineRepository stateMachineRepository, StateMachineGraph stateMachineGraph, BotClient botClient, DialogContextRepository dialogContextRepository) {
+    public TgUpdateHandler(StateMachineRepository stateMachineRepository,
+                           StateMachineGraph stateMachineGraph,
+                           BotClient botClient,
+                           DialogContextRepository dialogContextRepository)
+    {
         this.stateMachineRepository = stateMachineRepository;
         this.stateMachineGraph = stateMachineGraph;
         this.dialogContextRepository = dialogContextRepository;
@@ -36,12 +39,35 @@ public class TgUpdateHandler {
 
     public void handle(UpdateDto update) {
         try {
-            StateMachineEntity currentState = stateMachineRepository.findById(update.getChatId())
-                    .orElse(new StateMachineEntity(update.getChatId(), State.CITY_SELECT));
-            DialogContextEntity dialogContext = dialogContextRepository.findById(update.getChatId())
-                    .orElse(new DialogContextEntity(update.getChatId()));
-            Event event = getEventFromUpdate(update);
-            UpdateHandler updateHandler = stateMachineGraph.getHandler(currentState.getState(), event);
+            if (update.getUpdateType().equals(UpdateType.COMMAND)) {
+                handleCommand(update);
+            } else {
+                handleUserInput(update);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    private void handleCommand(UpdateDto update) {
+        {
+            if (update.getUserResponse().equals("/start")) {
+                stateMachineRepository.deleteById(update.getChatId());
+                dialogContextRepository.deleteById(update.getChatId());
+                handleUserInput(update);
+            }
+        }
+    }
+
+    private void handleUserInput(UpdateDto update) {
+        StateMachineEntity currentState = stateMachineRepository
+                .findById(update.getChatId())
+                .orElse(new StateMachineEntity(update.getChatId(), State.NEW));
+        DialogContextEntity dialogContext = dialogContextRepository
+                .findById(update.getChatId())
+                .orElse(new DialogContextEntity(update.getChatId()));
+        UpdateHandler updateHandler = stateMachineGraph.getHandler(currentState.getState());
+
             HandlerResponse handlerResponse = updateHandler.handleUpdate(update, dialogContext);
             if (handlerResponse.getMessage() != null) {
                 // TODO Подумать над retry логикой отправки сообщений
@@ -51,25 +77,9 @@ public class TgUpdateHandler {
                     dialogContextRepository.save(dialogContext);
                 } else throw new RuntimeException("Could not send message " + handlerResponse.getMessage());
             }
-            State newState = stateMachineGraph.getNextState(currentState.getState(), event);
+            // TODO Получать event из обработчика
+            State newState = stateMachineGraph.getNextState(currentState.getState(), Event.REPLY_RECEIVED);
             currentState.setState(newState);
             stateMachineRepository.save(currentState);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
     }
-
-    private Event getEventFromUpdate(UpdateDto update) {
-        if (update.getUpdateType().equals(UpdateType.COMMAND)) {
-            if (update.getUserResponse().equals("/start")) {
-                return Event.START_COMMAND_RECEIVED;
-            }
-        } else if (update.getUpdateType().equals(UpdateType.CALLBACK) ||
-                update.getUpdateType().equals(UpdateType.TEXT)
-        ) {
-            return Event.REPLY_RECEIVED;
-        }
-        return null;
-    }
-
 }

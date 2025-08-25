@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 @Builder
 public class StateDescriptor {
-    private State status;
-    public ConcurrentHashMap<Event, UpdateHandler> handlers;
+    private State state;
+    public UpdateHandler handler;
     public ConcurrentHashMap<Event, State> transitions;
 }
