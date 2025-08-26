@@ -25,12 +25,15 @@ public class CardFillOutHandler implements UpdateHandler {
     private final UserCartRepository userCartRepository;
     private final HttpBotClient botClient;
     private final ConcurrentHashMap<State, StateDescriptor> states = new ConcurrentHashMap<>();
-    private  StateMachineEntity currentState;
+    private StateMachineEntity currentState;
 
     public CardFillOutHandler(StartMessageActionHandlerHandler startMessageActionHandle,
                               CitySelectActionHandlerHandler citySelectActionHandle,
                               StreetInputActionHandlerHandler streetInputActionHandle,
-                              StreetSelectActionHandlerHandler streetSelectActionHandle, StateMachineRepository stateMachineRepository, UserCartRepository userCartRepository, HttpBotClient botClient) {
+                              StreetSelectActionHandlerHandler streetSelectActionHandle,
+                              StateMachineRepository stateMachineRepository,
+                              UserCartRepository userCartRepository,
+                              HttpBotClient botClient) {
         this.stateMachineRepository = stateMachineRepository;
         this.userCartRepository = userCartRepository;
         this.botClient = botClient;
@@ -63,9 +66,9 @@ public class CardFillOutHandler implements UpdateHandler {
                         }})
                         .build());
     }
+
     @Override
     public void handle(UpdateDto update) {
-        this.currentState = getCurrentState(update);
         try {
             if (update.getUpdateType().equals(UpdateType.COMMAND)) {
                 handleCommand(update);
@@ -79,8 +82,14 @@ public class CardFillOutHandler implements UpdateHandler {
 
     @Override
     public boolean canHandle(UpdateDto update) {
-        if (currentState.getState().equals(State.COMPLETED)) {
-            return false;
+        if (update.getUpdateType().equals(UpdateType.COMMAND)) {
+            return true;
+        }
+        else
+        {
+            if (getCurrentState(update).getState().equals(State.COMPLETED)) {
+                return false;
+            }
         }
         return true;
     }
@@ -96,6 +105,9 @@ public class CardFillOutHandler implements UpdateHandler {
     }
 
     private void handleUserAction(UpdateDto update) {
+        if (this.currentState == null) {
+            this.currentState = getCurrentState(update);
+        }
         UserCartEntity userCart = getUserCart(update);
         ActionHandler actionHandler = getActionHandler(currentState.getState());
         ActionResponseDto actionResponseDto = actionHandler.handleAction(update, userCart);
@@ -106,13 +118,12 @@ public class CardFillOutHandler implements UpdateHandler {
                 stateMachineRepository.save(currentState);
             } else throw new RuntimeException("Could not send message " + actionResponseDto.getMessage());
         }
-         currentState.setState(getNextState(currentState.getState(), Event.REPLY_RECEIVED));
-         stateMachineRepository.save(currentState);
+        currentState.setState(getNextState(currentState.getState(), Event.REPLY_RECEIVED));
+        stateMachineRepository.save(currentState);
     }
-
+    // TODO Вопрос : может лучше сразу присвоить this.currentState ?
     private StateMachineEntity getCurrentState(UpdateDto update) {
-        return stateMachineRepository
-                .findById(update.getChatId())
+        return stateMachineRepository.findById(update.getChatId())
                 .orElse(new StateMachineEntity(update.getChatId(), State.NEW));
     }
 
