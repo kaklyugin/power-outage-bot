@@ -1,7 +1,6 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers;
+package org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard.action;
 
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.dialogstatemachine.handlers.dto.HandlerResponse;
 import org.roxy.reminder.bot.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.entity.DialogContextEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
@@ -12,20 +11,15 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class StreetSelectHandler implements UpdateHandler {
+public class StreetSelectActionHandlerHandler implements ActionHandler {
 
     @Autowired
     private UserCartRepository userCartRepository;
 
     @Override
-    public HandlerResponse handleUpdate(UpdateDto update, DialogContextEntity context) {
+    public ActionResponseDto handleAction(UpdateDto update, UserCartEntity userCart) {
         log.info("Handling message = {}", update);
-        context.setStreet(update.getUserResponse());
-
-        UserCartEntity userCart = new UserCartEntity();
-        userCart.setChatId(context.getChatId());
-        userCart.setCity(context.getCity());
-        userCart.setStreet(context.getStreet());
+        userCart.setStreet(update.getUserResponse());
         userCartRepository.save(userCart);
 
         MessageDto registrationCompleted = MessageDto.builder()
@@ -33,7 +27,7 @@ public class StreetSelectHandler implements UpdateHandler {
                 .text("Всё получилось. Мы отправим уведомление, если на вашей улице будет запланировано отключение света.")
                 .build();
 
-        return HandlerResponse.builder()
+        return ActionResponseDto.builder()
                 .message(registrationCompleted)
                 .build();
     }

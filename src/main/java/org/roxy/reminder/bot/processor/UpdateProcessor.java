@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.dialogstatemachine.TgUpdateHandler;
+import org.roxy.reminder.bot.dialogstatemachine.UpdateHandlerService;
 import org.roxy.reminder.bot.dto.UpdateDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 public class UpdateProcessor {
 
     private final ObjectMapper objectMapper;
-    private final TgUpdateHandler updateHandler;
+    private final UpdateHandlerService updateHandler;
 
-    public UpdateProcessor(ObjectMapper objectMapper, TgUpdateHandler updateHandler) {
+    public UpdateProcessor(ObjectMapper objectMapper, UpdateHandlerService updateHandler) {
         this.objectMapper = objectMapper;
         this.updateHandler = updateHandler;
     }

@@ -26,9 +26,14 @@ public class UserCartEntity {
     @Column(name = "street")
     private String street;
 
-    @OneToMany(mappedBy = "userCart")
+    @OneToMany(mappedBy = "userCart",cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
     private List<PowerOutageNotificationEntity> notifications;
-// TODO
+
+    public UserCartEntity(Long chatId) {
+        this.chatId = chatId;
+    }
+
+    // TODO
 // @Column(name = "last_notified_at")
 // private ZonedDateTime lastNotifiedAt;
 }
