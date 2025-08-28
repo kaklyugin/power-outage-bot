@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.tgclient.service.http;
+package org.roxy.reminder.bot.service.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;

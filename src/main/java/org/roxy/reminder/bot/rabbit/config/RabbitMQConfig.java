@@ -21,6 +21,16 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.updates.routing.key}")
     private String updatesRoutingKey;
 
+
+    @Value("${rabbitmq.crawler.exchange.name}")
+    private String crawlerExchangeName;
+
+    @Value("${rabbitmq.crawler.power.outage.queue.name}")
+    private String powerOutageQueueName;
+
+    @Value("${rabbitmq.crawler.power.outage.routing.key}")
+    private String powerOutageRoutingKey;
+
     @Bean
     public DirectExchange updatesMessageExchange() {
         return new DirectExchange(updatesExchangeName);
@@ -36,6 +46,23 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(updatesMessageQueue())
                 .to(updatesMessageExchange())
                 .with(updatesRoutingKey);
+    }
+
+    @Bean
+    public DirectExchange crawlerupdatesMessageExchange() {
+        return new DirectExchange(crawlerExchangeName);
+    }
+
+    @Bean
+    public Queue powerOutageMessageQueue() {
+        return new Queue(powerOutageQueueName);
+    }
+
+    @Bean
+    public Binding powerOutageMessageBinding() {
+        return BindingBuilder.bind(powerOutageMessageQueue())
+                .to(crawlerupdatesMessageExchange())
+                .with(powerOutageRoutingKey);
     }
 
     @Bean
