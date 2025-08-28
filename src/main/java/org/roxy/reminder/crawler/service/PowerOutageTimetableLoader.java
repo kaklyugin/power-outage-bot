@@ -52,7 +52,7 @@ public class PowerOutageTimetableLoader {
                         anyMatch(p -> p.getHashCode().equals(item.getHashCode()));
                 if (!newItemAlreadyExists) {
                     PowerOutageEntity entity = new PowerOutageEntity();
-                    entity.setLocation(item.getLocation());
+                    entity.setCity(item.getCity());
                     entity.setAddress(item.getAddress());
                     entity.setDateTimeOff(item.getDateTimeOff());
                     entity.setDateTimeOn(item.getDateTimeOn());

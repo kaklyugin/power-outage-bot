@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard;
+package org.roxy.reminder.bot.dialogstatemachine.handlers;
 
 import org.roxy.reminder.bot.dto.UpdateDto;
 

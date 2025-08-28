@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard.action;
+package org.roxy.reminder.bot.dialogstatemachine.handlers.cartfillout.action;
 
 import lombok.Builder;
 import lombok.Data;

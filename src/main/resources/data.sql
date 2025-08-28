@@ -1,3 +1,6 @@
+insert into user_cart (chat_id, city, street, normalized_street)
+values (1053522116, 'Новочеркасск', 'Будённовская','буденновская');
+
 insert into streets (city, type, name)
 values ('Новочеркасск', 'улица', '8 Марта'),
        ('Новочеркасск', 'улица', '26 Бакинских Комиссаров'),

@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.tgclient.service.polling;
+package org.roxy.reminder.bot.service.polling;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,10 +7,10 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.dto.UpdateDto;
 import org.roxy.reminder.bot.mapper.UpdateResponseMapper;
-import org.roxy.reminder.bot.rabbit.producer.RabbitMQUpdateProducer;
+import org.roxy.reminder.bot.service.UpdateMessageProducer;
 import org.roxy.reminder.bot.tgclient.dto.updates.UpdateResponseDto;
 import org.roxy.reminder.bot.tgclient.dto.updates.UpdatesResponseDto;
-import org.roxy.reminder.bot.tgclient.service.http.HttpBotClient;
+import org.roxy.reminder.bot.service.http.HttpBotClient;
 import org.roxy.reminder.bot.tgclient.storage.ChatStore;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class UpdatesPollingService {
 
     private final HttpBotClient httpBotClient;
     private final ChatStore chatStore;
-    private final RabbitMQUpdateProducer rabbitMQUpdateProducer;
+    private final UpdateMessageProducer updateMessageProducer;
     private final ObjectMapper objectMapper;
     private final UpdateResponseMapper mapper;
     private final ExecutorService executor;
@@ -32,12 +32,12 @@ public class UpdatesPollingService {
 
     public UpdatesPollingService(HttpBotClient httpBotClient,
                                  ChatStore chatStore,
-                                 RabbitMQUpdateProducer rabbitMQUpdateProducer,
+                                 UpdateMessageProducer updateMessageProducer,
                                  ObjectMapper objectMapper,
                                  UpdateResponseMapper mapper) {
         this.httpBotClient = httpBotClient;
         this.chatStore = chatStore;
-        this.rabbitMQUpdateProducer = rabbitMQUpdateProducer;
+        this.updateMessageProducer = updateMessageProducer;
         this.objectMapper = objectMapper;
         this.mapper = mapper;
         executor = Executors.newFixedThreadPool(MAX_THREAD_COUNT);
@@ -85,7 +85,7 @@ public class UpdatesPollingService {
 
     public void publishUpdateForProcessing(UpdateDto update) {
         try {
-            rabbitMQUpdateProducer.sendMessage(objectMapper.writeValueAsString(update));
+            updateMessageProducer.sendMessage(objectMapper.writeValueAsString(update));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

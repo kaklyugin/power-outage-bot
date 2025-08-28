@@ -1,29 +1,30 @@
-package org.roxy.reminder.bot.processor;
+package org.roxy.reminder.bot.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
-import org.roxy.reminder.bot.persistence.repository.PowerOutageNotificationRepository;
+import org.roxy.reminder.bot.service.notification.NotificationService;
 import org.roxy.reminder.common.dto.PowerOutageDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class PowerOutageMessageConsumer {
 
     private final ObjectMapper objectMapper;
-    private final PowerOutageNotificationRepository notificationRepository;
-    private final PowerOutageMessageMapper mapper;
+    private final NotificationService notificationService;
 
-    public PowerOutageMessageConsumer(ObjectMapper objectMapper, PowerOutageNotificationRepository notificationRepository, PowerOutageMessageMapper mapper) {
+    public PowerOutageMessageConsumer(ObjectMapper objectMapper,
+                                      NotificationService notificationService
+                                     ) {
         this.objectMapper = objectMapper;
-        this.notificationRepository = notificationRepository;
-        this.mapper = mapper;
+        this.notificationService = notificationService;
     }
 
     @SneakyThrows
@@ -34,8 +35,8 @@ public class PowerOutageMessageConsumer {
         try {
             log.info("Received PowerOutageMessage: {}", message);
             var powerOutageInfo = objectMapper.readValue(message, PowerOutageDto.class);
-            // FIXME
-             notificationRepository.save(mapper.mapDtoToEntity(powerOutageInfo));
+            //FIXME переделать на список после батчей
+            notificationService.createNotifications(List.of(powerOutageInfo));
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
             log.error("RabbitMQ message processor failed. Could not process update {}", e.getMessage());

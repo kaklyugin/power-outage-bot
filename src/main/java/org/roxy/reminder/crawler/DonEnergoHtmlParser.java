@@ -24,7 +24,7 @@ public class DonEnergoHtmlParser {
         Elements tbodyAll = doc.select("table.table_site1 tr:gt(1)");
         tbodyAll.forEach(row -> {
             String id = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(0).text().trim();
-            String location = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(1).text().trim();
+            String city = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(1).text().trim();
             String[] addresses = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(2).text().split(";");
             String powerOffDate = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(3).text().trim();
             String powerOnDate = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(4).text().trim();
@@ -33,7 +33,7 @@ public class DonEnergoHtmlParser {
             String reason = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(7).text().trim();
             for (String address : addresses) {
                 String trimmedAddress = address.trim();
-                items.add(new PowerOutageItem(id, location, trimmedAddress, powerOffDate, powerOnDate, powerOffTime, powerOnTime, reason, zoneId));
+                items.add(new PowerOutageItem(id, city, trimmedAddress, powerOffDate, powerOnDate, powerOffTime, powerOnTime, reason, zoneId));
             }
         });
         return items;

@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 @ToString
 public class PowerOutageItem {
     private final int id;
-    private final String location;
+    private final String city;
     private final String address;
     private final ZonedDateTime dateTimeOff;
     private final ZonedDateTime dateTimeOn;
@@ -21,7 +21,7 @@ public class PowerOutageItem {
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH['=']['-']mm");
 
     public PowerOutageItem(String id,
-                           String location,
+                           String city,
                            String address,
                            String startDate,
                            String endDate,
@@ -31,11 +31,11 @@ public class PowerOutageItem {
                            ZoneId zoneId
     ) {
         this.id = Integer.parseInt(id);
-        this.location = location;
+        this.city = city;
         this.address = address;
         this.dateTimeOff = convertDateTime(startDate, startTime, zoneId);
         this.dateTimeOn = convertDateTime(endDate, endTime, zoneId);
-        this.hashCode = calculateHashForPowerOutageRecord(location,address,dateTimeOff,dateTimeOn);
+        this.hashCode = calculateHashForPowerOutageRecord(city,address,dateTimeOff,dateTimeOn);
         this.powerOutageReason = powerOutageReason;
     }
 
@@ -44,8 +44,8 @@ public class PowerOutageItem {
         return ldt.atZone(zoneId);
     }
 
-    private int calculateHashForPowerOutageRecord(String location, String address, ZonedDateTime powerOffDateTime,ZonedDateTime powerOnDateTime )
+    private int calculateHashForPowerOutageRecord(String city, String address, ZonedDateTime powerOffDateTime,ZonedDateTime powerOnDateTime )
     {
-        return (location + address + powerOnDateTime +powerOnDateTime).toLowerCase().hashCode();
+        return (city + address + powerOnDateTime + powerOffDateTime).toLowerCase().hashCode();
     }
 }

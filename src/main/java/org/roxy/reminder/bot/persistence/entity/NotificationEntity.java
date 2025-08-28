@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 @Data
 @NoArgsConstructor
 @Table(name = "power_outage_notifications")
-public class PowerOutageNotificationEntity {
+public class NotificationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +30,8 @@ public class PowerOutageNotificationEntity {
     @Column(name = "notified_at")
     private ZonedDateTime notifiedAt;
 
-    @Column(name = "reason_message_hash_code")
-    private Integer reasonMessageHashCode;
+    @Column(name = "outage_item_hash")
+    private Integer powerOutageHash;
 // TODO
 // @Column(name = "last_notified_at")
 // private ZonedDateTime lastNotifiedAt;

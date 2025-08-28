@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.rabbit.producer;
+package org.roxy.reminder.bot.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RabbitMQUpdateProducer {
+public class UpdateMessageProducer {
 
     private final RabbitTemplate rabbitTemplate;
 

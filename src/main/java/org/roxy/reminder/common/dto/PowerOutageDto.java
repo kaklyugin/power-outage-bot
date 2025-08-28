@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 @Data
 public class PowerOutageDto {
 
-    private String location;
+    private String city;
     private String address;
     private ZonedDateTime dateTimeOff;
     private ZonedDateTime dateTimeOn;

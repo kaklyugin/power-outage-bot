@@ -1,10 +1,10 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard;
+package org.roxy.reminder.bot.dialogstatemachine.handlers;
 
 import lombok.Builder;
 import lombok.Data;
 import org.roxy.reminder.bot.dialogstatemachine.enums.Event;
 import org.roxy.reminder.bot.dialogstatemachine.enums.State;
-import org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard.action.ActionHandler;
+import org.roxy.reminder.bot.dialogstatemachine.handlers.cartfillout.action.ActionHandler;
 
 import java.util.concurrent.ConcurrentHashMap;
 

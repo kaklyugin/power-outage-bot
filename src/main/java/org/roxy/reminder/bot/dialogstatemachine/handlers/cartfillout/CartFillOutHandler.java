@@ -1,9 +1,11 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard;
+package org.roxy.reminder.bot.dialogstatemachine.handlers.cartfillout;
 
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.dialogstatemachine.enums.Event;
 import org.roxy.reminder.bot.dialogstatemachine.enums.State;
-import org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard.action.*;
+import org.roxy.reminder.bot.dialogstatemachine.handlers.StateDescriptor;
+import org.roxy.reminder.bot.dialogstatemachine.handlers.UpdateHandler;
+import org.roxy.reminder.bot.dialogstatemachine.handlers.cartfillout.action.*;
 import org.roxy.reminder.bot.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.entity.StateMachineEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
@@ -11,7 +13,7 @@ import org.roxy.reminder.bot.persistence.repository.StateMachineRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.tgclient.dto.message.response.SendMessageResponseDto;
 import org.roxy.reminder.bot.tgclient.dto.updates.UpdateType;
-import org.roxy.reminder.bot.tgclient.service.http.HttpBotClient;
+import org.roxy.reminder.bot.service.http.HttpBotClient;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -19,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
-public class CardFillOutHandler implements UpdateHandler {
+public class CartFillOutHandler implements UpdateHandler {
 
     private final StateMachineRepository stateMachineRepository;
     private final UserCartRepository userCartRepository;
@@ -27,7 +29,7 @@ public class CardFillOutHandler implements UpdateHandler {
     private final ConcurrentHashMap<State, StateDescriptor> states = new ConcurrentHashMap<>();
     private StateMachineEntity currentState;
 
-    public CardFillOutHandler(StartMessageActionHandlerHandler startMessageActionHandle,
+    public CartFillOutHandler(StartMessageActionHandlerHandler startMessageActionHandle,
                               CitySelectActionHandlerHandler citySelectActionHandle,
                               StreetInputActionHandlerHandler streetInputActionHandle,
                               StreetSelectActionHandlerHandler streetSelectActionHandle,
@@ -129,7 +131,7 @@ public class CardFillOutHandler implements UpdateHandler {
 
     private UserCartEntity getUserCart(UpdateDto update) {
         return userCartRepository
-                .findById(update.getChatId())
+                .findByChatId(update.getChatId())
                 .orElse(new UserCartEntity(update.getChatId()));
     }
 

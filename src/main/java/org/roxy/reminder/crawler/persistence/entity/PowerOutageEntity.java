@@ -16,8 +16,8 @@ public class PowerOutageEntity {
     @Column(name = "id", nullable = false, unique = true)
     private int id;
 
-    @Column (name = "location")
-    private String location;
+    @Column (name = "city")
+    private String city;
 
     @Column (name = "address")
     private String address;

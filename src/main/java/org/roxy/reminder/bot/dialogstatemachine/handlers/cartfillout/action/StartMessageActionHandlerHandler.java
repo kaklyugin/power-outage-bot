@@ -1,9 +1,8 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard.action;
+package org.roxy.reminder.bot.dialogstatemachine.handlers.cartfillout.action;
 
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.dialogstatemachine.enums.Event;
 import org.roxy.reminder.bot.dto.UpdateDto;
-import org.roxy.reminder.bot.persistence.entity.DialogContextEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.tgclient.dto.message.request.MessageDto;
 import org.roxy.reminder.bot.tgclient.dto.message.request.keyboard.InlineKeyboardDto;
@@ -24,10 +23,10 @@ public class StartMessageActionHandlerHandler implements ActionHandler {
                         .replyMarkup(
                                 new InlineKeyboardDto.KeyboardBuilder()
                                         .addRow()
-                                        .addButton("Ростов", "г.Ростов-на-Дону")
-                                        .addButton("Аксай", "г.Аксай")
+                                        .addButton("Ростов", "Ростов-на-Дону")
+                                        .addButton("Аксай", "Аксай")
                                         .addRow()
-                                        .addButton("Новочеркасск", "г.Новочеркасск")
+                                        .addButton("Новочеркасск", "Новочеркасск")
                                         .build())
                         .build();
 

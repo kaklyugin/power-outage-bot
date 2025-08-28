@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.tgclient.service.http;
+package org.roxy.reminder.bot.service.http;
 
 import org.roxy.reminder.bot.tgclient.dto.message.request.MessageDto;
 import org.roxy.reminder.bot.tgclient.dto.message.response.SendMessageResponseDto;

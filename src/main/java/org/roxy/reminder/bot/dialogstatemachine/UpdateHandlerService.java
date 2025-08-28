@@ -1,8 +1,7 @@
 package org.roxy.reminder.bot.dialogstatemachine;
 
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard.CardFillOutHandler;
-import org.roxy.reminder.bot.dialogstatemachine.handlers.filloutcard.UpdateHandler;
+import org.roxy.reminder.bot.dialogstatemachine.handlers.UpdateHandler;
 import org.roxy.reminder.bot.dto.UpdateDto;
 import org.springframework.stereotype.Service;
 

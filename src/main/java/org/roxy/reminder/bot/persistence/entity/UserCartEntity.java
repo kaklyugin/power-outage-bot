@@ -26,8 +26,11 @@ public class UserCartEntity {
     @Column(name = "street")
     private String street;
 
+    @Column(name = "normalized_street")
+    private String normalizedStreet;
+
     @OneToMany(mappedBy = "userCart",cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
-    private List<PowerOutageNotificationEntity> notifications;
+    private List<NotificationEntity> notifications;
 
     public UserCartEntity(Long chatId) {
         this.chatId = chatId;
