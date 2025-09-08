@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
     void findByPowerOutageHashNotIn(List<Integer> collect);
+    List<NotificationEntity> findByIsNotified(boolean isNotified);
 }
