@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.dialogstatemachine.UpdateHandlerService;
+import org.roxy.reminder.bot.sate.machine.UpdateHandlerService;
 import org.roxy.reminder.bot.dto.UpdateDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;

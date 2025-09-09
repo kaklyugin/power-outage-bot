@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers;
+package org.roxy.reminder.bot.sate.machine.handlers;
 
 import org.roxy.reminder.bot.dto.UpdateDto;
 

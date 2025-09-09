@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.dialogstatemachine.enums;
+package org.roxy.reminder.bot.sate.machine.enums;
 
 public enum Event {
     REPLY_RECEIVED,
