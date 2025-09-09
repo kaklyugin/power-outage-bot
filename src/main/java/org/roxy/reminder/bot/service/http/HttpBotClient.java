@@ -1,5 +1,6 @@
 package org.roxy.reminder.bot.service.http;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,10 @@ import java.net.http.HttpResponse;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -43,17 +48,10 @@ public class HttpBotClient implements BotClient {
         this.client = createHttpClient();
     }
 
-    @SneakyThrows
     @Override
     public SendMessageResponseDto sendMessage(MessageDto message) {
-        String jsonMessage = objectMapper.writeValueAsString(message);
-        log.info("JsonMessage = {}", jsonMessage);
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(botBaseUrl + SEND_MESSAGE_ENDPOINT))
-                .header(CONTENT_TYPE_HEADER, APPLICATION_JSON)
-                .POST(HttpRequest.BodyPublishers.ofString(jsonMessage))
-                .build();
         try {
+            HttpRequest request = createHttpRequest(message);
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             log.info("Sent message.Response body = {}", response.body());
             return objectMapper.readValue(response.body(), SendMessageResponseDto.class);
@@ -61,6 +59,27 @@ public class HttpBotClient implements BotClient {
             log.error("Failed to send message to Telegram", e);
         }
         return null;
+    }
+
+    @Override
+    public List<SendMessageResponseDto> sendMessagesAsync(List<MessageDto> messages) {
+        List<SendMessageResponseDto> result = new ArrayList<>();
+        try {
+
+            List<CompletableFuture<HttpResponse<String>>> futures = new ArrayList<>();
+            List<HttpRequest> httpRequests = messages.stream().map(this::createHttpRequest).toList();
+            httpRequests.forEach(httpRequest ->
+                    futures.add(client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString()))
+            );
+            CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            allFutures.join();
+            for (CompletableFuture<HttpResponse<String>> future : futures) {
+                result.add(objectMapper.readValue(future.get().body(), SendMessageResponseDto.class));
+            }
+        } catch (Exception e) {
+            log.error("Failed to send messages asynchronously to Telegram", e);
+        }
+        return result;
     }
 
     @Override
@@ -83,7 +102,6 @@ public class HttpBotClient implements BotClient {
     public void clearUpdates(Long lastUpdateId) {
         log.info("Clearing updates");
         final long NEXT_OFFSET = lastUpdateId + 1L;
-
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(botBaseUrl + GET_UPDATES_MESSAGE_ENDPOINT + "?offset=" + NEXT_OFFSET))
                 .GET()
@@ -104,9 +122,7 @@ public class HttpBotClient implements BotClient {
                 .text("Обработка ответа")
                 .showAlert(true)
                 .build();
-
         String jsonMessage = objectMapper.writeValueAsString(callbackAnswerDto);
-
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(botBaseUrl + ANSWER_CALLBACK_QUERY))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonMessage))
@@ -119,6 +135,21 @@ public class HttpBotClient implements BotClient {
         } catch (IOException | InterruptedException e) {
             log.error("Failed to get bot message updates from Telegram", e);
         }
+    }
+
+    private HttpRequest createHttpRequest(MessageDto message) {
+        String jsonMessage;
+        try {
+            jsonMessage = objectMapper.writeValueAsString(message);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        log.info("JsonMessage = {}", jsonMessage);
+        return HttpRequest.newBuilder()
+                .uri(URI.create(botBaseUrl + SEND_MESSAGE_ENDPOINT))
+                .header(CONTENT_TYPE_HEADER, APPLICATION_JSON)
+                .POST(HttpRequest.BodyPublishers.ofString(jsonMessage))
+                .build();
     }
 
 

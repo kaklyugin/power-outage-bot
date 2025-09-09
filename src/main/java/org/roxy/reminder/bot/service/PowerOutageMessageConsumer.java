@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.service.notification.NotificationService;
+import org.roxy.reminder.bot.service.notification.MessageNotificationService;
 import org.roxy.reminder.common.dto.PowerOutageDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
@@ -18,13 +18,13 @@ import java.util.List;
 public class PowerOutageMessageConsumer {
 
     private final ObjectMapper objectMapper;
-    private final NotificationService notificationService;
+    private final MessageNotificationService messageNotificationService;
 
     public PowerOutageMessageConsumer(ObjectMapper objectMapper,
-                                      NotificationService notificationService
+                                      MessageNotificationService messageNotificationService
                                      ) {
         this.objectMapper = objectMapper;
-        this.notificationService = notificationService;
+        this.messageNotificationService = messageNotificationService;
     }
 
     @SneakyThrows
@@ -36,7 +36,7 @@ public class PowerOutageMessageConsumer {
             log.info("Received PowerOutageMessage: {}", message);
             var powerOutageInfo = objectMapper.readValue(message, PowerOutageDto.class);
             //FIXME переделать на список после батчей
-            notificationService.createNotifications(List.of(powerOutageInfo));
+            messageNotificationService.createNotifications(List.of(powerOutageInfo));
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
             log.error("RabbitMQ message processor failed. Could not process update {}", e.getMessage());

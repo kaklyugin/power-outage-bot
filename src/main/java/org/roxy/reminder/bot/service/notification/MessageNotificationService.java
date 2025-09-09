@@ -1,5 +1,6 @@
 package org.roxy.reminder.bot.service.notification;
 
+import jakarta.transaction.Transactional;
 import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.entity.NotificationEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
@@ -15,19 +16,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class NotificationService {
+public class MessageNotificationService {
+
     private final NotificationRepository notificationRepository;
     private final UserCartRepository userCartRepository;
     private final PowerOutageMessageMapper mapper;
 
 
-    public NotificationService(NotificationRepository notificationRepository, UserCartRepository userCartRepository,  PowerOutageMessageMapper mapper) {
+    public MessageNotificationService(NotificationRepository notificationRepository, UserCartRepository userCartRepository, PowerOutageMessageMapper mapper) {
         this.notificationRepository = notificationRepository;
         this.userCartRepository = userCartRepository;
         this.mapper = mapper;
 
     }
 
+    @Transactional
     public void createNotifications(List<PowerOutageDto> powerOutageItems)
     {
         List<Integer> powerItemHashes = powerOutageItems.stream().map(PowerOutageDto::getHashCode).toList();
