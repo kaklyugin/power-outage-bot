@@ -1,5 +1,8 @@
 insert into user_cart (chat_id, city, street, normalized_street)
-values (1053522116, 'Новочеркасск', 'Будённовская','буденновская');
+values (1053522116, 'Новочеркасск', 'Котовского','котовского');
+
+insert into power_outage_notifications (id,user_cart_id,is_notified, notification_text)
+values (1, 1, false, 'На ул.Котовского сегодня ожидается отключение света с 9:00 до 10:00');
 
 insert into streets (city, type, name)
 values ('Новочеркасск', 'улица', '8 Марта'),

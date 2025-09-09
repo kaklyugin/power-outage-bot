@@ -51,7 +51,7 @@ public class HttpBotClient implements BotClient {
     @Override
     public SendMessageResponseDto sendMessage(MessageDto message) {
         try {
-            HttpRequest request =  createHttpRequest(message);
+            HttpRequest request = createHttpRequest(message);
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             log.info("Sent message.Response body = {}", response.body());
             return objectMapper.readValue(response.body(), SendMessageResponseDto.class);
@@ -61,22 +61,22 @@ public class HttpBotClient implements BotClient {
         return null;
     }
 
-     public List<SendMessageResponseDto> sendMessagesAsync(List<MessageDto> messages) {
+    @Override
+    public List<SendMessageResponseDto> sendMessagesAsync(List<MessageDto> messages) {
         List<SendMessageResponseDto> result = new ArrayList<>();
         try {
 
             List<CompletableFuture<HttpResponse<String>>> futures = new ArrayList<>();
             List<HttpRequest> httpRequests = messages.stream().map(this::createHttpRequest).toList();
-            httpRequests.forEach(httpRequest -> {
-                futures.add(client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString()));
-            });
+            httpRequests.forEach(httpRequest ->
+                    futures.add(client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString()))
+            );
             CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
             allFutures.join();
             for (CompletableFuture<HttpResponse<String>> future : futures) {
                 result.add(objectMapper.readValue(future.get().body(), SendMessageResponseDto.class));
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed to send messages asynchronously to Telegram", e);
         }
         return result;
@@ -137,8 +137,7 @@ public class HttpBotClient implements BotClient {
         }
     }
 
-    private HttpRequest createHttpRequest(MessageDto message)
-    {
+    private HttpRequest createHttpRequest(MessageDto message) {
         String jsonMessage;
         try {
             jsonMessage = objectMapper.writeValueAsString(message);
