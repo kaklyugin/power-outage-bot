@@ -8,11 +8,11 @@
         <version>3.5.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>org.rostov-energo-parser</groupId>
-    <artifactId>tg-client</artifactId>
+    <groupId>org.roxy</groupId>
+    <artifactId>crawler-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>tg-client</name>
-    <description>tg-client</description>
+    <name>crawler</name>
+    <description>Don Energo Power outage crawler</description>
     <url/>
     <licenses>
         <license/>
