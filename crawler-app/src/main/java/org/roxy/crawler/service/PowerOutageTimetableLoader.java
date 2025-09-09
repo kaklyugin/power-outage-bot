@@ -6,7 +6,9 @@ import org.roxy.crawler.DonEnergoHtmlParser;
 import org.roxy.crawler.DonEnergoHttpClient;
 import org.roxy.crawler.dto.PowerOutageItem;
 import org.roxy.crawler.persistence.entity.PowerOutageEntity;
+import org.roxy.crawler.persistence.entity.PowerOutageSourceEntity;
 import org.roxy.crawler.persistence.repository.PowerOutageRepository;
+import org.roxy.crawler.persistence.repository.PowerOutageSourceRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,26 +23,35 @@ public class PowerOutageTimetableLoader {
 
     private final DonEnergoHttpClient donEnergoHttpClient;
     private final PowerOutageRepository powerOutageRepository;
-    @Value("${power.outage.urls}")
-    private String[] powerOutageUrls;
     private final PowerOutageBrokerService powerOutageBrokerService;
+    private final PowerOutageSourceRepository powerOutageSourceRepository;
 
 
-    public PowerOutageTimetableLoader(DonEnergoHttpClient donEnergoHttpClient, PowerOutageRepository powerOutageRepository, PowerOutageBrokerService powerOutageBrokerService) {
+    public PowerOutageTimetableLoader(DonEnergoHttpClient donEnergoHttpClient, PowerOutageRepository powerOutageRepository, PowerOutageBrokerService powerOutageBrokerService, PowerOutageSourceRepository powerOutageSourceRepository) {
         this.donEnergoHttpClient = donEnergoHttpClient;
         this.powerOutageRepository = powerOutageRepository;
         this.powerOutageBrokerService = powerOutageBrokerService;
+        this.powerOutageSourceRepository = powerOutageSourceRepository;
     }
 
-    @SneakyThrows
+
     public void loadPowerOutageTimetable() {
-        CompletableFuture<List<PowerOutageItem>> getPowerOutageItemsFuture =
-                donEnergoHttpClient.getPageContentAsync(URI.create(powerOutageUrls[0])) //Todo заменить на итерацию по списку
-                        .thenApplyAsync(DonEnergoHtmlParser::parsePage);
-        List<PowerOutageItem> powerOutageItems = getPowerOutageItemsFuture.get();
-        List<PowerOutageEntity> newPowerOutages = savePowerOutageTimetable(powerOutageItems);
-        log.info("New Power Outage Timetable items count: {}", newPowerOutages.size());
-        powerOutageBrokerService.sendPowerOutageMessage(newPowerOutages);
+        List<PowerOutageSourceEntity> powerOutageSourceEntities = powerOutageSourceRepository.findAll();
+        for (PowerOutageSourceEntity entity : powerOutageSourceEntities) {
+            try {
+                log.info("Requesting page {}", entity.getPageUrl());
+                List<PowerOutageItem> powerOutageItems = donEnergoHttpClient.getPageContentAsync(URI.create(entity.getPageUrl()))
+                        .thenApplyAsync(DonEnergoHtmlParser::parsePage)
+                        .get();
+                log.info("Page {} is parsed", entity.getPageUrl());
+                List<PowerOutageEntity> newPowerOutages = savePowerOutageTimetable(powerOutageItems);
+                log.info("New Power Outage Timetable items count: {}", newPowerOutages.size());
+                powerOutageBrokerService.sendPowerOutageMessage(newPowerOutages);
+                Thread.sleep(3000);
+            } catch (Exception e) {
+                log.error("Failed to get or parse page {}",  entity.getPageUrl(), e);
+            }
+        }
     }
 
     private List<PowerOutageEntity> savePowerOutageTimetable(List<PowerOutageItem> items) {
@@ -62,7 +73,7 @@ public class PowerOutageTimetableLoader {
                 }
             }
         }
-       return powerOutageRepository.saveAll(entitiesToSave);
+        return powerOutageRepository.saveAll(entitiesToSave);
     }
 
 }

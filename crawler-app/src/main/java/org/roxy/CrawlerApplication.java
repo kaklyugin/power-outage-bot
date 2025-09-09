@@ -1,3 +1,5 @@
+package org.roxy;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -7,10 +9,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableAsync
 //@EnableJpaAuditing
-public class TgClientApplication {
+public class CrawlerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TgClientApplication.class, args);
+        SpringApplication.run(CrawlerApplication.class, args);
     }
 
 }
