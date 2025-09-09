@@ -1,9 +1,8 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers.cartfillout.action;
+package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.dialogstatemachine.enums.Event;
+import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.dto.UpdateDto;
-import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.StreetRepository;
 import org.roxy.reminder.bot.tgclient.dto.message.request.MessageDto;
 import org.roxy.reminder.bot.tgclient.dto.message.request.keyboard.InlineKeyboardDto;
@@ -14,36 +13,31 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class StreetInputActionHandlerHandler implements ActionHandler {
+public class StreetInputActionResolver extends ActionResolver {
 
     @Autowired
     private StreetRepository streetRepository;
 
     @Override
-    public ActionResponseDto handleAction(UpdateDto update, UserCartEntity userCart)  {
+    public Event resolveAction(UpdateDto update) {
         log.info("Handling message = {}", update);
         List<String> streets = streetRepository.findFuzzyByName(update.getUserResponse());
         if (streets.isEmpty()) {
-            var response =
+            super.botClient.sendMessage(
                     MessageDto.builder()
                             .chatId(String.valueOf(update.getChatId()))
                             .text("Не удалось найти улицу. Может быть Вы ошиблись или у нас устаревший справочник :(")
-                            .build();
-            return ActionResponseDto.builder()
-                    .message(response)
-                    .event(Event.RETRY)
-                    .build();
+                            .build());
+            return Event.RETRY;
+
         }
         if (streets.size() > 10) {
-            var response =
+            super.botClient.sendMessage(
                     MessageDto.builder()
                             .chatId(String.valueOf(update.getChatId()))
                             .text(String.format("Мы нашли более 10 улиц с текстом %s. Пожалуйста, уточните имя улицы", update.getUserResponse()))
-                            .build();
-            return ActionResponseDto.builder()
-                    .message(response)
-                    .event(Event.RETRY)
-                    .build();
+                            .build());
+            return Event.RETRY;
         }
 
         InlineKeyboardDto.KeyboardBuilder keyboardOfStreetsBuilder = new InlineKeyboardDto.KeyboardBuilder();
@@ -52,16 +46,13 @@ public class StreetInputActionHandlerHandler implements ActionHandler {
         }
         InlineKeyboardDto keyboardOfStreets = keyboardOfStreetsBuilder.build();
 
-        var response =
+        super.botClient.sendMessage(
                 MessageDto.builder()
                         .chatId(String.valueOf(update.getChatId()))
                         .text("Выберите улицу")
                         .replyMarkup(keyboardOfStreets)
-                        .build();
+                        .build());
 
-        return ActionResponseDto.builder()
-                .message(response)
-                .event(Event.REPLY_RECEIVED)
-                .build();
+        return Event.REPLY_RECEIVED;
     }
 }

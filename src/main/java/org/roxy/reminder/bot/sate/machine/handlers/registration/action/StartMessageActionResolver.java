@@ -1,19 +1,18 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers.cartfillout.action;
+package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.dialogstatemachine.enums.Event;
+import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.dto.UpdateDto;
-import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.tgclient.dto.message.request.MessageDto;
 import org.roxy.reminder.bot.tgclient.dto.message.request.keyboard.InlineKeyboardDto;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class StartMessageActionHandlerHandler implements ActionHandler {
+public class StartMessageActionResolver extends ActionResolver {
 
     @Override
-    public ActionResponseDto handleAction(UpdateDto update, UserCartEntity userCart) {
+    public Event resolveAction(UpdateDto update) {
         log.info("Handling message = {}", update);
         //TODO Добавить удаление старой записи из БД
         MessageDto citySelectMessage =
@@ -30,10 +29,7 @@ public class StartMessageActionHandlerHandler implements ActionHandler {
                                         .build())
                         .build();
 
-        return
-                ActionResponseDto.builder()
-                        .message(citySelectMessage)
-                        .event(Event.REPLY_RECEIVED)
-                        .build();
+        super.botClient.sendMessage(citySelectMessage);
+        return Event.REPLY_RECEIVED;
     }
 }

@@ -1,7 +1,7 @@
-package org.roxy.reminder.bot.dialogstatemachine.handlers.cartfillout.action;
+package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.dialogstatemachine.enums.Event;
+import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
@@ -11,25 +11,22 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class CitySelectActionHandlerHandler implements ActionHandler {
+public class CitySelectActionResolver extends ActionResolver {
 
     @Autowired
     private UserCartRepository userCartRepository;
 
     @Override
-    public ActionResponseDto handleAction(UpdateDto update, UserCartEntity userCart) {
+    public Event resolveAction(UpdateDto update) {
         log.info("Handling update = {}", update);
+        UserCartEntity userCart = userCartRepository.findByChatId(update.getChatId())
+                .orElseThrow(() -> new RuntimeException("User cart not found"));
         userCart.setCity(update.getUserResponse());
         userCartRepository.save(userCart);
-
-        MessageDto cityInputMessage =  MessageDto.builder()
+        super.botClient.sendMessage(MessageDto.builder()
                 .chatId(String.valueOf(update.getChatId()))
                 .text("Введите улицу")
-                .build();
-
-        return ActionResponseDto.builder()
-                .message(cityInputMessage)
-                .event(Event.REPLY_RECEIVED)
-                .build();
+                .build());
+        return Event.REPLY_RECEIVED;
     }
 }
