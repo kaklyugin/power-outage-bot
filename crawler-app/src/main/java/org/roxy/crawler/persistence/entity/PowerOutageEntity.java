@@ -2,10 +2,13 @@ package org.roxy.crawler.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
-//@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Data
 @Table(name = "power_outage_addresses")
@@ -33,13 +36,11 @@ public class PowerOutageEntity {
 
     @Column (name = "hash_code")
     private Integer hashCode;
-//TODO Check
-//    @CreatedDate
-//    @Column(name = "created_at")
-//    private LocalDateTime createdAt;
-//
-//    @LastModifiedDate
-//    @Column(name = "updated_at")
-//    private LocalDateTime updatedAt;
 
+    @Column (name = "comment")
+    private String comment;
+
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 }
