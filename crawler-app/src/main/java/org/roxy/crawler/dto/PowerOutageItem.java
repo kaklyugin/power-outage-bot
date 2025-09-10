@@ -2,12 +2,14 @@ package org.roxy.crawler.dto;
 
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 @Getter
 @ToString
+@Slf4j
 public class PowerOutageItem {
     private final int id;
     private final String city;
@@ -16,6 +18,7 @@ public class PowerOutageItem {
     private final ZonedDateTime dateTimeOn;
     private final String powerOutageReason;
     private final Integer hashCode;
+    private final String comment;
 
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yy");
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH['=']['-']mm");
@@ -28,7 +31,8 @@ public class PowerOutageItem {
                            String startTime,
                            String endTime,
                            String powerOutageReason,
-                           ZoneId zoneId
+                           ZoneId zoneId,
+                           String comment
     ) {
         this.id = Integer.parseInt(id);
         this.city = city;
@@ -37,11 +41,20 @@ public class PowerOutageItem {
         this.dateTimeOn = convertDateTime(endDate, endTime, zoneId);
         this.hashCode = calculateHashForPowerOutageRecord(city,address,dateTimeOff,dateTimeOn);
         this.powerOutageReason = powerOutageReason;
+        this.comment = comment;
     }
-
+    //TODO Вынести Zone в настройки бота
     private ZonedDateTime convertDateTime(String date, String time, ZoneId zoneId) {
-        LocalDateTime ldt = LocalDateTime.of(LocalDate.parse(date, dateFormatter), LocalTime.parse(time, timeFormatter));
-        return ldt.atZone(zoneId);
+        LocalDateTime ldt;
+        try {
+            ldt = LocalDateTime.of(LocalDate.parse(date, dateFormatter), LocalTime.parse(time, timeFormatter));
+            return ldt.atZone(zoneId);
+        }
+        catch (DateTimeException e)
+        {
+           log.error("Failed to parse date/time from string: " + date, e);
+        }
+        return null;
     }
 
     private int calculateHashForPowerOutageRecord(String city, String address, ZonedDateTime powerOffDateTime,ZonedDateTime powerOnDateTime )

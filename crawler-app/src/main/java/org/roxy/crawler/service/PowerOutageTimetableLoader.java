@@ -52,13 +52,14 @@ public class PowerOutageTimetableLoader {
                 log.error("Failed to get or parse page {}",  entity.getPageUrl(), e);
             }
         }
+        log.info("Power Outage Timetable loaded");
     }
 
     private List<PowerOutageEntity> savePowerOutageTimetable(List<PowerOutageItem> items) {
         List<PowerOutageEntity> entitiesToSave = new ArrayList<>();
         List<PowerOutageEntity> existingEntities = powerOutageRepository.findAll(); //TODO Ограничить
         for (PowerOutageItem item : items) {
-            {
+            {  //TODO add mapstruct
                 boolean newItemAlreadyExists = existingEntities.stream().
                         anyMatch(p -> p.getHashCode().equals(item.getHashCode()));
                 if (!newItemAlreadyExists) {
@@ -69,11 +70,11 @@ public class PowerOutageTimetableLoader {
                     entity.setDateTimeOn(item.getDateTimeOn());
                     entity.setPowerOutageReason(item.getPowerOutageReason());
                     entity.setHashCode(item.getHashCode());
+                    entity.setComment(item.getComment());
                     entitiesToSave.add(entity);
                 }
             }
         }
         return powerOutageRepository.saveAll(entitiesToSave);
     }
-
 }
