@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.roxy.crawler.dto.PowerOutageItem;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ public class DonEnergoHtmlParser {
         List<PowerOutageItem> items = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements tbodyAll = doc.select("table.table_site1 tr:gt(1)");
-        tbodyAll.forEach(row -> {
+        for (Element row : tbodyAll) {
             try {
                 String id = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(0).text().trim();
                 String city = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(1).text().trim();
@@ -36,6 +37,12 @@ public class DonEnergoHtmlParser {
                 String powerOnTime = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(6).text().trim();
                 String reason = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(7).text().trim();
                 String comment = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(8).text().trim();
+
+                if (powerOffDate.equals("") || powerOnDate.equals("") || powerOffTime.equals("") || powerOnTime.equals(""))
+                {
+                    log.warn("Power outage time interval is empty in row =  {} and will be skipped", row);
+                    continue;
+                }
 
                 for (String address : addresses) {
                     String trimmedAddress = address.trim();
@@ -55,7 +62,7 @@ public class DonEnergoHtmlParser {
                 log.error("Failed to parse row =  {} ", row);
                 e.printStackTrace();
             }
-        });
+        }
         return items;
     }
 

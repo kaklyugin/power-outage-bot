@@ -7,24 +7,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.sate.machine.UpdateHandlerService;
 import org.roxy.reminder.bot.dto.UpdateDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class UpdateProcessor {
+public class UpdateMessageConsumer {
 
     private final ObjectMapper objectMapper;
     private final UpdateHandlerService updateHandler;
+    private final ConnectionFactory connectionFactory;
 
-    public UpdateProcessor(ObjectMapper objectMapper, UpdateHandlerService updateHandler) {
+    public UpdateMessageConsumer(ObjectMapper objectMapper, UpdateHandlerService updateHandler, ConnectionFactory connectionFactory) {
         this.objectMapper = objectMapper;
         this.updateHandler = updateHandler;
+        this.connectionFactory = connectionFactory;
     }
 
     @SneakyThrows
-    @RabbitListener(queues = "${rabbitmq.updates.queue.name}")
+    @RabbitListener(queues = "${rabbitmq.updates.queue.name}", containerFactory = "rabbitListenerContainerFactory")
     public void handleMessage(String message, Channel channel,
                               @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) {
         try {

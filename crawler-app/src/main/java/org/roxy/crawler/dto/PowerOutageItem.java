@@ -4,8 +4,13 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Getter
 @ToString
@@ -20,8 +25,12 @@ public class PowerOutageItem {
     private final Integer hashCode;
     private final String comment;
 
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yy");
+    private static final List<DateTimeFormatter> dateFormatters = List.of(
+            DateTimeFormatter.ofPattern("dd.MM.yy"),
+            DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    );
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH['=']['-']mm");
+
 
     public PowerOutageItem(String id,
                            String city,
@@ -47,12 +56,25 @@ public class PowerOutageItem {
     private ZonedDateTime convertDateTime(String date, String time, ZoneId zoneId) {
         LocalDateTime ldt;
         try {
-            ldt = LocalDateTime.of(LocalDate.parse(date, dateFormatter), LocalTime.parse(time, timeFormatter));
+            LocalDate localDate = parseDate(date);
+            Objects.requireNonNull(localDate);
+            ldt = LocalDateTime.of(localDate, LocalTime.parse(time, timeFormatter));
             return ldt.atZone(zoneId);
         }
-        catch (DateTimeException e)
+        catch (Exception e)
         {
-           log.error("Failed to parse date/time from string: " + date, e);
+            log.error("Failed to parse date/time from string: time = {} date = {}. Error message : {}", time, date, e.getMessage());
+        }
+        return null;
+    }
+
+    public static LocalDate parseDate(String dateString) {
+        for (DateTimeFormatter dtf : dateFormatters) {
+            try {
+                return LocalDate.parse(dateString,dtf);
+            } catch (DateTimeParseException e) {
+                log.info("Retry parse date: date = {} with other formatter", dateString);
+            }
         }
         return null;
     }
