@@ -9,7 +9,11 @@ import java.util.List;
 @Data
 public class InlineKeyboardDto {
     @JsonProperty("inline_keyboard")
-    private List<List<InlineKeyboardButtonDto>> inlineKeyboard = new ArrayList<>();
+    private List<List<InlineKeyboardButtonDto>> inlineKeyboard;
+
+    public InlineKeyboardDto(List<List<InlineKeyboardButtonDto>> inlineKeyboard) {
+        this.inlineKeyboard = inlineKeyboard;
+    }
 
     InlineKeyboardDto(KeyboardBuilder builder) {
         this.inlineKeyboard = builder.inlineKeyboard;

@@ -20,8 +20,9 @@ public class UserCartEntity {
     @Column(name = "chat_id")
     private Long chatId;
 
-    @Column(name = "city")
-    private String city;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "city_fias_id")
+    private CityEntity city;
 
     @Column(name = "street")
     private String street;

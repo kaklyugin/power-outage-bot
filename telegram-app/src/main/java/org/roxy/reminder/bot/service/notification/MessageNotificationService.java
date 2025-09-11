@@ -46,7 +46,8 @@ public class MessageNotificationService {
         List<NotificationEntity> notifications = new ArrayList<>();
         for (UserCartEntity userCartEntity : userCartEntities) {
             if (AddressFormatter.normalizeStreetName(powerOutageDto.getAddress()).contains(userCartEntity.getNormalizedStreet())
-                    && powerOutageDto.getCity().contains(userCartEntity.getCity())
+                    //TODO лучше
+                    && powerOutageDto.getCity().contains(userCartEntity.getCity().getName())
                         && (powerOutageDto.getDateTimeOff().isBefore(ZonedDateTime.now(ZoneId.of("Europe/Moscow"))))
             )
             {
