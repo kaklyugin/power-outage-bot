@@ -13,7 +13,9 @@ public class StreetEntity {
 
     private String type;
 
-    private String city;
+    @ManyToOne
+    @JoinColumn(name = "city_fias_id")
+    private CityEntity city;
 
     private String name;
 }
