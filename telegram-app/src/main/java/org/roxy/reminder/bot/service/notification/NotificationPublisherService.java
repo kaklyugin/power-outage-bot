@@ -29,7 +29,7 @@ public class NotificationPublisherService {
     //FIXME надо в ответе получать id notification`а который был успешно отправлен, чтобы в БД проапдейтить признак isNotified = true
     private void publishAsync() {
         List<NotificationEntity> notificationEntityList = notificationRepository.findByNotifiedIsFalse();
-        List<MessageDto> messageDtos = mapper.mapNotificationEntityToMessageDtoList(notificationEntityList);
+        List<MessageDto> messageDtos = mapper.mapNotificationEntityToMessageDto(notificationEntityList);
         List<SendMessageResponseDto> responseDtos = botClient.sendMessagesAsync(messageDtos);
     }
 

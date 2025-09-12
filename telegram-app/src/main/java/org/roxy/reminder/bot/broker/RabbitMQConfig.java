@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class RabbitMQConfig {
 
+    private final int BATCH_SIZE = 20;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -58,8 +60,8 @@ public class RabbitMQConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setConsumerBatchEnabled(true);
-        factory.setBatchListener(true); // Enable batch listening
-        factory.setBatchSize(10); // Optional: Set a batch size
+        factory.setBatchListener(true);
+        factory.setBatchSize(BATCH_SIZE);
         factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         return factory;
     }
@@ -70,5 +72,4 @@ public class RabbitMQConfig {
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter(objectMapper));
         return rabbitTemplate;
     }
-
 }

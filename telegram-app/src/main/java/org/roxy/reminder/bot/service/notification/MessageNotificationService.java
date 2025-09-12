@@ -51,7 +51,7 @@ public class MessageNotificationService {
                         && (powerOutageDto.getDateTimeOff().isBefore(ZonedDateTime.now(ZoneId.of("Europe/Moscow"))))
             )
             {
-                NotificationEntity notificationEntity = mapper.mapDtoToEntity(powerOutageDto);
+                NotificationEntity notificationEntity = mapper.mapDtoToNotificationEntity(powerOutageDto);
                 notificationEntity.setUserCart(userCartEntity);
                 notifications.add(notificationEntity);
             }

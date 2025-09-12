@@ -14,6 +14,6 @@ public interface NotificationEntityToTgMessageMapper {
     @Mapping(target = "text", source = "source.notificationText")
     MessageDto mapNotificationEntityToMessageDto(NotificationEntity source);
 
-    List<MessageDto> mapNotificationEntityToMessageDtoList(List<NotificationEntity> sourceList);
+    List<MessageDto> mapNotificationEntityToMessageDto(List<NotificationEntity> sourceList);
 
 }
