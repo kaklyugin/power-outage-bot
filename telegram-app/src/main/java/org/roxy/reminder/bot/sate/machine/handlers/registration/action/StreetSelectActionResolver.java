@@ -23,7 +23,7 @@ public class StreetSelectActionResolver extends ActionResolver {
     public Event resolveAction(UpdateDto update) {
         log.info("Handling message = {}", update);
         UserCartEntity userCart = userCartRepository.findByChatId(update.getChatId())
-                .orElseThrow(() -> new RuntimeException("User cart not found"));
+                .orElseThrow(() -> new RuntimeException("StreetSelectActionResolver error. User cart not found for update = " + update));
         userCart.setStreet(update.getUserResponse());
         userCart.setNormalizedStreet(AddressFormatter.normalizeStreetName(update.getUserResponse()));
         userCartRepository.save(userCart);

@@ -25,7 +25,7 @@ public class CitySelectActionResolver extends ActionResolver {
     public Event resolveAction(UpdateDto update) {
         log.info("Handling update = {}", update);
         UserCartEntity userCart = userCartRepository.findByChatId(update.getChatId())
-                .orElseThrow(() -> new RuntimeException("User cart not found"));
+                .orElseThrow(() -> new RuntimeException("CitySelectActionResolver error. User cart not found for update = " + update));
         CityEntity cityEntity = cityRepository.findById(update.getUserResponse())
                 .orElseThrow(() -> new RuntimeException(
                 String.format("Failed to save user response. City with id = %s not found", update.getUserResponse())));

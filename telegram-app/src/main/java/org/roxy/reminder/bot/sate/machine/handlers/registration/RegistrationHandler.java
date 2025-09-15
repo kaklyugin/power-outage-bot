@@ -1,6 +1,7 @@
 package org.roxy.reminder.bot.sate.machine.handlers.registration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.sate.machine.StateMachine;
 import org.roxy.reminder.bot.sate.machine.StateMachineProvider;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
@@ -14,6 +15,8 @@ import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.handlers.registration.action.*;
 import org.roxy.reminder.bot.tgclient.dto.updates.UpdateType;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -47,8 +50,10 @@ public class RegistrationHandler implements UpdateHandler {
     public void handle(UpdateDto update) {
 
         if (update.getUserResponse().equals("/start")) {
-            stateMachineRepository.deleteById(update.getChatId());
-            userCartRepository.deleteById(update.getChatId());
+            stateMachineRepository.findByChatId(update.getChatId())
+                    .ifPresent(stateMachineRepository::delete);
+            userCartRepository.findByChatId(update.getChatId())
+                    .ifPresent(userCartRepository::delete);
         }
         StateMachineEntity stateMachineEntity = getStateMachineEntity(update);
         StateMachine stateMachine = stateMachineProvider.getStateMachine(update);

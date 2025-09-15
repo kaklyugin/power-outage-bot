@@ -12,6 +12,8 @@ import org.roxy.reminder.bot.tgclient.dto.updates.UpdateResponseDto;
 import org.roxy.reminder.bot.tgclient.dto.updates.UpdatesResponseDto;
 import org.roxy.reminder.bot.service.http.HttpBotClient;
 import org.roxy.reminder.bot.tgclient.storage.ChatStore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -26,9 +28,10 @@ public class UpdatesPollingService {
     private final ChatStore chatStore;
     private final UpdateMessageProducer updateMessageProducer;
     private final ObjectMapper objectMapper;
-    private final UpdateResponseMapper mapper;
     private final ExecutorService executor;
+    private final UpdateResponseMapper mapper;
     private final int MAX_THREAD_COUNT = 1;
+    private final int SLEEP_BEFORE_NEXT_UPDATE_REQUEST_MS = 1_000;
 
     public UpdatesPollingService(HttpBotClient httpBotClient,
                                  ChatStore chatStore,
@@ -64,7 +67,7 @@ public class UpdatesPollingService {
                         if (!chatStore.checkUpdateExists(responseDto.getChatId(), responseDto.getUpdateId())) {
                             chatStore.pushUpdate(responseDto.getChatId(), responseDto.getUpdateId(), responseDto);
                             UpdateDto updateDto = mapper.mapUpdateResponseToUpdateDto(responseDto);
-                            publishUpdateForProcessing(updateDto);
+                            updateMessageProducer.sendUpdateToUpdateProcessor(updateDto);
                         }
                     }
             );
@@ -72,22 +75,13 @@ public class UpdatesPollingService {
             Optional<Long> maxUpdatedId = updates.getResult().stream()
                     .map(UpdateResponseDto::getUpdateId)
                     .max(Long::compareTo);
-
             if (maxUpdatedId.isPresent()) {
                 log.info("Max updated id is {}", maxUpdatedId.get());
                 httpBotClient.clearUpdates(maxUpdatedId.get());
             } else {
                 log.info("No updates found");
             }
-            Thread.sleep(1000);
-        }
-    }
-
-    public void publishUpdateForProcessing(UpdateDto update) {
-        try {
-            updateMessageProducer.sendMessage(objectMapper.writeValueAsString(update));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            Thread.sleep(SLEEP_BEFORE_NEXT_UPDATE_REQUEST_MS);
         }
     }
 }

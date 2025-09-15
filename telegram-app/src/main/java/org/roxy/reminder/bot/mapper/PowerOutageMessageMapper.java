@@ -13,7 +13,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface PowerOutageMessageMapper {
 
-
     @Mapping(target = "notificationText", source = "source", qualifiedByName = "createNotificationText")
     NotificationEntity mapEntityToNotification(PowerOutageSourceMessageEntity source);
 

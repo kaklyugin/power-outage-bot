@@ -3,12 +3,14 @@ package org.roxy.reminder.bot.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
+@SuperBuilder
 @Table(name = "user_cart")
 public class UserCartEntity {
 
