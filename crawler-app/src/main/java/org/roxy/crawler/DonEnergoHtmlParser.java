@@ -6,10 +6,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.roxy.crawler.dto.PowerOutageItem;
+import org.roxy.crawler.dto.PowerOutageParsedItem;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +20,9 @@ public class DonEnergoHtmlParser {
 
     private static final ZoneId zoneId = ZoneId.of("Europe/Moscow");
 
-    public static List<PowerOutageItem> parsePage(String html) {
+    public static List<PowerOutageParsedItem> parsePage(String html) {
         System.out.println("Started parsing " + Thread.currentThread().getName());
-        List<PowerOutageItem> items = new ArrayList<>();
+        List<PowerOutageParsedItem> items = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements tbodyAll = doc.select("table.table_site1 tr:gt(1)");
         for (Element row : tbodyAll) {
@@ -46,7 +45,7 @@ public class DonEnergoHtmlParser {
 
                 for (String address : addresses) {
                     String trimmedAddress = address.trim();
-                    items.add(new PowerOutageItem(
+                    items.add(new PowerOutageParsedItem(
                             id,
                             city,
                             trimmedAddress,

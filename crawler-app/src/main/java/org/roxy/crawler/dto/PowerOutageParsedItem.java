@@ -4,18 +4,16 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Getter
 @ToString
 @Slf4j
-public class PowerOutageItem {
+public class PowerOutageParsedItem {
     private final int id;
     private final String city;
     private final String address;
@@ -32,16 +30,16 @@ public class PowerOutageItem {
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH['=']['-']mm");
 
 
-    public PowerOutageItem(String id,
-                           String city,
-                           String address,
-                           String startDate,
-                           String endDate,
-                           String startTime,
-                           String endTime,
-                           String powerOutageReason,
-                           ZoneId zoneId,
-                           String comment
+    public PowerOutageParsedItem(String id,
+                                 String city,
+                                 String address,
+                                 String startDate,
+                                 String endDate,
+                                 String startTime,
+                                 String endTime,
+                                 String powerOutageReason,
+                                 ZoneId zoneId,
+                                 String comment
     ) {
         this.id = Integer.parseInt(id);
         this.city = city;

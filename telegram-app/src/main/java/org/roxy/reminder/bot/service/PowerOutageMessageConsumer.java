@@ -59,7 +59,6 @@ public class PowerOutageMessageConsumer {
                 channel.basicAck(deliveryTag, false);
             }
             log.info("Successfully processed PowerOutageMessage batch count: {}", savedMessageCount);
-            messageNotificationService.createNotifications(powerOutageDtos);
         } catch (Exception e) {
             log.error("Batch processing failed: {}", e.getMessage());
         }

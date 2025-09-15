@@ -3,11 +3,13 @@ package org.roxy.reminder.bot.service.notification;
 import jakarta.transaction.Transactional;
 import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.entity.NotificationEntity;
+import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.NotificationRepository;
+import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
-import org.roxy.reminder.common.dto.PowerOutageDto;
 import org.roxy.reminder.common.util.AddressFormatter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -19,43 +21,57 @@ import java.util.List;
 public class MessageNotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final PowerOutageSourceMessageRepository messageRepository;
     private final UserCartRepository userCartRepository;
     private final PowerOutageMessageMapper mapper;
 
+    @Value("${local.timezone}")
+    private String timeZone;
 
-    public MessageNotificationService(NotificationRepository notificationRepository, UserCartRepository userCartRepository, PowerOutageMessageMapper mapper) {
+    public MessageNotificationService(NotificationRepository notificationRepository,
+                                      PowerOutageSourceMessageRepository messageRepository,
+                                      UserCartRepository userCartRepository,
+                                      PowerOutageMessageMapper mapper) {
         this.notificationRepository = notificationRepository;
+        this.messageRepository = messageRepository;
         this.userCartRepository = userCartRepository;
         this.mapper = mapper;
 
     }
 
     @Transactional
-    public void createNotifications(List<PowerOutageDto> powerOutageItems)
+    public void createNotifications()
     {
-        List<Integer> powerItemHashes = powerOutageItems.stream().map(PowerOutageDto::getHashCode).toList();
-        List<UserCartEntity> userCartEntities = userCartRepository.findAllWhereNotificationHashNotIn(powerItemHashes);
-        for(PowerOutageDto item: powerOutageItems)
+        List<PowerOutageSourceMessageEntity> powerOutageSourceMessages = messageRepository.findActualForDateTime(ZonedDateTime.now(ZoneId.of(timeZone)));
+        List<Integer> notificationsHashCodes = powerOutageSourceMessages.stream().map(PowerOutageSourceMessageEntity::getMessageHashCode).toList();
+        List<UserCartEntity> userCartsWithoutNotifications = userCartRepository.findAllUserCartsWithoutConcreteNotifications(notificationsHashCodes);
+        for(PowerOutageSourceMessageEntity powerOutageMessageItem: powerOutageSourceMessages)
         {
-            List<NotificationEntity> notifications = findMatchingUserCartAndGenerateNotification(userCartEntities, item);
-            notificationRepository.saveAll(notifications);
+            List<UserCartEntity> userCartsMatchingNotificationAddress = findUserCartsWhereAddressMatchesPowerOutageAddress(userCartsWithoutNotifications, powerOutageMessageItem);
+            List<NotificationEntity> notifications = createNotificationsForUserCarts(userCartsMatchingNotificationAddress, powerOutageMessageItem);
         }
     }
 
-    private List<NotificationEntity> findMatchingUserCartAndGenerateNotification(List<UserCartEntity> userCartEntities, PowerOutageDto powerOutageDto) {
-        List<NotificationEntity> notifications = new ArrayList<>();
+    private List<UserCartEntity> findUserCartsWhereAddressMatchesPowerOutageAddress (List<UserCartEntity> userCartEntities, PowerOutageSourceMessageEntity powerOutageSourceMessage) {
+        List<UserCartEntity> userCarts = new ArrayList<>();
         for (UserCartEntity userCartEntity : userCartEntities) {
-            if (AddressFormatter.normalizeStreetName(powerOutageDto.getAddress()).contains(userCartEntity.getNormalizedStreet())
-                    //TODO лучше
-                    && powerOutageDto.getCity().contains(userCartEntity.getCity().getName())
-                        && (powerOutageDto.getDateTimeOff().isBefore(ZonedDateTime.now(ZoneId.of("Europe/Moscow"))))
+            if (AddressFormatter.normalizeStreetName(powerOutageSourceMessage.getAddress()).contains(userCartEntity.getNormalizedStreet())
+                    && powerOutageSourceMessage.getCity().contains(userCartEntity.getCity().getName())
             )
             {
-                NotificationEntity notificationEntity = mapper.mapDtoToNotificationEntity(powerOutageDto);
-                notificationEntity.setUserCart(userCartEntity);
-                notifications.add(notificationEntity);
+                userCarts.add(userCartEntity);
             }
         }
-        return notifications;
+        return userCarts;
+    }
+
+    private List<NotificationEntity> createNotificationsForUserCarts(List<UserCartEntity> userCartEntities, PowerOutageSourceMessageEntity powerOutageSourceMessage) {
+        List<NotificationEntity> notifications = new ArrayList<>();
+        for (UserCartEntity userCartEntity : userCartEntities) {
+                NotificationEntity notificationEntity = mapper.mapEntityToNotification(powerOutageSourceMessage);
+                notificationEntity.setUserCart(userCartEntity);
+                notifications.add(notificationEntity);
+        }
+        return notificationRepository.saveAll(notifications);
     }
 }

@@ -27,6 +27,9 @@ public class PowerOutageSourceMessageEntity {
     @Column
     private String powerOutageReason;
 
-    @Column(name = "hash_code", unique = true)
-    private Integer hashCode;
+    @Column
+    private String url;
+
+    @Column(name = "message_hash_code", unique = true)
+    private Integer messageHashCode;
 }

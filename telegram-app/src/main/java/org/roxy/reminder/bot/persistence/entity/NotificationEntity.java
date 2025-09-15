@@ -30,8 +30,8 @@ public class NotificationEntity {
     @Column(name = "notified_at")
     private ZonedDateTime notifiedAt;
 
-    @Column(name = "outage_item_hash")
-    private Integer powerOutageHash;
+    @Column(name = "message_hash_code")
+    private Integer messageHashCode;
 // TODO
 // @Column(name = "last_notified_at")
 // private ZonedDateTime lastNotifiedAt;

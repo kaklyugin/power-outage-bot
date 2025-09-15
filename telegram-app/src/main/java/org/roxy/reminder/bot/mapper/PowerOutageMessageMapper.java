@@ -13,16 +13,14 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface PowerOutageMessageMapper {
 
-    @Mapping(target = "powerOutageHash", source = "source.hashCode")
-    @Mapping(target = "notificationText", source = "source", qualifiedByName = "createNotificationText")
-    NotificationEntity mapDtoToNotificationEntity(PowerOutageDto source);
 
-    PowerOutageSourceMessageEntity mapDtoToEntity(PowerOutageDto source);
+    @Mapping(target = "notificationText", source = "source", qualifiedByName = "createNotificationText")
+    NotificationEntity mapEntityToNotification(PowerOutageSourceMessageEntity source);
+
     List<PowerOutageSourceMessageEntity> mapDtoToEntity(List<PowerOutageDto> sourceList);
 
-
     @Named("createNotificationText")
-    default String createNotificationText(PowerOutageDto source) {
+    default String createNotificationText(PowerOutageSourceMessageEntity source) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM (EEEE) HH:mm:ss");
         return "Отключение света по адресу " +
                 source.getCity() + " "+
@@ -30,6 +28,7 @@ public interface PowerOutageMessageMapper {
                 " c " + source.getDateTimeOff().format(formatter) +
                 " по " + source.getDateTimeOn().format(formatter) +
                 ". " +
-                "Причина : " + source.getPowerOutageReason();
+                "Причина : " + source.getPowerOutageReason() +
+                "Источник : " + source.getUrl();
     }
 }

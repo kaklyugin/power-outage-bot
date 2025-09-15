@@ -1,7 +1,10 @@
 package org.roxy.crawler.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -11,7 +14,7 @@ import java.time.ZonedDateTime;
 
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Data
+@Data @NoArgsConstructor @SuperBuilder
 @Table(name = "power_outage_addresses")
 public class PowerOutageEntity {
 
@@ -34,6 +37,9 @@ public class PowerOutageEntity {
 
     @Column (name = "reason")
     private String powerOutageReason;
+
+    @Column (name = "url")
+    private String url;
 
     @Column (name = "hash_code")
     private Integer hashCode;

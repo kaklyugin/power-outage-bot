@@ -6,7 +6,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "power_outage_source_pages")
-public class PowerOutageSourceEntity {
+public class PowerOutagePageUrlEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "page_sequence_generator")
