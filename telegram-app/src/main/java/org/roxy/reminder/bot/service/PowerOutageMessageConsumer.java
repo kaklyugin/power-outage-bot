@@ -6,12 +6,10 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
-import org.roxy.reminder.bot.service.notification.MessageNotificationService;
+import org.roxy.reminder.bot.service.notification.NotificationService;
 import org.roxy.reminder.common.dto.PowerOutageDto;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.support.AmqpHeaders;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,15 +20,15 @@ import java.util.List;
 public class PowerOutageMessageConsumer {
 
     private final ObjectMapper objectMapper;
-    private final MessageNotificationService messageNotificationService;
+    private final NotificationService notificationService;
     private final PowerOutageSourceMessageRepository messageRepository;
     private final PowerOutageMessageMapper messageMapper;
 
     public PowerOutageMessageConsumer(ObjectMapper objectMapper,
-                                      MessageNotificationService messageNotificationService, PowerOutageSourceMessageRepository messageRepository, PowerOutageMessageMapper messageMapper
+                                      NotificationService notificationService, PowerOutageSourceMessageRepository messageRepository, PowerOutageMessageMapper messageMapper
     ) {
         this.objectMapper = objectMapper;
-        this.messageNotificationService = messageNotificationService;
+        this.notificationService = notificationService;
         this.messageRepository = messageRepository;
         this.messageMapper = messageMapper;
     }

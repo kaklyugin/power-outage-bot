@@ -10,28 +10,19 @@ import org.roxy.reminder.bot.tgclient.dto.message.response.SendMessageResponseDt
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
 @Slf4j
-public class NotificationPublisherService {
+public class NotificationPublishService {
     private final NotificationRepository notificationRepository;
     private final BotClient botClient;
     private final NotificationEntityToTgMessageMapper mapper;
 
-    public NotificationPublisherService(NotificationRepository notificationRepository, BotClient botClient, NotificationEntityToTgMessageMapper mapper) {
+    public NotificationPublishService(NotificationRepository notificationRepository, BotClient botClient, NotificationEntityToTgMessageMapper mapper) {
         this.notificationRepository = notificationRepository;
         this.botClient = botClient;
         this.mapper = mapper;
-    }
-
-
-    //FIXME надо в ответе получать id notification`а который был успешно отправлен, чтобы в БД проапдейтить признак isNotified = true
-    private void publishAsync() {
-        List<NotificationEntity> notificationEntityList = notificationRepository.findByNotifiedIsFalse();
-        List<MessageDto> messageDtos = mapper.mapNotificationEntityToMessageDto(notificationEntityList);
-        List<SendMessageResponseDto> responseDtos = botClient.sendMessagesAsync(messageDtos);
     }
 
     @Scheduled(cron = "0/5 * * * * ?")

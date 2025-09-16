@@ -15,7 +15,5 @@ public interface StateMachineRepository extends JpaRepository<StateMachineEntity
     @Query("select s from StateMachineEntity s where s.chatId = :chatId and s.state != State.COMPLETED")
     Optional<StateMachineEntity> findActiveByChatId(@Param("chatId") Long chatId);
 
-    void deleteByChatId(Long chatId);
-
     Optional<StateMachineEntity> findByChatId(Long chatId);
 }
