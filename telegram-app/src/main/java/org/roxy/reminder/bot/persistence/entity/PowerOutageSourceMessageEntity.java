@@ -3,6 +3,7 @@ package org.roxy.reminder.bot.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -32,4 +33,7 @@ public class PowerOutageSourceMessageEntity {
 
     @Column(name = "message_hash_code", unique = true)
     private Integer messageHashCode;
+
+    @Version
+    private LocalDateTime lastUpdatedAt;
 }

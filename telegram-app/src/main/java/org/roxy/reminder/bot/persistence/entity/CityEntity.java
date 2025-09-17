@@ -3,6 +3,8 @@ package org.roxy.reminder.bot.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "cities")
 @Data
@@ -13,4 +15,7 @@ public class CityEntity {
     private String fiasId;
 
     private String name;
+
+    @Version
+    private LocalDateTime lastUpdatedAt;
 }

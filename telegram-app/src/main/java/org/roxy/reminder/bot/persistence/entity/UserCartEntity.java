@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -32,14 +33,14 @@ public class UserCartEntity {
     @Column(name = "normalized_street")
     private String normalizedStreet;
 
-    @OneToMany(mappedBy = "userCart",cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
+    @OneToMany(mappedBy = "userCart", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private List<NotificationEntity> notifications;
+
+    @Version
+    private LocalDateTime lastUpdatedAt;
 
     public UserCartEntity(Long chatId) {
         this.chatId = chatId;
     }
 
-    // TODO
-// @Column(name = "last_notified_at")
-// private ZonedDateTime lastNotifiedAt;
 }

@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface StreetRepository extends JpaRepository<StreetEntity, Long> {
-    @Query(nativeQuery = true, value = "Select s.type || ' ' || name from streets s where s.city_fias_id = :cityId and :streetName % name ")
+    @Query(nativeQuery = true, value = "Select name from streets s where s.city_fias_id = :cityId and :streetName % name ")
     List<String> findWithFuzzySearchByCityIdAndName(@Param("cityId")String cityId,
                                                     @Param("streetName") String streetName);
 }

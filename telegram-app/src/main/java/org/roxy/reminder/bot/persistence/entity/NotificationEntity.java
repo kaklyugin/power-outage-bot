@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -32,7 +33,7 @@ public class NotificationEntity {
 
     @Column(name = "message_hash_code")
     private Integer messageHashCode;
-// TODO
-// @Column(name = "last_notified_at")
-// private ZonedDateTime lastNotifiedAt;
+
+    @Version
+    private LocalDateTime lastUpdatedAt;
 }
