@@ -1,5 +1,6 @@
 package org.roxy.crawler.service;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.crawler.DonEnergoHtmlParser;
 import org.roxy.crawler.DonEnergoHttpClient;
@@ -8,6 +9,7 @@ import org.roxy.crawler.persistence.entity.PowerOutageEntity;
 import org.roxy.crawler.persistence.entity.PowerOutagePageUrlEntity;
 import org.roxy.crawler.persistence.repository.PowerOutageRepository;
 import org.roxy.crawler.persistence.repository.PowerOutageSourceRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -21,18 +23,24 @@ public class PowerOutageTimetableLoader {
     private final DonEnergoHttpClient donEnergoHttpClient;
     private final PowerOutageRepository powerOutageRepository;
     private final PowerOutageBrokerService powerOutageBrokerService;
-    private final PowerOutageSourceRepository powerOutageSourceRepository;
+    private final PowerOutageSourceRepository powerOutagePageRepository;
+
+    @Value("${feature.send.all.saved.items}")
+    private boolean SEND_ALL_SAVED_ITEMS;
+
+    private int SLEEP_BETWEEN_REQUESTS_MS = 2000;
 
 
-    public PowerOutageTimetableLoader(DonEnergoHttpClient donEnergoHttpClient, PowerOutageRepository powerOutageRepository, PowerOutageBrokerService powerOutageBrokerService, PowerOutageSourceRepository powerOutageSourceRepository) {
+    public PowerOutageTimetableLoader(DonEnergoHttpClient donEnergoHttpClient, PowerOutageRepository powerOutageRepository, PowerOutageBrokerService powerOutageBrokerService, PowerOutageSourceRepository powerOutagePageRepository) {
         this.donEnergoHttpClient = donEnergoHttpClient;
         this.powerOutageRepository = powerOutageRepository;
         this.powerOutageBrokerService = powerOutageBrokerService;
-        this.powerOutageSourceRepository = powerOutageSourceRepository;
+        this.powerOutagePageRepository = powerOutagePageRepository;
     }
 
+    @Transactional
     public void loadPowerOutageTimetable() {
-        List<PowerOutagePageUrlEntity> powerOutagePageUrlEntities = powerOutageSourceRepository.findAll();
+        List<PowerOutagePageUrlEntity> powerOutagePageUrlEntities = powerOutagePageRepository.findAll();
         for (PowerOutagePageUrlEntity powerOutagePageUrl : powerOutagePageUrlEntities) {
             try {
                 final String PAGE_URL = powerOutagePageUrl.getPageUrl();
@@ -42,9 +50,11 @@ public class PowerOutageTimetableLoader {
                         .get();
                 log.info("Page {} is parsed", PAGE_URL);
                 List<PowerOutageEntity> newPowerOutages = savePowerOutageTimetable(powerOutageParsedItems,PAGE_URL);
-                log.info("New Power Outage Timetable items count: {}", newPowerOutages.size());
+                if (SEND_ALL_SAVED_ITEMS) {
+                    newPowerOutages = powerOutageRepository.findAll();
+                }
                 powerOutageBrokerService.sendPowerOutageMessage(newPowerOutages);
-                Thread.sleep(3000);
+                Thread.sleep(SLEEP_BETWEEN_REQUESTS_MS);
             } catch (Exception e) {
                 log.error("Failed to get or parse page {}", powerOutagePageUrl.getPageUrl(), e);
             }
@@ -58,7 +68,7 @@ public class PowerOutageTimetableLoader {
         for (PowerOutageParsedItem item : items) {
             {  //TODO add mapstruct
                 boolean newItemAlreadyExists = existingEntities.stream().
-                        anyMatch(p -> p.getHashCode().equals(item.getHashCode()));
+                        anyMatch(p -> p.getMessageHashCode().equals(item.getMessageHashCode()));
                 if (!newItemAlreadyExists) {
                     PowerOutageEntity entity = PowerOutageEntity.builder()
                             .city(item.getCity())
@@ -67,7 +77,7 @@ public class PowerOutageTimetableLoader {
                             .dateTimeOn(item.getDateTimeOn())
                             .powerOutageReason(item.getPowerOutageReason())
                             .url(url)
-                            .hashCode(item.getHashCode())
+                            .messageHashCode(item.getMessageHashCode())
                             .comment(item.getComment())
                             .build();
                     entitiesToSave.add(entity);

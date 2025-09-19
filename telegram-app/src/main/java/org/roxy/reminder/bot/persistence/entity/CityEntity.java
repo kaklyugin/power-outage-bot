@@ -14,6 +14,7 @@ public class CityEntity {
     @Column(name = "id")
     private String fiasId;
 
+    @Column(name = "name", columnDefinition = "TEXT")
     private String name;
 
     @Version

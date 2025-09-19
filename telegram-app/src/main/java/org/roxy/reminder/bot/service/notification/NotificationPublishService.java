@@ -38,16 +38,9 @@ public class NotificationPublishService {
                 notification.setNotified(true);
             }
             notificationRepository.save(notification);
-            //TODO Как корректно сохранять признак отправки ? Была ошибка
-//            how to fix Caused by: org.hibernate.StaleObjectStateException:
-//            Row was updated or deleted by another transaction (or unsaved-value mapping was incorrect):
-//            [org.roxy.reminder.bot.persistence.entity.NotificationEntity#599]
-//            at org.hibernate.event.internal.DefaultMergeEventListener.entityIsDetached(DefaultMergeEventListener.java:426)
-//            ~[hibernate-core-6.6.18.Final.jar:6.6.18.Final]
-//            at org.hibernate.event.internal.DefaultMergeEventListener.merge(DefaultMergeEventListener.java:214)
-//            ~[hibernate-core-6.6.18.Final.jar:6.6.18.Final] at org.hibernate.event.internal.DefaultMergeEventListener.doMerge(DefaultMergeEventListener.java:152) ~[hibernate-core-6.6.18.Final.jar:6.6.18.Final] at org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:136) ~[hibernate-core-6.6.18.Final.jar:6.6.18.Final] at org.hibernate.event.internal.DefaultMergeEventListener.onMerge(DefaultMergeEventListener.java:89) ~[hibernate-core-6.6.18.Final.jar:6.6.18.Final] at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:127) ~[hibernate-core-6.6.18.Final.jar:6.6.18.Final] at org.hibernate.internal.SessionImpl.fireMerge(SessionImpl.java:854) ~[hibernate-core-6.6.18.Final.jar:6.6.18.Final] at org.hibernate.internal.SessionImpl.merge(SessionImpl.java:840) ~[hibernate-core-6.6.18.Final.jar:6.6.18.Final] at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na] at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-//            ~[na:na] at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:320)
-        }
+            //TODO Как корректно сохранять признак отправки ?
+            // TODO Как ретраить, если возникла ошибка записи в БД ?
+     }
         log.info("Sent {} notifications", notificationEntityList.size());
     }
 }

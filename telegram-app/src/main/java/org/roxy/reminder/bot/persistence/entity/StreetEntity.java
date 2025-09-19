@@ -19,6 +19,7 @@ public class StreetEntity {
     @JoinColumn(name = "city_fias_id")
     private CityEntity city;
 
+    @Column(name = "name" ,columnDefinition = "TEXT")
     private String name;
 
     @Version

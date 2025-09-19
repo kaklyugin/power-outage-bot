@@ -9,10 +9,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserCartRepository extends JpaRepository<UserCartEntity, Long> {
-
-    @Query("SELECT distinct u FROM UserCartEntity u left join fetch u.notifications n " +
-            " where (n is null or n.messageHashCode not in :excludeHashes)")
-    List<UserCartEntity> findAllUserCartsWithoutConcreteNotifications(@Param("excludeHashes") List<Integer> excludeHashes);
-
     Optional<UserCartEntity> findByChatId(Long chatId);
 }

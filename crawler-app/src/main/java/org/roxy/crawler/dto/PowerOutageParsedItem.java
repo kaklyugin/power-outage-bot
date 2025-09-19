@@ -20,7 +20,7 @@ public class PowerOutageParsedItem {
     private final ZonedDateTime dateTimeOff;
     private final ZonedDateTime dateTimeOn;
     private final String powerOutageReason;
-    private final Integer hashCode;
+    private final Integer messageHashCode;
     private final String comment;
 
     private static final List<DateTimeFormatter> dateFormatters = List.of(
@@ -46,7 +46,7 @@ public class PowerOutageParsedItem {
         this.address = address;
         this.dateTimeOff = convertDateTime(startDate, startTime, zoneId);
         this.dateTimeOn = convertDateTime(endDate, endTime, zoneId);
-        this.hashCode = calculateHashForPowerOutageRecord(city,address,dateTimeOff,dateTimeOn);
+        this.messageHashCode = calculateHashForPowerOutageRecord(city,address,dateTimeOff,dateTimeOn);
         this.powerOutageReason = powerOutageReason;
         this.comment = comment;
     }

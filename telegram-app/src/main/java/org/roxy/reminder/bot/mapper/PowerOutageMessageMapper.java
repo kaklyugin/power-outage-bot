@@ -12,22 +12,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface PowerOutageMessageMapper {
-
-    @Mapping(target = "notificationText", source = "source", qualifiedByName = "createNotificationText")
-    NotificationEntity mapEntityToNotification(PowerOutageSourceMessageEntity source);
-
+    PowerOutageSourceMessageEntity mapDtoToEntity(PowerOutageDto source);
     List<PowerOutageSourceMessageEntity> mapDtoToEntity(List<PowerOutageDto> sourceList);
-
-    @Named("createNotificationText")
-    default String createNotificationText(PowerOutageSourceMessageEntity source) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM (EEEE) HH:mm:ss");
-        return "Отключение света по адресу " +
-                source.getCity() + " "+
-                source.getAddress() + " " +
-                " c " + source.getDateTimeOff().format(formatter) +
-                " по " + source.getDateTimeOn().format(formatter) +
-                ". " +
-                "Причина : " + source.getPowerOutageReason() +
-                "Источник : " + source.getUrl();
-    }
 }

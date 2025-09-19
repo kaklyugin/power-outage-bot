@@ -9,8 +9,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface PowerOutageSourceMessageRepository extends JpaRepository<PowerOutageSourceMessageEntity, Long> {
-    @Query("select m from PowerOutageSourceMessageEntity m where m.dateTimeOff > :dateTimeOff")
-    List<PowerOutageSourceMessageEntity> findActualForDateTime(@Param("dateTimeOff") ZonedDateTime dateTimeOff );
+    @Query("select m.messageHashCode from PowerOutageSourceMessageEntity m where m.dateTimeOff > :dateTimeOff")
+    List<Integer> findActualForDateTime(@Param("dateTimeOff") ZonedDateTime dateTimeOff );
 
-
+    List<PowerOutageSourceMessageEntity> findAllByMessageHashCodeIn(List<Integer> messageHashCodes);
 }

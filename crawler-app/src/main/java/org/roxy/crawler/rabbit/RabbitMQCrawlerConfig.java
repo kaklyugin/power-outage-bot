@@ -33,7 +33,7 @@ public class RabbitMQCrawlerConfig {
     @Value("${rabbitmq.crawler.exchange.name}")
     private String crawlerExchangeName;
 
-    private final Integer POWER_OUTAGE_QUEUE_SIZE = 1_000;
+    private final Integer POWER_OUTAGE_QUEUE_SIZE = 5_000;
     private final Integer POWER_OUTAGE_QUEUE_TTL_MILLISECONDS = 30_000;
 
     private final Map<String, Object> POWER_OUTAGE_QUEUE_ARGS = new HashMap<>() {{

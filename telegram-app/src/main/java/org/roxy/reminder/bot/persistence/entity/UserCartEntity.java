@@ -27,10 +27,10 @@ public class UserCartEntity {
     @JoinColumn(name = "city_fias_id")
     private CityEntity city;
 
-    @Column(name = "street")
+    @Column(name = "street", columnDefinition = "TEXT")
     private String street;
 
-    @Column(name = "normalized_street")
+    @Column(name = "normalized_street", columnDefinition = "TEXT")
     private String normalizedStreet;
 
     @OneToMany(mappedBy = "userCart", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.EAGER)

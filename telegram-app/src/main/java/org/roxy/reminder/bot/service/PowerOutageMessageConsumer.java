@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
 import org.roxy.reminder.bot.service.notification.NotificationService;
 import org.roxy.reminder.common.dto.PowerOutageDto;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,43 +23,29 @@ import java.util.List;
 public class PowerOutageMessageConsumer {
 
     private final ObjectMapper objectMapper;
-    private final NotificationService notificationService;
     private final PowerOutageSourceMessageRepository messageRepository;
     private final PowerOutageMessageMapper messageMapper;
 
     public PowerOutageMessageConsumer(ObjectMapper objectMapper,
-                                      NotificationService notificationService, PowerOutageSourceMessageRepository messageRepository, PowerOutageMessageMapper messageMapper
+                                      PowerOutageSourceMessageRepository messageRepository,
+                                      PowerOutageMessageMapper messageMapper
     ) {
         this.objectMapper = objectMapper;
-        this.notificationService = notificationService;
         this.messageRepository = messageRepository;
         this.messageMapper = messageMapper;
     }
 
     @SneakyThrows
-    @RabbitListener(queues = "${rabbitmq.crawler.power.outage.queue.name}", containerFactory = "rabbitBatchListenerContainerFactory")
-    public void handleMessage(List<Message> messages, Channel channel) {
+    @RabbitListener(queues = "${rabbitmq.crawler.power.outage.queue.name}", containerFactory = "rabbitListenerContainerFactory")
+    public void handleMessage(Message message, Channel channel) {
         try {
-            log.info("Received PowerOutageMessage batch count: {}", messages.size());
-            List<PowerOutageDto> powerOutageDtos = new ArrayList<>();
-            List<Long> deliveryTags = new ArrayList<>();
-            for (int i = 0; i < messages.size(); i++) {
-                Message message = messages.get(i);
-                long deliveryTag =  message.getMessageProperties().getDeliveryTag();
-                deliveryTags.add(deliveryTag);
-                try {
-                    PowerOutageDto powerOutage = objectMapper.readValue(message.getBody(),PowerOutageDto.class);
-                    powerOutageDtos.add(powerOutage);
-                } catch (Exception e) {
-                    log.error("Failed to process message {}: {}", i, e.getMessage());
-                    channel.basicNack(deliveryTag, false, false);
-                }
-            }
-            var savedMessageCount = messageRepository.saveAll(messageMapper.mapDtoToEntity(powerOutageDtos));
-            for (Long deliveryTag : deliveryTags) {
-                channel.basicAck(deliveryTag, false);
-            }
-            log.info("Successfully processed PowerOutageMessage batch count: {}", savedMessageCount);
+            var powerOutage = objectMapper.readValue(message.getBody(), PowerOutageDto.class);
+            messageRepository.save(messageMapper.mapDtoToEntity(powerOutage));
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (ConstraintViolationException e) {
+            log.warn("PowerOutageMessage already exists {}",
+                    objectMapper.readValue(message.getBody(), PowerOutageDto.class).toString());
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             log.error("Batch processing failed: {}", e.getMessage());
         }

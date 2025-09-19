@@ -13,6 +13,6 @@ public class PowerOutageDto {
     private ZonedDateTime dateTimeOn;
     private String powerOutageReason;
     private String url;
-    private Integer hashCode;
+    private Integer messageHashCode;
 
 }

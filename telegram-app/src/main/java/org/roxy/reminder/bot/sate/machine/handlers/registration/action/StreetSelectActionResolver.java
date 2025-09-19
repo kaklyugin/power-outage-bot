@@ -33,7 +33,6 @@ public class StreetSelectActionResolver extends ActionResolver {
                 .chatId(String.valueOf(update.getChatId()))
                 .text("Всё получилось. Мы отправим уведомление, если на вашей улице будет запланировано отключение света.")
                 .build());
-        notificationService.createNotificationsForUser(userCart);
         return Event.REPLY_RECEIVED;
     }
 }

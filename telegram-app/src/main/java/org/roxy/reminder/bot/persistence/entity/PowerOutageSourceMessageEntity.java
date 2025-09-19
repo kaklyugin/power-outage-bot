@@ -8,15 +8,16 @@ import java.time.ZonedDateTime;
 
 @Entity
 @Data
+@Table(name = "power_outage_inbound_message")
 public class PowerOutageSourceMessageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name = "city" ,columnDefinition = "TEXT")
     private String city;
 
-    @Column
+    @Column(name = "address" ,columnDefinition = "TEXT")
     private String address;
 
     @Column
@@ -25,10 +26,10 @@ public class PowerOutageSourceMessageEntity {
     @Column
     private ZonedDateTime dateTimeOn;
 
-    @Column
+    @Column(name = "power_outage_reason" ,columnDefinition = "TEXT")
     private String powerOutageReason;
 
-    @Column
+    @Column (name = "url" ,columnDefinition = "TEXT")
     private String url;
 
     @Column(name = "message_hash_code", unique = true)

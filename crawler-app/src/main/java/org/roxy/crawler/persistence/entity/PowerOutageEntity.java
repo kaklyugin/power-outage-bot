@@ -41,11 +41,14 @@ public class PowerOutageEntity {
     @Column (name = "url")
     private String url;
 
-    @Column (name = "hash_code")
-    private Integer hashCode;
+    @Column (name = "message_hash_code")
+    private Integer messageHashCode;
 
     @Column (name = "comment")
     private String comment;
+
+    @Version
+    private LocalDateTime lastUpdatedAt;
 
     @CreatedDate
     @Column(name = "created_at")

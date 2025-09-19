@@ -10,13 +10,11 @@ import org.roxy.reminder.bot.persistence.repository.NotificationRepository;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.common.util.AddressFormatter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,9 +26,9 @@ public class NotificationService {
     private final PowerOutageSourceMessageRepository messageRepository;
     private final UserCartRepository userCartRepository;
     private final PowerOutageMessageMapper mapper;
-
-    @Value("${local.timezone}")
-    private String timeZone;
+    private final DateTimeFormatter DATE_TIME_FORMATTER_FIRST_DATE = DateTimeFormatter.ofPattern("dd MMMM (EEEE) HH:mm");
+    private final DateTimeFormatter DATE_TIME_FORMATER_SECOND_DATE = DateTimeFormatter.ofPattern("HH:mm");
+    private final String NEW_PARAGRAPH_SYMBOL = "\uD83D\uDCA1";
 
     public NotificationService(NotificationRepository notificationRepository,
                                PowerOutageSourceMessageRepository messageRepository,
@@ -42,52 +40,59 @@ public class NotificationService {
         this.mapper = mapper;
 
     }
+
     @Scheduled(fixedRate = 10_000)
-    public void creteNotificationsBySchedule()
-    {
+    public void creteNotificationsBySchedule() {
         log.info("Started scheduled  function creteNotificationsBySchedule()");
-        List<PowerOutageSourceMessageEntity> actualMessages = messageRepository.findActualForDateTime(ZonedDateTime.now());
-        int notificationsCount = createNotificationsForMessages(actualMessages).size();
-        log.info("Count of created notifications = " + notificationsCount);
+        createNotificationsForAllUsers();
     }
 
+
     @Transactional
-    public List<NotificationEntity> createNotificationsForUsers(List<UserCartEntity> userCartEntities, List<PowerOutageSourceMessageEntity> powerOutageSourceMessages)
-    {
-        List<NotificationEntity> notifications = new ArrayList<>();
-        for (PowerOutageSourceMessageEntity powerOutageMessageEntity : powerOutageSourceMessages)
-        {
-            for (UserCartEntity userCartEntity : userCartEntities)
-            {
-                boolean isNotificationCreated =
-                userCartEntity.getNotifications().stream()
-                        .map(NotificationEntity::getMessageHashCode)
-                        .anyMatch(messageHashCode ->
-                                Objects.equals(messageHashCode, powerOutageMessageEntity.getMessageHashCode()));
-                if (!isNotificationCreated) {
-                    if (AddressFormatter.normalizeStreetName(powerOutageMessageEntity.getAddress()).contains(userCartEntity.getNormalizedStreet())
-                            && powerOutageMessageEntity.getCity().contains(userCartEntity.getCity().getName())) {
-                        NotificationEntity notificationEntity = mapper.mapEntityToNotification(powerOutageMessageEntity);
-                        notificationEntity.setUserCart(userCartEntity);
-                        notifications.add(notificationEntity);
+    public void createNotificationsForAllUsers() {
+        try {
+            List<UserCartEntity> userCartEntities = userCartRepository.findAll();
+            List<Integer> actualMessagesHashCodes = messageRepository.findActualForDateTime(ZonedDateTime.now());
+            List<PowerOutageSourceMessageEntity> sourceMessages = messageRepository.findAllByMessageHashCodeIn(actualMessagesHashCodes);
+            for (UserCartEntity userCartEntity : userCartEntities) {
+                NotificationEntity notificationEntity = new NotificationEntity();
+                for (PowerOutageSourceMessageEntity sourceMessage : sourceMessages) {
+                    boolean isNotificationCreated =
+                            userCartEntity.getNotifications().stream()
+                                    .map(NotificationEntity::getMessageHashCodes)
+                                    .flatMap(List::stream)
+                                    .anyMatch(messageHashCode ->
+                                            Objects.equals(messageHashCode, sourceMessage.getMessageHashCode()));
+                    if (!isNotificationCreated) {
+                        if (AddressFormatter.normalizeStreetName(sourceMessage.getAddress()).contains(userCartEntity.getNormalizedStreet())
+                                && sourceMessage.getCity().contains(userCartEntity.getCity().getName())) {
+                            notificationEntity.setUserCart(userCartEntity);
+                            notificationEntity.getMessageHashCodes().add(sourceMessage.getMessageHashCode());
+                            String notificationText = appendAddressToNotificationText(notificationEntity.getNotificationText(), sourceMessage);
+                            notificationEntity.setNotificationText(notificationText);
+                            notificationEntity.setUserCart(userCartEntity);
+                        }
                     }
                 }
+                if (!notificationEntity.getMessageHashCodes().isEmpty()) {
+                    notificationRepository.save(notificationEntity);
+                }
             }
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
         }
-        return notificationRepository.saveAll(notifications);
     }
 
-    @Transactional
-    public List<NotificationEntity> createNotificationsForUser(UserCartEntity userCartEntity)
-    {
-        List<PowerOutageSourceMessageEntity> powerOutageSourceMessages = messageRepository.findActualForDateTime(ZonedDateTime.now(ZoneId.of(timeZone)));
-        return createNotificationsForUsers (List.of(userCartEntity),powerOutageSourceMessages);
-    }
-
-    @Transactional
-    public List<NotificationEntity> createNotificationsForMessages(List<PowerOutageSourceMessageEntity> powerOutageSourceMessages)
-    {
-        List<UserCartEntity> userCartEntities = userCartRepository.findAll();
-        return createNotificationsForUsers(userCartEntities,powerOutageSourceMessages);
+    private String appendAddressToNotificationText(String existingNotificationText, PowerOutageSourceMessageEntity sourceMessage) {
+        if (existingNotificationText == null || existingNotificationText.isEmpty()) {
+            existingNotificationText = NEW_PARAGRAPH_SYMBOL + "Планируется отключение света \n в " + sourceMessage.getCity() + " по адресам ";
+        }
+        StringBuilder notificationTextBuilder = new StringBuilder(existingNotificationText);
+        String address =
+                "\n\n " + sourceMessage.getAddress() + " " +
+                "\n " + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
+                "\n\n " + "Причина : " + sourceMessage.getPowerOutageReason();
+        notificationTextBuilder.append(address);
+        return notificationTextBuilder.toString();
     }
 }

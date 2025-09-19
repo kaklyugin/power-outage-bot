@@ -19,7 +19,11 @@ public class DialogContextEntity {
     @Id
     private Long   chatId;
     private Long   lastBotMessageId;
+
+    @Column(name = "city")
     private String city;
+
+    @Column(name = "street", columnDefinition = "TEXT")
     private String street;
 
     @Version
