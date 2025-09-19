@@ -17,6 +17,12 @@ public class CityEntity {
     @Column(name = "name", columnDefinition = "TEXT")
     private String name;
 
+    @Column(name = "type", columnDefinition = "TEXT")
+    private String type;
+
+    @Column(name = "district", columnDefinition = "TEXT")
+    private String district;
+
     @Version
     private LocalDateTime lastUpdatedAt;
 }
