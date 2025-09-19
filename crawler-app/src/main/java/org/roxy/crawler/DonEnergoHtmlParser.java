@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.roxy.crawler.dto.PowerOutageItem;
+import org.roxy.crawler.dto.PowerOutageParsedItem;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +20,12 @@ public class DonEnergoHtmlParser {
 
     private static final ZoneId zoneId = ZoneId.of("Europe/Moscow");
 
-    public static List<PowerOutageItem> parsePage(String html) {
+    public static List<PowerOutageParsedItem> parsePage(String html) {
         System.out.println("Started parsing " + Thread.currentThread().getName());
-        List<PowerOutageItem> items = new ArrayList<>();
+        List<PowerOutageParsedItem> items = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements tbodyAll = doc.select("table.table_site1 tr:gt(1)");
-        tbodyAll.forEach(row -> {
+        for (Element row : tbodyAll) {
             try {
                 String id = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(0).text().trim();
                 String city = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(1).text().trim();
@@ -37,9 +37,15 @@ public class DonEnergoHtmlParser {
                 String reason = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(7).text().trim();
                 String comment = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(8).text().trim();
 
+                if (powerOffDate.equals("") || powerOnDate.equals("") || powerOffTime.equals("") || powerOnTime.equals(""))
+                {
+                    log.warn("Power outage time interval is empty in row =  {} and will be skipped", row);
+                    continue;
+                }
+
                 for (String address : addresses) {
                     String trimmedAddress = address.trim();
-                    items.add(new PowerOutageItem(
+                    items.add(new PowerOutageParsedItem(
                             id,
                             city,
                             trimmedAddress,
@@ -55,7 +61,7 @@ public class DonEnergoHtmlParser {
                 log.error("Failed to parse row =  {} ", row);
                 e.printStackTrace();
             }
-        });
+        }
         return items;
     }
 

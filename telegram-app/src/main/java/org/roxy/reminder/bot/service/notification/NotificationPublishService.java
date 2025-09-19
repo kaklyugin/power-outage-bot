@@ -1,5 +1,6 @@
 package org.roxy.reminder.bot.service.notification;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.mapper.NotificationEntityToTgMessageMapper;
 import org.roxy.reminder.bot.persistence.entity.NotificationEntity;
@@ -14,27 +15,19 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class NotificationPublisherService {
+public class NotificationPublishService {
     private final NotificationRepository notificationRepository;
     private final BotClient botClient;
     private final NotificationEntityToTgMessageMapper mapper;
 
-    public NotificationPublisherService(NotificationRepository notificationRepository, BotClient botClient, NotificationEntityToTgMessageMapper mapper) {
+    public NotificationPublishService(NotificationRepository notificationRepository, BotClient botClient, NotificationEntityToTgMessageMapper mapper) {
         this.notificationRepository = notificationRepository;
         this.botClient = botClient;
         this.mapper = mapper;
     }
 
-
-    //FIXME надо в ответе получать id notification`а который был успешно отправлен, чтобы в БД проапдейтить признак isNotified = true
-    private void publishAsync() {
-        List<NotificationEntity> notificationEntityList = notificationRepository.findByNotifiedIsFalse();
-        List<MessageDto> messageDtos = mapper.mapNotificationEntityToMessageDtoList(notificationEntityList);
-        List<SendMessageResponseDto> responseDtos = botClient.sendMessagesAsync(messageDtos);
-    }
-
     @Scheduled(cron = "0/5 * * * * ?")
-    private void publish() {
+    public void publish() {
         log.info("Started scheduled notification publishing" );
         List<NotificationEntity> notificationEntityList = notificationRepository.findByNotifiedIsFalse();
         for(NotificationEntity notification: notificationEntityList) {
@@ -44,8 +37,10 @@ public class NotificationPublisherService {
             {
                 notification.setNotified(true);
             }
-        }
-        notificationRepository.saveAll(notificationEntityList);
+            notificationRepository.save(notification);
+            //TODO Как корректно сохранять признак отправки ?
+            // TODO Как ретраить, если возникла ошибка записи в БД ?
+     }
         log.info("Sent {} notifications", notificationEntityList.size());
     }
 }

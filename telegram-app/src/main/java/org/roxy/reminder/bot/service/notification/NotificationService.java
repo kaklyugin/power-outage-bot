@@ -1,0 +1,98 @@
+package org.roxy.reminder.bot.service.notification;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
+import org.roxy.reminder.bot.persistence.entity.NotificationEntity;
+import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
+import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
+import org.roxy.reminder.bot.persistence.repository.NotificationRepository;
+import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
+import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
+import org.roxy.reminder.common.util.AddressFormatter;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
+
+@Service
+@Slf4j
+public class NotificationService {
+
+    private final NotificationRepository notificationRepository;
+    private final PowerOutageSourceMessageRepository messageRepository;
+    private final UserCartRepository userCartRepository;
+    private final PowerOutageMessageMapper mapper;
+    private final DateTimeFormatter DATE_TIME_FORMATTER_FIRST_DATE = DateTimeFormatter.ofPattern("dd MMMM (EEEE) HH:mm");
+    private final DateTimeFormatter DATE_TIME_FORMATER_SECOND_DATE = DateTimeFormatter.ofPattern("HH:mm");
+    private final String NEW_PARAGRAPH_SYMBOL = "\uD83D\uDCA1";
+
+    public NotificationService(NotificationRepository notificationRepository,
+                               PowerOutageSourceMessageRepository messageRepository,
+                               UserCartRepository userCartRepository,
+                               PowerOutageMessageMapper mapper) {
+        this.notificationRepository = notificationRepository;
+        this.messageRepository = messageRepository;
+        this.userCartRepository = userCartRepository;
+        this.mapper = mapper;
+
+    }
+
+    @Scheduled(fixedRate = 10_000)
+    public void creteNotificationsBySchedule() {
+        log.info("Started scheduled  function creteNotificationsBySchedule()");
+        createNotificationsForAllUsers();
+    }
+
+
+    @Transactional
+    public void createNotificationsForAllUsers() {
+        try {
+            List<UserCartEntity> userCartEntities = userCartRepository.findAll();
+            List<Integer> actualMessagesHashCodes = messageRepository.findActualForDateTime(ZonedDateTime.now());
+            List<PowerOutageSourceMessageEntity> sourceMessages = messageRepository.findAllByMessageHashCodeIn(actualMessagesHashCodes);
+            for (UserCartEntity userCartEntity : userCartEntities) {
+                NotificationEntity notificationEntity = new NotificationEntity();
+                for (PowerOutageSourceMessageEntity sourceMessage : sourceMessages) {
+                    boolean isNotificationCreated =
+                            userCartEntity.getNotifications().stream()
+                                    .map(NotificationEntity::getMessageHashCodes)
+                                    .flatMap(List::stream)
+                                    .anyMatch(messageHashCode ->
+                                            Objects.equals(messageHashCode, sourceMessage.getMessageHashCode()));
+                    if (!isNotificationCreated) {
+                        if (AddressFormatter.normalizeStreetName(sourceMessage.getAddress()).contains(userCartEntity.getNormalizedStreet())
+                                && sourceMessage.getCity().contains(userCartEntity.getCity().getName())) {
+                            notificationEntity.setUserCart(userCartEntity);
+                            notificationEntity.getMessageHashCodes().add(sourceMessage.getMessageHashCode());
+                            String notificationText = appendAddressToNotificationText(notificationEntity.getNotificationText(), sourceMessage);
+                            notificationEntity.setNotificationText(notificationText);
+                            notificationEntity.setUserCart(userCartEntity);
+                        }
+                    }
+                }
+                if (!notificationEntity.getMessageHashCodes().isEmpty()) {
+                    notificationRepository.save(notificationEntity);
+                }
+            }
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+    }
+
+    private String appendAddressToNotificationText(String existingNotificationText, PowerOutageSourceMessageEntity sourceMessage) {
+        if (existingNotificationText == null || existingNotificationText.isEmpty()) {
+            existingNotificationText = NEW_PARAGRAPH_SYMBOL + "Планируется отключение света \n в " + sourceMessage.getCity() + " по адресам ";
+        }
+        StringBuilder notificationTextBuilder = new StringBuilder(existingNotificationText);
+        String address =
+                "\n\n " + sourceMessage.getAddress() + " " +
+                "\n " + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
+                "\n\n " + "Причина : " + sourceMessage.getPowerOutageReason();
+        notificationTextBuilder.append(address);
+        return notificationTextBuilder.toString();
+    }
+}

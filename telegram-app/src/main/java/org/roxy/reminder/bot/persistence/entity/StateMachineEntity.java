@@ -9,6 +9,7 @@ import org.hibernate.type.SqlTypes;
 import org.roxy.reminder.bot.sate.machine.enums.State;
 import org.roxy.reminder.bot.sate.machine.enums.StateMachineName;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,9 @@ public class StateMachineEntity {
 
     @Enumerated(EnumType.STRING)
     private StateMachineName stateMachineName;
+
+    @Version
+    private LocalDateTime lastUpdatedAt;
 
     public StateMachineEntity(Long chatId, State state, StateMachineName stateMachineName) {
         this.chatId = chatId;

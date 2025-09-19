@@ -1,14 +1,12 @@
 package org.roxy.reminder.bot.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,22 +19,14 @@ public class DialogContextEntity {
     @Id
     private Long   chatId;
     private Long   lastBotMessageId;
+
+    @Column(name = "city")
     private String city;
+
+    @Column(name = "street", columnDefinition = "TEXT")
     private String street;
 
-    @Column(columnDefinition = "jsonb", name = "last_update_raw")
-    @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, Object> lastUpdateRaw = new HashMap<>();
+    @Version
+    private LocalDateTime lastUpdatedAt;
 
-    public DialogContextEntity(Long chatId) {
-        this.chatId = chatId;
-    }
-
-    public void clear()
-    {
-        lastUpdateRaw.clear();
-        setLastBotMessageId(null);
-        setCity(null);
-        setStreet(null);
-    }
 }

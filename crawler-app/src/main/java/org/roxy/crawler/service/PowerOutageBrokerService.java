@@ -24,9 +24,8 @@ public class PowerOutageBrokerService {
     @SneakyThrows
     public void sendPowerOutageMessage(List<PowerOutageEntity> powerOutages) {
         for(PowerOutageEntity item: powerOutages) {
-            String json = objectMapper.writeValueAsString(item);
-            producer.sendPowerOutageMessage(json);
-            log.info("Send power-outage message to RabbitMQ {}", json);
+            producer.sendPowerOutageMessage(item);
+            log.info("Send power-outage message to RabbitMQ {}", objectMapper.writeValueAsString(item));
         }
     }
 }

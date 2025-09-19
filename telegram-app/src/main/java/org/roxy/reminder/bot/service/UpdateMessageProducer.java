@@ -1,6 +1,7 @@
 package org.roxy.reminder.bot.service;
 
 import lombok.RequiredArgsConstructor;
+import org.roxy.reminder.bot.dto.UpdateDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,8 @@ public class UpdateMessageProducer {
     @Value("${rabbitmq.updates.routing.key}")
     private String routingKey;
 
-    public void sendMessage(String message) {
-        System.out.println("Sending message: " + message);
-        rabbitTemplate.convertAndSend(exchangeName, routingKey, message);
+    public void sendUpdateToUpdateProcessor(UpdateDto updateDto) {
+        System.out.println("Sending message: " + updateDto.toString());
+        rabbitTemplate.convertAndSend(exchangeName, routingKey, updateDto);
     }
 }

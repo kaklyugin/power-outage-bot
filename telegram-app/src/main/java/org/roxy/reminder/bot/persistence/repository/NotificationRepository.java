@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
-    void findByPowerOutageHashNotIn(List<Integer> collect);
     @Query ("select n from NotificationEntity n left join fetch n.userCart u where n.isNotified = false")
     List<NotificationEntity> findByNotifiedIsFalse();
 }
