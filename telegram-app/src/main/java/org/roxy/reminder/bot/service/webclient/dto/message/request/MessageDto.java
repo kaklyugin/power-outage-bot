@@ -1,9 +1,9 @@
-package org.roxy.reminder.bot.tgclient.dto.message.request;  //TODO переименовать
+package org.roxy.reminder.bot.service.webclient.dto.message.request;  //TODO переименовать
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
-import org.roxy.reminder.bot.tgclient.dto.message.request.keyboard.InlineKeyboardDto;
+import org.roxy.reminder.bot.service.webclient.dto.message.request.keyboard.InlineKeyboardDto;
 
 @Data
 @SuperBuilder(toBuilder = true)

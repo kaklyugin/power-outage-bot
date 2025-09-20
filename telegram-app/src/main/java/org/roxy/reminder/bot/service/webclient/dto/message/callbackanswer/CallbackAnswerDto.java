@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.tgclient.dto.message.callbackanswer;
+package org.roxy.reminder.bot.service.webclient.dto.message.callbackanswer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;

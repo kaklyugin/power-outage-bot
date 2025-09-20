@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class CityEntity {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "fias_id")
     private String fiasId;
 
     @Column(name = "name", columnDefinition = "TEXT")

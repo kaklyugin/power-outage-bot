@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.tgclient.dto.message.request.keyboard;
+package org.roxy.reminder.bot.service.webclient.dto.message.request.keyboard;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package org.roxy.reminder.bot.sate.machine.handlers;
 
-import org.roxy.reminder.bot.dto.UpdateDto;
+import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 
 public interface UpdateHandler {
      void handle(UpdateDto update);
