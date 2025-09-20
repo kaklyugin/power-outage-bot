@@ -1,57 +1,6 @@
 -- liquibase formatted sql
 
--- changeset  anton.kaklyugin:001:create-cities-table-1
-CREATE TABLE cities
-(
-    fias_id         VARCHAR(36) NOT NULL,
-    name            TEXT        NOT NULL,
-    type            TEXT        NOT NULL,
-    district        TEXT        NOT NULL,
-    last_updated_at TIMESTAMP(6) NULL,
-    CONSTRAINT pk_cities PRIMARY KEY (fias_id)
-);
-
--- changeset  anton.kaklyugin:001:add-cities-constraints-2
-ALTER TABLE cities
-    ADD CONSTRAINT chk_cities_fias_id_not_empty CHECK (fias_id <> ''),
-ADD CONSTRAINT chk_cities_name_not_empty CHECK (name <> '');
-
--- changeset  anton.kaklyugin:001:add-cities-index-3
-CREATE INDEX idx_cities_name ON cities (name);
-CREATE INDEX idx_cities_last_updated ON cities (last_updated_at);
-
--- changeset  anton.kaklyugin:001:add-cities-comments-4
-COMMENT
-ON TABLE cities IS 'Stores city information with FIAS identifiers';
-COMMENT
-ON COLUMN cities.fias_id IS 'Primary key - FIAS identifier for the city';
-COMMENT
-ON COLUMN cities.name IS 'Name of the city';
-COMMENT
-ON COLUMN cities.last_updated_at IS 'Timestamp of last update for optimistic locking (JPA @Version)';
-
-CREATE TABLE streets (
-     id SERIAL PRIMARY KEY,
-     type VARCHAR(255) NULL,
-     city_fias_id VARCHAR(255) NOT NULL,
-     name TEXT NOT NULL,
-     last_updated_at TIMESTAMP(6) NULL,
-     CONSTRAINT fk_streets_city FOREIGN KEY (city_fias_id)
-         REFERENCES cities(fias_id) ON DELETE CASCADE
-);
-
-CREATE INDEX idx_streets_city_fias_id ON streets(city_fias_id);
-CREATE INDEX idx_streets_name ON streets(name);
-CREATE INDEX idx_streets_type ON streets(type);
-
-COMMENT ON TABLE streets IS 'Stores street information linked to cities';
-COMMENT ON COLUMN streets.id IS 'Auto-generated primary key';
-COMMENT ON COLUMN streets.type IS 'Type of street (e.g., street, avenue, boulevard)';
-COMMENT ON COLUMN streets.city_fias_id IS 'Foreign key reference to cities table (FIAS ID)';
-COMMENT ON COLUMN streets.name IS 'Name of the street';
-COMMENT ON COLUMN streets.last_updated_at IS 'Timestamp of last update for optimistic locking (JPA @Version)';
-        
--- changeset  anton.kaklyugin:001:insert-cities
+-- changeset  anton.kaklyugin:007:load-cities
 insert into cities (fias_id, name, type, district, last_updated_at)
 values ('00016440-54cc-45bf-a2b5-163ed69fb9e2', 'Аникин', 'хутор', 'Каменский район', 'now()'),
        ('0012499f-45ad-4548-9407-79cf1f7d8d54', 'Титов', 'хутор', 'Семикаракорский район', 'now()'),

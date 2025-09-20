@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset anton.kaklyugin:002:load-streets-novocherkassk
+-- changeset anton.kaklyugin:008:load-streets-novocherkassk
 insert into streets (city_fias_id, type, name, last_updated_at)
 values ('28bafcb3-92b2-445b-9443-a341be73fdb9', 'улица', '8 Марта',now()),
        ('28bafcb3-92b2-445b-9443-a341be73fdb9', 'улица', '26 Бакинских Комиссаров',now()),
@@ -482,7 +482,7 @@ values ('28bafcb3-92b2-445b-9443-a341be73fdb9', 'улица', '8 Марта',now
        ('28bafcb3-92b2-445b-9443-a341be73fdb9', 'проезд', 'Очистной',now()),
        ('28bafcb3-92b2-445b-9443-a341be73fdb9', 'площадка', 'Алюминиевая',now());
 
--- changeset anton.kaklyugin:002:load-streets-aksay
+-- changeset anton.kaklyugin:008:load-streets-aksay
 insert into streets (city_fias_id, type, name, last_updated_at)
 values ('9bebf626-3ee7-4e1b-9e91-569c9d402152', 'улица', 'Авиаторов',now()),
        ('9bebf626-3ee7-4e1b-9e91-569c9d402152', 'улица', 'Авиационная',now()),
@@ -804,7 +804,7 @@ values ('9bebf626-3ee7-4e1b-9e91-569c9d402152', 'улица', 'Авиаторо�
        ('9bebf626-3ee7-4e1b-9e91-569c9d402152', 'улица', '8-я линия',now()),
        ('9bebf626-3ee7-4e1b-9e91-569c9d402152', 'улица', '9-я линия',now());
 
--- changeset anton.kaklyugin:002:load-streets-rostov
+-- changeset anton.kaklyugin:008:load-streets-rostov
 insert into streets (city_fias_id, type, name, last_updated_at)
 values ('c1cfe4b9-f7c2-423c-abfa-6ed1c05a15c5', 'площадь', '1-го Гвардейского авиаполка', now()),
        ('c1cfe4b9-f7c2-423c-abfa-6ed1c05a15c5', 'переулок', '1-й Автосборочный', now()),
