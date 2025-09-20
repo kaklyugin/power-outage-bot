@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.tgclient.dto.updates;
+package org.roxy.reminder.bot.service.webclient.dto.updates;
 
 public enum UpdateType {
     COMMAND,

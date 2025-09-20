@@ -16,6 +16,7 @@ public class RegistrationStateMachine extends StateMachine {
 
     public RegistrationStateMachine(StartMessageActionResolver startMessageActionHandle,
                                     CitySelectActionResolver citySelectActionHandle,
+                                    SpecificCitySelectActionResolver specificCitySelectActionResolver,
                                     StreetInputActionResolver streetInputActionHandle,
                                     StreetSelectActionResolver streetSelectActionHandle) {
         super.states.put(State.NEW, StateDescriptor.builder()
@@ -27,9 +28,18 @@ public class RegistrationStateMachine extends StateMachine {
         states.put(State.CITY_SELECT, StateDescriptor.builder()
                 .actionResolver(citySelectActionHandle)
                 .transitions(new ConcurrentHashMap<>() {{
+                    put(Event.SPECIFIC_CITY_INPUT_REQUESTED, State.SPECIFIC_CITY_SELECT);
                     put(Event.REPLY_RECEIVED, State.STREET_INPUT);
                 }})
                 .build());
+        states.put(State.SPECIFIC_CITY_SELECT, StateDescriptor.builder()
+                .actionResolver(specificCitySelectActionResolver)
+                .transitions(new ConcurrentHashMap<>() {{
+                    put(Event.RETRY, State.SPECIFIC_CITY_SELECT);
+                    put(Event.REPLY_RECEIVED, State.CITY_SELECT);
+                }})
+                .build());
+
         states.put(State.STREET_INPUT, StateDescriptor.builder()
                 .actionResolver(streetInputActionHandle)
                 .transitions(new ConcurrentHashMap<>() {{

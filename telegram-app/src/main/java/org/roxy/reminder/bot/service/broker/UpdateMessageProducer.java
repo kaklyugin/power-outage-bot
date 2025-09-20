@@ -1,7 +1,7 @@
-package org.roxy.reminder.bot.service;
+package org.roxy.reminder.bot.service.broker;
 
 import lombok.RequiredArgsConstructor;
-import org.roxy.reminder.bot.dto.UpdateDto;
+import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

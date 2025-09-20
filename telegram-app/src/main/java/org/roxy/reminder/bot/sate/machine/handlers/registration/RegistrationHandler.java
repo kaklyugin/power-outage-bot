@@ -1,22 +1,19 @@
 package org.roxy.reminder.bot.sate.machine.handlers.registration;
 
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.sate.machine.StateMachine;
 import org.roxy.reminder.bot.sate.machine.StateMachineProvider;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.sate.machine.enums.State;
 import org.roxy.reminder.bot.sate.machine.enums.StateMachineName;
 import org.roxy.reminder.bot.sate.machine.handlers.UpdateHandler;
-import org.roxy.reminder.bot.dto.UpdateDto;
+import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.entity.StateMachineEntity;
 import org.roxy.reminder.bot.persistence.repository.StateMachineRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.handlers.registration.action.*;
-import org.roxy.reminder.bot.tgclient.dto.updates.UpdateType;
+import org.roxy.reminder.bot.service.webclient.dto.updates.UpdateType;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 @Slf4j

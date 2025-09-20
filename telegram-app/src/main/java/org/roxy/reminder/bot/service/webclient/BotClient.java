@@ -1,7 +1,7 @@
-package org.roxy.reminder.bot.service.http;
+package org.roxy.reminder.bot.service.webclient;
 
-import org.roxy.reminder.bot.tgclient.dto.message.request.MessageDto;
-import org.roxy.reminder.bot.tgclient.dto.message.response.SendMessageResponseDto;
+import org.roxy.reminder.bot.service.webclient.dto.message.request.MessageDto;
+import org.roxy.reminder.bot.service.webclient.dto.message.response.SendMessageResponseDto;
 
 import java.util.List;
 

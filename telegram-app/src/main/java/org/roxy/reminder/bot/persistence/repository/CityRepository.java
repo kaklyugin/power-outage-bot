@@ -1,13 +1,26 @@
 package org.roxy.reminder.bot.persistence.repository;
 
+import org.roxy.reminder.bot.persistence.dto.CityDto;
 import org.roxy.reminder.bot.persistence.entity.CityEntity;
-import org.roxy.reminder.bot.persistence.entity.StreetEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CityRepository extends JpaRepository<CityEntity, String> {
+    @Query("SELECT c FROM CityEntity c WHERE c.fiasId IN :fiasIds ORDER BY c.name")
+    List<CityEntity> findByFiasIdsIn(@Param("fiasIds") List<String> fiasIds);
 
+    @Query("SELECT c FROM CityEntity c WHERE c.fiasId = :fiasId")
+    Optional<CityEntity> findById(@Param("fiasId") String fiasId);
+
+    @Query(nativeQuery = true, value =
+            "Select fias_id as fiasId," +
+                    " name as name ," +
+                    " district || ' ' || name as fullName " +
+                    "from cities c " +
+                    "where :cityName % name")
+    List<CityDto> findWithFuzzySearchByName(@Param("cityName") String cityName);
 }

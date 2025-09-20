@@ -1,6 +1,6 @@
-package org.roxy.reminder.bot.tgclient.storage;
+package org.roxy.reminder.bot.cache;
 
-import org.roxy.reminder.bot.tgclient.dto.updates.UpdateResponseDto;
+import org.roxy.reminder.bot.service.webclient.dto.updates.UpdateResponseDto;
 
 public interface ChatStore {
     void pushUpdate(Long chatId, Long updateId, UpdateResponseDto message);

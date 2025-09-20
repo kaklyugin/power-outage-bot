@@ -1,9 +1,9 @@
-package org.roxy.reminder.bot.dto;
+package org.roxy.reminder.bot.service.broker.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.roxy.reminder.bot.tgclient.dto.updates.UpdateType;
+import org.roxy.reminder.bot.service.webclient.dto.updates.UpdateType;
 
 @Data
 @NoArgsConstructor

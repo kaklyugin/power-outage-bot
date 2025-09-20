@@ -2,7 +2,7 @@ package org.roxy.reminder.bot.sate.machine;
 
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.sate.machine.handlers.UpdateHandler;
-import org.roxy.reminder.bot.dto.UpdateDto;
+import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

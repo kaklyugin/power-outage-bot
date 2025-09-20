@@ -4,13 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
-import org.roxy.reminder.bot.dto.UpdateDto;
-import org.roxy.reminder.bot.persistence.repository.StreetRepository;
-import org.roxy.reminder.bot.tgclient.dto.message.request.MessageDto;
-import org.roxy.reminder.bot.tgclient.dto.message.request.keyboard.InlineKeyboardDto;
+import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
+import org.roxy.reminder.bot.service.suggestion.SuggestionService;
+import org.roxy.reminder.bot.service.webclient.dto.message.request.MessageDto;
+import org.roxy.reminder.bot.service.webclient.dto.message.request.keyboard.InlineKeyboardDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,20 +20,22 @@ import java.util.Optional;
 public class StreetInputActionResolver extends ActionResolver {
 
     @Autowired
-    private StreetRepository streetRepository;
+    private SuggestionService suggestionService;
     @Autowired
     private UserCartRepository userCartRepository;
+
 
     @Override
     public Event resolveAction(UpdateDto update) {
         log.info("Handling message = {}", update);
+        List<String> streets = new ArrayList<>();
         Optional<UserCartEntity> userCart = userCartRepository.findByChatId(update.getChatId());
         if (userCart.isEmpty()) {
             throw new RuntimeException("User cart is empty for update = " + update);
         }
-        List<String> streets = streetRepository.findWithFuzzySearchByCityIdAndName(
-                userCart.get().getCity().getFiasId()
-                , update.getUserResponse());
+        streets = suggestionService.getStreetSuggestions(userCart.get().getCity().getFiasId(),
+                userCart.get().getCity().getType(),
+                update.getUserResponse());
 
         if (streets.isEmpty()) {
             super.botClient.sendMessage(
@@ -52,17 +55,17 @@ public class StreetInputActionResolver extends ActionResolver {
             return Event.RETRY;
         }
 
-        InlineKeyboardDto.KeyboardBuilder keyboardOfStreetsBuilder = new InlineKeyboardDto.KeyboardBuilder();
+        InlineKeyboardDto.KeyboardBuilder keyboardStreetsBuilder = new InlineKeyboardDto.KeyboardBuilder();
         for (String street : streets) {
-            keyboardOfStreetsBuilder.addRow().addButton(street, street);
+            keyboardStreetsBuilder.addRow().addButton(street, street);
         }
-        InlineKeyboardDto keyboardOfStreets = keyboardOfStreetsBuilder.build();
+        InlineKeyboardDto keyboardStreets = keyboardStreetsBuilder.build();
 
         super.botClient.sendMessage(
                 MessageDto.builder()
                         .chatId(String.valueOf(update.getChatId()))
                         .text("Выберите улицу")
-                        .replyMarkup(keyboardOfStreets)
+                        .replyMarkup(keyboardStreets)
                         .build());
 
         return Event.REPLY_RECEIVED;
