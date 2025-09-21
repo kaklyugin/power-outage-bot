@@ -16,5 +16,7 @@
     <include file="changesets/006-create-state-machines-table.sql" relativeToChangelogFile="true"/>
     <include file="changesets/007-load-cities-data.sql" relativeToChangelogFile="true"/>
     <include file="changesets/008-load-streets-data.sql" relativeToChangelogFile="true"/>
+    <include file="changesets/009-create-loaction-types.sql" relativeToChangelogFile="true"/>
+    <include file="changesets/010-load-loaction-types.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

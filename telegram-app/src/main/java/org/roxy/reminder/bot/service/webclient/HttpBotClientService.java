@@ -1,14 +1,14 @@
-package org.roxy.reminder.bot.service.http;
+package org.roxy.reminder.bot.service.webclient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.tgclient.dto.message.callbackanswer.CallbackAnswerDto;
-import org.roxy.reminder.bot.tgclient.dto.message.request.MessageDto;
-import org.roxy.reminder.bot.tgclient.dto.message.response.SendMessageResponseDto;
+import org.roxy.reminder.bot.service.webclient.dto.message.callbackanswer.CallbackAnswerDto;
+import org.roxy.reminder.bot.service.webclient.dto.message.request.MessageDto;
+import org.roxy.reminder.bot.service.webclient.dto.message.response.SendMessageResponseDto;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -24,11 +24,10 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Slf4j
-@Component
-public class HttpBotClient implements BotClient {
+@Service
+public class HttpBotClientService implements BotClient {
 
     private static final String SSL_PROTOCOL = "TLS";
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
@@ -41,7 +40,7 @@ public class HttpBotClient implements BotClient {
     private final HttpClient client;
     private final ObjectMapper objectMapper;
 
-    public HttpBotClient(
+    public HttpBotClientService(
             @Value("${bot.url}") String botBaseUrl, ObjectMapper objectMapper) {
         this.botBaseUrl = botBaseUrl;
         this.objectMapper = objectMapper;
@@ -53,6 +52,9 @@ public class HttpBotClient implements BotClient {
         try {
             HttpRequest request = createHttpRequest(message);
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+               log.error("Failed to send message. Response is {}", response.body());
+            }
             log.info("Sent message.Response body = {}", response.body());
             return objectMapper.readValue(response.body(), SendMessageResponseDto.class);
         } catch (Exception e) {
