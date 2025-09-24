@@ -13,11 +13,9 @@ CREATE TABLE power_outage_notifications
     CONSTRAINT pk_power_outage_notifications PRIMARY KEY (id)
 );
 
--- changeset anton.kaklyugin:004:add-foreign-key-constraint-user-cart
 ALTER TABLE power_outage_notifications
     ADD CONSTRAINT fk_power_outage_notifications_user_cart
         FOREIGN KEY (user_cart_id) REFERENCES user_cart(id);
 
--- changeset anton.kaklyugin:004:create-index-on-user-cart-id
 CREATE INDEX idx_power_outage_notifications_user_cart_id
     ON power_outage_notifications(user_cart_id);

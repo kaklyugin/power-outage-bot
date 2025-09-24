@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.dadata.client;
+package org.roxy.reminder.bot.service.suggestion.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
