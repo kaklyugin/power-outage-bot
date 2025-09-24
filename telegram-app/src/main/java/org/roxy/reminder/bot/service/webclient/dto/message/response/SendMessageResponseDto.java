@@ -16,7 +16,8 @@ public class SendMessageResponseDto {
     private Long messageId;
     private Long chatId;
 
-    //TODO переписать под обычный маппинг RESULT
+    //TODO переписать под маппинг RESULT не с помощью HashMap, а просто определить класс, если это возможно или
+    // написать кастомный jackson deserializer
     @JsonProperty("result")
     private void unpackMessageId(Map<String, Object> result) {
         this.messageId = Long.valueOf(result.get("message_id").toString());

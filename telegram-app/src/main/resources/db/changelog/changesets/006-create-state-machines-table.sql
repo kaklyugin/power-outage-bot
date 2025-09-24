@@ -11,14 +11,11 @@ CREATE TABLE state_machines
     CONSTRAINT pk_state_machines PRIMARY KEY (id)
 );
 
--- changeset anton.kaklyugin:006:create-index-on-chat-id
 CREATE INDEX idx_state_machines_chat_id
     ON state_machines(chat_id);
 
--- changeset anton.kaklyugin:006:create-index-on-state
 CREATE INDEX idx_state_machines_state
     ON state_machines(state);
 
--- changeset anton.kaklyugin:006:create-index-on-state-machine-name
 CREATE INDEX idx_state_machines_state_machine_name
     ON state_machines(state_machine_name);

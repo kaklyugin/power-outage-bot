@@ -7,7 +7,7 @@ import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.service.notification.NotificationService;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.MessageDto;
-import org.roxy.reminder.common.util.AddressFormatter;
+import org.roxy.reminder.bot.service.formatter.AddressFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ public class StreetSelectActionResolver extends ActionResolver {
     @Autowired
     private UserCartRepository userCartRepository;
     @Autowired
-    private NotificationService notificationService;
+    private AddressFormatter addressFormatter;
 
 
     @Override
@@ -27,7 +27,7 @@ public class StreetSelectActionResolver extends ActionResolver {
         UserCartEntity userCart = userCartRepository.findByChatId(update.getChatId())
                 .orElseThrow(() -> new RuntimeException("StreetSelectActionResolver error. User cart not found for update = " + update));
         userCart.setStreet(update.getUserResponse());
-        userCart.setNormalizedStreet(AddressFormatter.normalizeStreetName(update.getUserResponse()));
+        userCart.setNormalizedStreet(addressFormatter.normalizeStreetName(update.getUserResponse()));
         userCartRepository.save(userCart);
         super.botClient.sendMessage( MessageDto.builder()
                 .chatId(String.valueOf(update.getChatId()))

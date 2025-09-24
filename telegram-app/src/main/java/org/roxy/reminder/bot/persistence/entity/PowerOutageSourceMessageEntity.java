@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 
 @Entity
 @Data
-@Table(name = "power_outage_inbound_message")
+@Table(name = "power_outage_inbound_messages")
 public class PowerOutageSourceMessageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +31,9 @@ public class PowerOutageSourceMessageEntity {
 
     @Column (name = "url" ,columnDefinition = "TEXT")
     private String url;
+
+    @Column(name = "normalized_street_type", columnDefinition = "TEXT")
+    private String normalizedStreetType;
 
     @Column(name = "message_hash_code", unique = true)
     private Integer messageHashCode;

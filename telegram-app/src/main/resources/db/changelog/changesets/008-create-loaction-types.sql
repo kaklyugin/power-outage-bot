@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset anton.kaklyugin:009:create-location-types-table
+-- changeset anton.kaklyugin:008:create-location-types-table
 CREATE TABLE location_types
 (
     id              BIGSERIAL NOT NULL,

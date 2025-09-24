@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.dadata.client;
+package org.roxy.reminder.bot.service.suggestion.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +40,7 @@ public class DaDataWebClient {
         this.client = createHttpClient();
     }
 
-    public AddressSuggestionsResponse getSuggestions(DaDataSearchRequest searchRequest) {
+    public DaDataSuggestionsResponse getSuggestions(DaDataSearchRequest searchRequest) {
         try {
             HttpRequest request = createHttpRequest(searchRequest);
             log.info("Suggestion request body = {}", objectMapper.writeValueAsString(searchRequest));
@@ -49,11 +49,11 @@ public class DaDataWebClient {
                 log.error(response.body());
             }
             log.info("Suggestion response body = {}", response.body());
-            return objectMapper.readValue(response.body(), AddressSuggestionsResponse.class);
+            return objectMapper.readValue(response.body(), DaDataSuggestionsResponse.class);
         } catch (Exception e) {
             log.error("Failed to get suggestion", e);
         }
-        return new AddressSuggestionsResponse(List.of());
+        return new DaDataSuggestionsResponse(List.of());
     }
 
     private HttpRequest createHttpRequest(DaDataSearchRequest searchRequest) {

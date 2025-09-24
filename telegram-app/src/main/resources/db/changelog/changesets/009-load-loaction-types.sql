@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset anton.kaklyugin:010:load-location-types-table
+-- changeset anton.kaklyugin:009:load-location-types-table
 insert into location_types (category, type, alias, last_updated_at) values
     ('улица',	'улица',	'ул', now()),
     ('улица',	'улица',	'улица', now()),
