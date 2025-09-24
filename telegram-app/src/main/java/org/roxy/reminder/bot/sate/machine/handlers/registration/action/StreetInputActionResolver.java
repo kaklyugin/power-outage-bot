@@ -5,7 +5,7 @@ import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
-import org.roxy.reminder.bot.service.suggestion.SuggestionService;
+import org.roxy.reminder.bot.service.suggestion.DaDataSuggestionService;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.MessageDto;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.keyboard.InlineKeyboardDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class StreetInputActionResolver extends ActionResolver {
 
     @Autowired
-    private SuggestionService suggestionService;
+    private DaDataSuggestionService suggestionService;
     @Autowired
     private UserCartRepository userCartRepository;
 
@@ -34,7 +34,6 @@ public class StreetInputActionResolver extends ActionResolver {
             throw new RuntimeException("User cart is empty for update = " + update);
         }
         streets = suggestionService.getStreetSuggestions(userCart.get().getCity().getFiasId(),
-                userCart.get().getCity().getType(),
                 update.getUserResponse());
 
         if (streets.isEmpty()) {

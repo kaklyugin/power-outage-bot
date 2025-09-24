@@ -8,14 +8,6 @@
         http://www.liquibase.org/xml/ns/pro
         http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.23.xsd">
 
-    <include file="changesets/001-create-cities-table.sql" relativeToChangelogFile="true"/>
-    <include file="changesets/002-create-streets-table.sql" relativeToChangelogFile="true"/>
-    <include file="changesets/003-create-user-carts-table.sql" relativeToChangelogFile="true"/>
-    <include file="changesets/004-create-notifications-table.sql" relativeToChangelogFile="true"/>
-    <include file="changesets/005-create-inbound-power-outage-messages-table.sql" relativeToChangelogFile="true"/>
-    <include file="changesets/006-create-state-machines-table.sql" relativeToChangelogFile="true"/>
-    <include file="changesets/007-load-cities-data.sql" relativeToChangelogFile="true"/>
-    <include file="changesets/008-create-loaction-types.sql" relativeToChangelogFile="true"/>
-    <include file="changesets/009-load-loaction-types.sql" relativeToChangelogFile="true"/>
+    <include file="changesets/001-initial-schema.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

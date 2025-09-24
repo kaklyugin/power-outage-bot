@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @SuperBuilder
-@Table(name = "user_cart")
+@Table(name = "user_carts")
 public class UserCartEntity {
 
     @Id

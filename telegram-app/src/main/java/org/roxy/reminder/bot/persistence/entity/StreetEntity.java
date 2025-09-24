@@ -2,6 +2,7 @@ package org.roxy.reminder.bot.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
 
@@ -62,4 +63,5 @@ public class StreetEntity {
     @Version
     @Column(name = "last_updated_at")
     private LocalDateTime lastUpdatedAt;
+
 }
