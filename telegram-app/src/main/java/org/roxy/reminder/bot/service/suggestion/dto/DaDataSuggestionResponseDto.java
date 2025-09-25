@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.service.suggestion.client;
+package org.roxy.reminder.bot.service.suggestion.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class SuggestionDto {
+public class DaDataSuggestionResponseDto {
 
     @JsonProperty("value")
     private String value;
@@ -17,5 +17,5 @@ public class SuggestionDto {
     private String unrestrictedValue;
 
     @JsonProperty("data")
-    private AddressDataDto data;
+    private DaDataAddressResponseDto data;
 }

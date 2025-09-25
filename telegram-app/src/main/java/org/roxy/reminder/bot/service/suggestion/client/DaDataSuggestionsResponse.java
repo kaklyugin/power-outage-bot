@@ -2,6 +2,8 @@ package org.roxy.reminder.bot.service.suggestion.client;
 
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.roxy.reminder.bot.service.suggestion.dto.DaDataSuggestionResponseDto;
+
 import java.util.List;
 
 @Data
@@ -12,7 +14,7 @@ import java.util.List;
 public class DaDataSuggestionsResponse {
 
     @JsonProperty("suggestions")
-    private List<SuggestionDto> suggestions;
+    private List<DaDataSuggestionResponseDto> suggestions;
 
 
 

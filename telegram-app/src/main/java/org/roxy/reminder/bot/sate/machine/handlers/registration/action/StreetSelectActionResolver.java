@@ -1,6 +1,7 @@
 package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
+import org.roxy.reminder.bot.service.UserCartService;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
@@ -16,19 +17,13 @@ import org.springframework.stereotype.Component;
 public class StreetSelectActionResolver extends ActionResolver {
 
     @Autowired
-    private UserCartRepository userCartRepository;
-    @Autowired
-    private AddressFormatter addressFormatter;
-
+    private UserCartService userCartService;
 
     @Override
     public Event resolveAction(UpdateDto update) {
         log.info("Handling message = {}", update);
-        UserCartEntity userCart = userCartRepository.findByChatId(update.getChatId())
-                .orElseThrow(() -> new RuntimeException("StreetSelectActionResolver error. User cart not found for update = " + update));
-        userCart.setStreet(update.getUserResponse());
-        userCart.setNormalizedStreet(addressFormatter.normalizeStreetName(update.getUserResponse()));
-        userCartRepository.save(userCart);
+        UserCartEntity userCart = userCartService.getUserCartByChatId(update.getChatId());
+        userCartService.addStreet(userCart.getId(),update.getUserResponse());
         super.botClient.sendMessage( MessageDto.builder()
                 .chatId(String.valueOf(update.getChatId()))
                 .text("Всё получилось. Мы отправим уведомление, если на вашей улице будет запланировано отключение света.")

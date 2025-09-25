@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,18 +24,11 @@ public class UserCartEntity {
     @Column(name = "chat_id")
     private Long chatId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "city_fias_id")
-    private CityEntity city;
-
-    @Column(name = "street", columnDefinition = "TEXT")
-    private String street;
-
-    @Column(name = "normalized_street", columnDefinition = "TEXT")
-    private String normalizedStreet;
-
-    @OneToMany(mappedBy = "userCart", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "userCart", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER,orphanRemoval = true)
     private List<NotificationEntity> notifications;
+
+    @OneToMany(mappedBy = "userCart", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER ,orphanRemoval = true)
+    private List<UserAddressEntity> addresses = new ArrayList<>();
 
     @Version
     private LocalDateTime lastUpdatedAt;
@@ -42,5 +36,4 @@ public class UserCartEntity {
     public UserCartEntity(Long chatId) {
         this.chatId = chatId;
     }
-
 }

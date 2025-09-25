@@ -5,6 +5,7 @@ import org.roxy.reminder.bot.Constantst;
 import org.roxy.reminder.bot.persistence.entity.CityEntity;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
+import org.roxy.reminder.bot.service.UserCartService;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class CitySelectActionResolver extends ActionResolver {
 
     @Autowired
-    private UserCartRepository userCartRepository;
+    private UserCartService userCartService;
 
     @Autowired
     private CityRepository cityRepository;
@@ -35,13 +36,12 @@ public class CitySelectActionResolver extends ActionResolver {
         }
 
         log.info("Handling update = {}", update);
-        UserCartEntity userCart = userCartRepository.findByChatId(update.getChatId())
-                .orElseThrow(() -> new RuntimeException("CitySelectActionResolver error. User cart not found for update = " + update));
+        UserCartEntity userCart = userCartService.getUserCartByChatId(update.getChatId());
         CityEntity cityEntity = cityRepository.findById(update.getUserResponse())
                 .orElseThrow(() -> new RuntimeException(
                 String.format("Failed to save user response. City with id = %s not found", update.getUserResponse())));
-        userCart.setCity(cityEntity);
-        userCartRepository.save(userCart);
+        userCartService.addCity(userCart.getId(),cityEntity.getFiasId());
+        userCartService.save(userCart);
         super.botClient.sendMessage(MessageDto.builder()
                 .chatId(String.valueOf(update.getChatId()))
                 .text("Введите улицу")

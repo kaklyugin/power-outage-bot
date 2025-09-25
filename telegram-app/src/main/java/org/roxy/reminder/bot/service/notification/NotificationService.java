@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.entity.NotificationEntity;
 import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
+import org.roxy.reminder.bot.persistence.entity.UserAddressEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.NotificationRepository;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
@@ -49,7 +50,7 @@ public class NotificationService {
         createNotificationsForAllUsers();
     }
 
-
+    //TODO REFACTOR
     @Transactional
     public void createNotificationsForAllUsers() {
         try {
@@ -59,20 +60,24 @@ public class NotificationService {
             for (UserCartEntity userCartEntity : userCartEntities) {
                 NotificationEntity notificationEntity = new NotificationEntity();
                 for (PowerOutageSourceMessageEntity sourceMessage : sourceMessages) {
-                    boolean isNotificationCreated =
+                    boolean isNotificationForMessageIsCreated =
                             userCartEntity.getNotifications().stream()
                                     .map(NotificationEntity::getMessageHashCodes)
                                     .flatMap(List::stream)
                                     .anyMatch(messageHashCode ->
                                             Objects.equals(messageHashCode, sourceMessage.getMessageHashCode()));
-                    if (!isNotificationCreated) {
-                        if (addressFormatter.normalizeStreetName(sourceMessage.getAddress()).contains(userCartEntity.getNormalizedStreet())
-                                && sourceMessage.getCity().contains(userCartEntity.getCity().getName())) {
-                            notificationEntity.setUserCart(userCartEntity);
-                            notificationEntity.getMessageHashCodes().add(sourceMessage.getMessageHashCode());
-                            String notificationText = appendAddressToNotificationText(notificationEntity.getNotificationText(), sourceMessage);
-                            notificationEntity.setNotificationText(notificationText);
-                            notificationEntity.setUserCart(userCartEntity);
+                    if (!isNotificationForMessageIsCreated) {
+                        for (UserAddressEntity userAddress: userCartEntity.getAddresses())
+                        {
+                            if (userAddress.getStreetEntity().getFiasId().equals(sourceMessage.getFiasId()))
+                            {
+                                notificationEntity.setUserCart(userCartEntity);
+                                notificationEntity.getMessageHashCodes().add(sourceMessage.getMessageHashCode());
+                                String notificationText = appendAddressToNotificationText(notificationEntity.getNotificationText(), sourceMessage);
+                                notificationEntity.setNotificationText(notificationText);
+                                notificationEntity.setUserCart(userCartEntity);
+                            }
+
                         }
                     }
                 }
