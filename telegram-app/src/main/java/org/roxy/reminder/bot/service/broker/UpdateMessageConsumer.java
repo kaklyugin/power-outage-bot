@@ -36,7 +36,10 @@ public class UpdateMessageConsumer {
             updateHandler.handle(update);
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
-            log.error("RabbitMQ message processor failed. Could not process update {}", e.getMessage());
+            log.error("RabbitMQ message processor failed. Could not process update {}. Error = {}",
+                    objectMapper.readValue(message.getBody(), UpdateDto.class),
+                    e.getMessage());
+            e.printStackTrace();
             channel.basicReject(deliveryTag, false);
         }
     }

@@ -6,6 +6,7 @@ import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.roxy.reminder.bot.service.suggestion.DaDataSuggestionService;
+import org.roxy.reminder.bot.service.suggestion.StreetDto;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.MessageDto;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.keyboard.InlineKeyboardDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,13 @@ public class StreetInputActionResolver extends ActionResolver {
     @Override
     public Event resolveAction(UpdateDto update) {
         log.info("Handling message = {}", update);
-        List<String> streets = new ArrayList<>();
         Optional<UserCartEntity> userCart = userCartRepository.findByChatId(update.getChatId());
         if (userCart.isEmpty()) {
             throw new RuntimeException("User cart is empty for update = " + update);
         }
-        streets = suggestionService.getStreetSuggestions(userCart.get().getCity().getFiasId(),
+
+        List<StreetDto> streets = suggestionService.getStreetSuggestions(
+                userCart.get().getAddresses().getLast().getCityEntity().getFiasId(),
                 update.getUserResponse());
 
         if (streets.isEmpty()) {
@@ -55,8 +57,8 @@ public class StreetInputActionResolver extends ActionResolver {
         }
 
         InlineKeyboardDto.KeyboardBuilder keyboardStreetsBuilder = new InlineKeyboardDto.KeyboardBuilder();
-        for (String street : streets) {
-            keyboardStreetsBuilder.addRow().addButton(street, street);
+        for (StreetDto streetDto : streets) {
+            keyboardStreetsBuilder.addRow().addButton(streetDto.getStreetFullName(), streetDto.getFiasId());
         }
         InlineKeyboardDto keyboardStreets = keyboardStreetsBuilder.build();
 

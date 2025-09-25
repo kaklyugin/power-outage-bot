@@ -7,6 +7,7 @@ import org.roxy.reminder.bot.persistence.entity.StreetEntity;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
 import org.roxy.reminder.bot.service.suggestion.client.*;
 import org.roxy.reminder.bot.persistence.repository.StreetRepository;
+import org.roxy.reminder.bot.service.suggestion.dto.DaDataSuggestionResponseDto;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -31,19 +32,19 @@ public class DaDataSuggestionService implements SuggestionService {
     }
 
     @Override
-    public List<String> getStreetSuggestions(String fiasId, String userInput) {
+    public List<StreetDto> getStreetSuggestions(String fiasId, String userInput) {
         String cityType = getCityType(fiasId);
         return getStreets(fiasId, cityType, userInput);
     }
 
-    private List<String> getStreets(String locationRestrictionFiasId, String type, String userInput) {
+    private List<StreetDto> getStreets(String locationRestrictionFiasId, String type, String userInput) {
         HashMap<String, String> location = new HashMap<>();
         if (type.equalsIgnoreCase("город")) {
             location.put("city_fias_id", locationRestrictionFiasId);
         } else {
             location.put("settlement_fias_id", locationRestrictionFiasId);
         }
-        List<SuggestionDto> suggestions = daDataWebClient.getSuggestions(
+        List<DaDataSuggestionResponseDto> suggestions = daDataWebClient.getSuggestions(
                 DaDataSearchRequest.builder()
                         .query(userInput)
                         .locations(
@@ -57,7 +58,7 @@ public class DaDataSuggestionService implements SuggestionService {
         if (suggestions.isEmpty()) {
             return Collections.emptyList();
         }
-        for (SuggestionDto suggestion : suggestions) {
+        for (DaDataSuggestionResponseDto suggestion : suggestions) {
             try {
                 StreetEntity streetEntity = mapper.mapStreetDtoToEntity(suggestion.getData());
                 streetRepository.findById(streetEntity.getFiasId()).orElseGet(() -> streetRepository.save(streetEntity));
@@ -66,7 +67,7 @@ public class DaDataSuggestionService implements SuggestionService {
             }
         }
         return suggestions.stream()
-                .map(SuggestionDto::getValue)
+                .map(r-> new StreetDto(r.getValue(),r.getData().getFiasId()))
                 .collect(Collectors.toList());
     }
 
