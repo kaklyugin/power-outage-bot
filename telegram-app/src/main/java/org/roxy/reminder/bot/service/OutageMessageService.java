@@ -6,7 +6,7 @@ import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
 import org.roxy.reminder.bot.service.formatter.AddressFormatter;
-import org.roxy.reminder.common.dto.PowerOutageDto;
+import org.roxy.reminder.bot.service.broker.dto.PowerOutageDto;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;

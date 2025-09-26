@@ -1,4 +1,4 @@
-package org.roxy.reminder.common.dto;
+package org.roxy.reminder.bot.service.broker.dto;
 
 import lombok.Data;
 

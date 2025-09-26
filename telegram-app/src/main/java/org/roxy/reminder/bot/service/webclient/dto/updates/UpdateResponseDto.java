@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.roxy.reminder.bot.jsonmapper.UpdateResponseDtoDeserializer;
+import org.roxy.reminder.bot.jackson.UpdateResponseDtoDeserializer;
 
 @Data
 @Builder
