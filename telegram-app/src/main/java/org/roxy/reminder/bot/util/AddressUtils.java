@@ -1,17 +1,14 @@
 package org.roxy.reminder.bot.util;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class AddressFormatter {
+public class AddressUtils {
 
-    public static SplittedAddress splitAddress(String address) {
+    public static AddressComponents extractAddressComponents(String address) {
         String[] tokens = address.split(" ");
         List<AddressToken> addressTokenList = new ArrayList<>();
 
@@ -25,28 +22,42 @@ public class AddressFormatter {
         }
         int longestTokenNumberWithLetters = addressTokenList.stream()
                 .max(Comparator.comparingInt(x -> x.cyrillicLettersCount)).get().tokenNumber;
+
         for (AddressToken token : addressTokenList) {
-            if (token.tokenNumber >= longestTokenNumberWithLetters
+            if (token.tokenNumber == 0 &&
+                    token.cyrillicLettersCount >= token.digitsAndSymbolsCount) {
+                token.type = TokenType.STREET_TYPE;
+            } else if (token.tokenNumber >= longestTokenNumberWithLetters
                     && token.digitsAndSymbolsCount >= token.cyrillicLettersCount
             ) {
-                token.isBuildingNumber = true;
+                token.type = TokenType.BUILDING_NUMBER;
+            } else {
+                token.type = TokenType.STREET_NAME;
             }
+
         }
+        String streetType = addressTokenList.stream().
+                filter(token -> token.type.equals(TokenType.STREET_TYPE))
+                .findFirst()
+                .map(t -> t.text)
+                .map(t -> t.replaceAll("\\.", "").toLowerCase())
+                .orElse("");
 
-        var streetName = addressTokenList.stream().
-                filter(token -> !token.isBuildingNumber)
+        String streetName = addressTokenList.stream().
+                filter(token -> token.type.equals(TokenType.STREET_NAME))
                 .map(t -> t.text)
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(" "));
 
-        var buildingsNumbers = addressTokenList.stream().
-                filter(token -> token.isBuildingNumber)
+        List<String> buildingsNumbers = addressTokenList.stream().
+                filter(token -> token.type.equals(TokenType.BUILDING_NUMBER))
                 .map(t -> t.text)
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining(" "));
+                .flatMap(t-> Arrays.stream(t.split(",")))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
 
-        return new SplittedAddress(streetName, buildingsNumbers);
-
+        return new AddressComponents(streetType, streetName, buildingsNumbers);
     }
 
     private static class AddressToken {
@@ -54,16 +65,13 @@ public class AddressFormatter {
         public String text;
         public int cyrillicLettersCount;
         public int digitsAndSymbolsCount;
-        public boolean isBuildingNumber;
+        public TokenType type;
     }
 
     private static int countCyrillicLetters(String text) {
         if (text == null) return 0;
-
         Pattern pattern = Pattern.compile("[А-Яа-я]");
-        ;
         Matcher matcher = pattern.matcher(text);
-
         int count = 0;
         while (matcher.find()) {
             count++;
@@ -73,14 +81,18 @@ public class AddressFormatter {
 
     private static int countDigitsAndSymbols(String text) {
         if (text == null) return 0;
-
         Pattern pattern = Pattern.compile("[\\d\\p{P}\\p{S}]");
         Matcher matcher = pattern.matcher(text);
-
         int count = 0;
         while (matcher.find()) {
             count++;
         }
         return count;
+    }
+
+    private enum TokenType {
+        STREET_TYPE,
+        STREET_NAME,
+        BUILDING_NUMBER
     }
 }
