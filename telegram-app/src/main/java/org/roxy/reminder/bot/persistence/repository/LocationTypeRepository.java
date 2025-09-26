@@ -12,6 +12,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LocationTypeRepository extends JpaRepository<LocationTypeEntity, String> {
-    @Query("Select l.id, l.type,l.alias from LocationTypeEntity l where l.category = :category")
-    List<LocationTypeDto> getTypesByCategory(@Param("category") String category);
+    List<LocationTypeDto> getAllByCategory(String category);
 }

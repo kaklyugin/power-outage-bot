@@ -8,18 +8,17 @@ import java.time.LocalDateTime;
 @Table(name = "location_types")
 public class LocationTypeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "category", columnDefinition = "TEXT")
-    private String category = "";
+    @Column(name = "category")
+    private String category;
 
-    @Column(name = "type", columnDefinition = "TEXT")
-    private String type = "";
+    @Column(name = "type")
+    private String type;
 
-    @Column(name = "alias", columnDefinition = "TEXT")
-    private String alias = "";
+    @Column(name = "alias")
+    private String alias;
 
     @Version
     private LocalDateTime lastUpdatedAt;

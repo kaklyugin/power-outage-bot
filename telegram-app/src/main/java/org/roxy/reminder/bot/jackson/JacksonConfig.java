@@ -1,4 +1,4 @@
-package org.roxy.reminder.common.config;
+package org.roxy.reminder.bot.jackson;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.text.SimpleDateFormat;
 
 
 @Configuration

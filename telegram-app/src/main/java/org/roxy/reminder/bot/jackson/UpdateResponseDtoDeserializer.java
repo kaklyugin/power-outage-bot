@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.jsonmapper;
+package org.roxy.reminder.bot.jackson;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;

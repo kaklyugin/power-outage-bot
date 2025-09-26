@@ -5,19 +5,12 @@ import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
-import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
-import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
-import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
 import org.roxy.reminder.bot.service.OutageMessageService;
-import org.roxy.reminder.common.dto.PowerOutageDto;
-import org.roxy.reminder.bot.service.formatter.AddressFormatter;
+import org.roxy.reminder.bot.service.broker.dto.PowerOutageDto;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Service
 @Slf4j

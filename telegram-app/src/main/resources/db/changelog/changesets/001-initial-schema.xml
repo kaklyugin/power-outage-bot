@@ -217,7 +217,16 @@
             <column name="address" type="TEXT">
                 <constraints nullable="true"/>
             </column>
-            <column name="fias_id" type="VARCHAR(36)">
+            <column name="street_fias_id" type="VARCHAR(36)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="street_type" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="street_name" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="buildings_numbers" type="JSONB">
                 <constraints nullable="true"/>
             </column>
             <column name="date_time_off" type="TIMESTAMP WITH TIME ZONE">
@@ -232,9 +241,6 @@
             <column name="url" type="TEXT">
                 <constraints nullable="true"/>
             </column>
-            <column name="normalized_street_type" type="TEXT">
-                <constraints nullable="true"/>
-            </column>
             <column name="message_hash_code" type="INTEGER">
                 <constraints nullable="true" unique="true"/>
             </column>
@@ -245,6 +251,9 @@
 
         <createIndex tableName="power_outage_inbound_messages" indexName="idx_power_outage_inbound_message_hash_code">
             <column name="message_hash_code"/>
+        </createIndex>
+        <createIndex tableName="power_outage_inbound_messages" indexName="idx_power_outage_inbound_message_street_fias_id">
+            <column name="street_fias_id"/>
         </createIndex>
 
         <!-- Create state_machines table -->
@@ -2822,28 +2831,28 @@
         <comment>Load initial location type data</comment>
         <sql>
             insert into location_types (category, type, alias, last_updated_at)
-            values ('улица', 'улица', 'ул', now()),
-                   ('улица', 'улица', 'улица', now()),
-                   ('улица', 'проспект', 'проспект', now()),
-                   ('улица', 'проспект', 'прос', now()),
-                   ('улица', 'проспект', 'просп', now()),
-                   ('улица', 'проспект', 'пр-кт', now()),
-                   ('улица', 'переулок', 'переулок', now()),
-                   ('улица', 'переулок', 'пер', now()),
-                   ('улица', 'переулок', 'п', now()),
-                   ('улица', 'проезд', 'проезд', now()),
-                   ('улица', 'спуск', 'спуск', now()),
-                   ('улица', 'спуск', 'сп', now()),
-                   ('улица', 'площадь', 'площадь', now()),
-                   ('улица', 'площадь', 'пл', now()),
-                   ('улица', 'бульвар', 'бульвар', now()),
-                   ('улица', 'бульвар', 'бул', now()),
-                   ('улица', 'бульвар', 'б-р', now()),
-                   ('улица', 'бульвар', 'бульв', now()),
-                   ('улица', 'улица', 'МКД', now()),
-                   ('улица', 'СДТ', 'СДТ', now()),
-                   ('улица', 'ДНТ', 'ДНТ', now()),
-                   ('улица', 'СНТ', 'СНТ', now());
+            values ('street', 'улица', 'ул', now()),
+                   ('street', 'улица', 'улица', now()),
+                   ('street', 'проспект', 'проспект', now()),
+                   ('street', 'проспект', 'прос', now()),
+                   ('street', 'проспект', 'просп', now()),
+                   ('street', 'проспект', 'пр-кт', now()),
+                   ('street', 'переулок', 'переулок', now()),
+                   ('street', 'переулок', 'пер', now()),
+                   ('street', 'переулок', 'п', now()),
+                   ('street', 'проезд', 'проезд', now()),
+                   ('street', 'спуск', 'спуск', now()),
+                   ('street', 'спуск', 'сп', now()),
+                   ('street', 'площадь', 'площадь', now()),
+                   ('street', 'площадь', 'пл', now()),
+                   ('street', 'бульвар', 'бульвар', now()),
+                   ('street', 'бульвар', 'бул', now()),
+                   ('street', 'бульвар', 'б-р', now()),
+                   ('street', 'бульвар', 'бульв', now()),
+                   ('street', 'улица', 'МКД', now()),
+                   ('street', 'СДТ', 'СДТ', now()),
+                   ('street', 'ДНТ', 'ДНТ', now()),
+                   ('street', 'СНТ', 'СНТ', now());
         </sql>
 
     </changeSet>

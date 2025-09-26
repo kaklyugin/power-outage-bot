@@ -10,7 +10,7 @@ import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.NotificationRepository;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
-import org.roxy.reminder.bot.service.formatter.AddressFormatter;
+import org.roxy.reminder.bot.service.formatter.AddressFormatterService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class NotificationService {
     private final PowerOutageSourceMessageRepository messageRepository;
     private final UserCartRepository userCartRepository;
     private final PowerOutageMessageMapper mapper;
-    private final AddressFormatter addressFormatter;
+    private final AddressFormatterService addressFormatterService;
     private final DateTimeFormatter DATE_TIME_FORMATTER_FIRST_DATE = DateTimeFormatter.ofPattern("dd MMMM (EEEE) HH:mm");
     private final DateTimeFormatter DATE_TIME_FORMATER_SECOND_DATE = DateTimeFormatter.ofPattern("HH:mm");
     private final String NEW_PARAGRAPH_SYMBOL = "\uD83D\uDCA1";
@@ -36,12 +36,12 @@ public class NotificationService {
                                PowerOutageSourceMessageRepository messageRepository,
                                UserCartRepository userCartRepository,
                                PowerOutageMessageMapper mapper,
-                               AddressFormatter addressFormatter) {
+                               AddressFormatterService addressFormatterService) {
         this.notificationRepository = notificationRepository;
         this.messageRepository = messageRepository;
         this.userCartRepository = userCartRepository;
         this.mapper = mapper;
-        this.addressFormatter = addressFormatter;
+        this.addressFormatterService = addressFormatterService;
     }
 
     @Scheduled(fixedRate = 10_000)
@@ -69,7 +69,7 @@ public class NotificationService {
                     if (!isNotificationForMessageIsCreated) {
                         for (UserAddressEntity userAddress: userCartEntity.getAddresses())
                         {
-                            if (userAddress.getStreetEntity().getFiasId().equals(sourceMessage.getFiasId()))
+                            if (userAddress.getStreetEntity().getFiasId().equals(sourceMessage.getStreetFiasId()))
                             {
                                 notificationEntity.setUserCart(userCartEntity);
                                 notificationEntity.getMessageHashCodes().add(sourceMessage.getMessageHashCode());
