@@ -30,7 +30,7 @@ public class CitySelectActionResolver extends ActionResolver {
         {
             super.botClient.sendMessage(MessageDto.builder()
                     .chatId(String.valueOf(update.getChatId()))
-                    .text("Введите название населенного пункта ")
+                    .text("✅Введите название населенного пункта ")
                     .build());
             return Event.SPECIFIC_CITY_INPUT_REQUESTED;
         }
@@ -44,7 +44,7 @@ public class CitySelectActionResolver extends ActionResolver {
         userCartService.save(userCart);
         super.botClient.sendMessage(MessageDto.builder()
                 .chatId(String.valueOf(update.getChatId()))
-                .text("Введите улицу")
+                .text("✅Введите улицу")
                 .build());
         return Event.REPLY_RECEIVED;
     }

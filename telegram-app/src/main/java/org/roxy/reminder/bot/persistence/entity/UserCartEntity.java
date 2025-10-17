@@ -24,6 +24,9 @@ public class UserCartEntity {
     @Column(name = "chat_id")
     private Long chatId;
 
+    @Column(name = "username")
+    private String username;
+
     @OneToMany(mappedBy = "userCart", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER,orphanRemoval = true)
     private List<NotificationEntity> notifications;
 

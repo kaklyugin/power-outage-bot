@@ -19,12 +19,11 @@ public class UpdateMessageConsumer {
 
     private final ObjectMapper objectMapper;
     private final UpdateHandlerService updateHandler;
-    private final ConnectionFactory connectionFactory;
 
-    public UpdateMessageConsumer(ObjectMapper objectMapper, UpdateHandlerService updateHandler, ConnectionFactory connectionFactory) {
+
+    public UpdateMessageConsumer(ObjectMapper objectMapper, UpdateHandlerService updateHandler) {
         this.objectMapper = objectMapper;
         this.updateHandler = updateHandler;
-        this.connectionFactory = connectionFactory;
     }
 
     @SneakyThrows

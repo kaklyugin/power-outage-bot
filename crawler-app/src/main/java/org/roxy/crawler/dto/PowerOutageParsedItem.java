@@ -25,9 +25,11 @@ public class PowerOutageParsedItem {
 
     private static final List<DateTimeFormatter> dateFormatters = List.of(
             DateTimeFormatter.ofPattern("dd.MM.yy"),
+            DateTimeFormatter.ofPattern("dd.MM.yyг."),
+            DateTimeFormatter.ofPattern("dd.MM.yyг"),
             DateTimeFormatter.ofPattern("dd.MM.yyyy")
     );
-    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH['=']['-']mm");
+    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H[=][-]mm");
 
 
     public PowerOutageParsedItem(String id,
@@ -51,7 +53,7 @@ public class PowerOutageParsedItem {
         this.comment = comment;
     }
     //TODO Вынести Zone в настройки бота
-    private ZonedDateTime convertDateTime(String date, String time, ZoneId zoneId) {
+    private ZonedDateTime convertDateTime(String date, String time, ZoneId zoneId) throws RuntimeException {
         LocalDateTime ldt;
         try {
             LocalDate localDate = parseDate(date);
@@ -61,9 +63,9 @@ public class PowerOutageParsedItem {
         }
         catch (Exception e)
         {
-            log.error("Failed to parse date/time from string: time = {} date = {}. Error message : {}", time, date, e.getMessage());
+            log.error("Failed to parse date/time from string: time = {} date = {} Error message : {}", time, date, e.getMessage());
+            throw new RuntimeException(e) ;
         }
-        return null;
     }
 
     public static LocalDate parseDate(String dateString) {

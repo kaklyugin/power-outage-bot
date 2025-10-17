@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CityRepository extends JpaRepository<CityEntity, String> {
-    @Query("SELECT c FROM CityEntity c WHERE c.fiasId IN :fiasIds ORDER BY c.name")
-    List<CityEntity> findByFiasIdsIn(@Param("fiasIds") List<String> fiasIds);
+    @Query("SELECT c FROM CityEntity c WHERE c.isDefaultTopCity = true ORDER BY c.name")
+    List<CityEntity> findTopMenuDefaultCities();
 
     @Query("SELECT c FROM CityEntity c WHERE c.fiasId = :fiasId")
     Optional<CityEntity> findById(@Param("fiasId") String fiasId);

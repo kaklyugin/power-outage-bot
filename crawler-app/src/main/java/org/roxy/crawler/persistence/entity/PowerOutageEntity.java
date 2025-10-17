@@ -20,8 +20,8 @@ public class PowerOutageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
-    private int id;
+    @Column(name = "id")
+    private Integer id;
 
     @Column (name = "city")
     private String city;

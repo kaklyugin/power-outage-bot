@@ -24,22 +24,25 @@ public class StartMessageActionResolver extends ActionResolver {
     @Autowired
     private UserCartService userCartService;
 
-    // FIXME get from table repository - set isDefault attribute
-    private final String RASSVET = "35e9349a-c1bc-435a-86e3-0bb2fc2d7ed5";
-    private final String NOVOCHERKASSK = "28bafcb3-92b2-445b-9443-a341be73fdb9";
-    private final String ROSTOV = "c1cfe4b9-f7c2-423c-abfa-6ed1c05a15c5";
-    private final String AKSAY = "c1cfe4b9-f7c2-423c-abfa-6ed1c05a15c5";
-    private final String AZOV = "a216cad5-7027-40b8-b1a1-d64abefbd5cd";
-    private final String SHAKHTY = "dee2e80e-f2e1-4a68-93b0-b7b89b6f3e74";
+    public static final String WELCOME_MESSAGE = """
+    🙌 Здравствуйте
+    Несколько слов о нашем сервисе💡
 
-    private final List<String> PROPOSED_CITIES = List.of(
-            RASSVET,
-            NOVOCHERKASSK,
-            ROSTOV,
-            AKSAY,
-            AZOV,
-            SHAKHTY
-            );
+    Этот бот создан для того, чтобы заранее уведомлять вас о плановых отключениях электроэнергии.
+
+    Как это работает:
+    - Вы получите уведомление 🔔 только в том случае, если на вашей улице запланированы аварийные работы
+    - Данные об отключениях мы получаем с официального сайта https://donenergo.ru/
+
+    Важно знать:
+    🆓 Это некоммерческий проект, который не принадлежит компании «Донэнерго»
+    🙅‍♂️ Мы не несём ответственность за точность предоставляемой информации
+    ⚡️ Стараемся быть максимально оперативными и достоверными
+    ❤️️️ Не храним ваши персональные данные и номера телефонов
+
+    Чтобы начать пользоваться сервисом, выберите город, в котором проживаете:
+
+    ✅ Нажмите на кнопку выбора города ниже""";
 
     @Override
     public Event resolveAction(UpdateDto update) {
@@ -47,8 +50,9 @@ public class StartMessageActionResolver extends ActionResolver {
         userCartService.save(
                 UserCartEntity.builder()
                         .chatId(update.getChatId())
+                        .username(update.getUsername())
                         .build());
-        List<CityEntity> cities = cityRepository.findByFiasIdsIn(PROPOSED_CITIES);
+        List<CityEntity> cities = cityRepository.findTopMenuDefaultCities();
         var keyboardBuilder = new InlineKeyboardDto.KeyboardBuilder();
         for (CityEntity city : cities) {
             keyboardBuilder.addRow().addButton(city.getName(), city.getFiasId());
@@ -59,7 +63,7 @@ public class StartMessageActionResolver extends ActionResolver {
         MessageDto citySelectMessage =
                 MessageDto.builder()
                         .chatId(String.valueOf(update.getChatId()))
-                        .text("Выберите город")
+                        .text(WELCOME_MESSAGE)
                         .replyMarkup(citiesKeyboard)
                         .build();
 

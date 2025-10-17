@@ -1,5 +1,6 @@
 package org.roxy.reminder.bot.service.suggestion;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.mapper.SuggestedAddressMapper;
 import org.roxy.reminder.bot.persistence.entity.CityEntity;
@@ -32,12 +33,17 @@ public class DaDataSuggestionService implements SuggestionService {
     }
 
     @Override
-    public List<StreetDto> getStreetSuggestions(String fiasId, String userInput) {
-        String cityType = getCityType(fiasId);
-        return getStreets(fiasId, cityType, userInput);
+    public List<StreetDto> getStreetSuggestions(String locationRestrictionFiasId, String text) {
+        String cityType = getCityType(locationRestrictionFiasId);
+        return getStreets(locationRestrictionFiasId, cityType, text);
     }
 
-    private List<StreetDto> getStreets(String locationRestrictionFiasId, String type, String userInput) {
+    @Override
+    public List<StreetDto> getStreetSuggestions(String text) {
+        return getStreets(text);
+    }
+
+    private List<StreetDto> getStreets(String locationRestrictionFiasId, String type, String text) {
         HashMap<String, String> location = new HashMap<>();
         if (type.equalsIgnoreCase("город")) {
             location.put("city_fias_id", locationRestrictionFiasId);
@@ -46,7 +52,7 @@ public class DaDataSuggestionService implements SuggestionService {
         }
         List<DaDataSuggestionResponseDto> suggestions = daDataWebClient.getSuggestions(
                 DaDataSearchRequest.builder()
-                        .query(userInput)
+                        .query(text)
                         .locations(
                                 List.of(location)
                         ).count(MAX_SUGGESTIONS_COUNT)
@@ -58,6 +64,32 @@ public class DaDataSuggestionService implements SuggestionService {
         if (suggestions.isEmpty()) {
             return Collections.emptyList();
         }
+        saveSuggestedAddresses(suggestions);
+        return suggestions.stream()
+                .map(r -> new StreetDto(r.getValue(), r.getData().getFiasId()))
+                .collect(Collectors.toList());
+    }
+
+    private List<StreetDto> getStreets(String userInput) {
+        List<DaDataSuggestionResponseDto> suggestions = daDataWebClient.getSuggestions(
+                DaDataSearchRequest.builder()
+                        .query(userInput)
+                        .count(MAX_SUGGESTIONS_COUNT)
+                        .fromBound(new DaDataSearchRequest.Bound("street"))
+                        .toBound(new DaDataSearchRequest.Bound("street"))
+                        .restrictValue(true)
+                        .build()
+        ).getSuggestions();
+        if (suggestions.isEmpty()) {
+            return Collections.emptyList();
+        }
+        saveSuggestedAddresses(suggestions);
+        return suggestions.stream()
+                .map(r -> new StreetDto(r.getValue(), r.getData().getFiasId()))
+                .collect(Collectors.toList());
+    }
+
+    private void saveSuggestedAddresses(List<DaDataSuggestionResponseDto> suggestions) {
         for (DaDataSuggestionResponseDto suggestion : suggestions) {
             try {
                 StreetEntity streetEntity = mapper.mapStreetDtoToEntity(suggestion.getData());
@@ -66,9 +98,6 @@ public class DaDataSuggestionService implements SuggestionService {
                 log.warn("Failed to save street {}. Error : {} ", suggestion.getData(), e.getMessage());
             }
         }
-        return suggestions.stream()
-                .map(r-> new StreetDto(r.getValue(),r.getData().getFiasId()))
-                .collect(Collectors.toList());
     }
 
     private String getCityType(String fiasId) {

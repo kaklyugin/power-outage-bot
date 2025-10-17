@@ -16,6 +16,11 @@ public class StreetSelectActionResolver extends ActionResolver {
     @Autowired
     private UserCartService userCartService;
 
+    private final String SUCCESS_REGISTRATION_TEXT = """
+    🎉 Отлично! ✅ Всё настроено.
+    Теперь мы будем присылать вам уведомления 🔔 о плановых отключениях света на вашей улице.
+    Как только появятся новые данные - мы обязательно вам сообщим❤️""";
+
     @Override
     public Event resolveAction(UpdateDto update) {
         log.info("Handling message = {}", update);
@@ -23,7 +28,7 @@ public class StreetSelectActionResolver extends ActionResolver {
         userCartService.addStreet(userCart.getId(),update.getUserResponse());
         super.botClient.sendMessage( MessageDto.builder()
                 .chatId(String.valueOf(update.getChatId()))
-                .text("Всё получилось. Мы отправим уведомление, если на вашей улице будет запланировано отключение света.")
+                .text(SUCCESS_REGISTRATION_TEXT)
                 .build());
         return Event.REPLY_RECEIVED;
     }

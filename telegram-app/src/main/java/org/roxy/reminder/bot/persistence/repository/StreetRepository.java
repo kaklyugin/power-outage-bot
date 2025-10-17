@@ -1,5 +1,6 @@
 package org.roxy.reminder.bot.persistence.repository;
 
+import jakarta.transaction.Transactional;
 import org.roxy.reminder.bot.persistence.entity.StreetEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

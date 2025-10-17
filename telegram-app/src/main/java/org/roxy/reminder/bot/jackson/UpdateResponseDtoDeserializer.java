@@ -48,6 +48,7 @@ public class UpdateResponseDtoDeserializer extends StdDeserializer<UpdateRespons
                 resultUpdateResponseDto.setUpdateType(UpdateType.COMMAND);
                 resultUpdateResponseDto.setFromId(node.at("/message/from/id").asLong());
                 resultUpdateResponseDto.setChatId(node.at("/message/chat/id").asLong());
+                resultUpdateResponseDto.setUsername(node.at("/message/chat/username").asText());
                 resultUpdateResponseDto.setDate(node.at("/message/date").asLong());
                 resultUpdateResponseDto.setUserResponse(node.at("/message/text").asText());
 

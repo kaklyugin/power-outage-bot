@@ -10,6 +10,7 @@ import org.roxy.reminder.bot.service.webclient.dto.message.response.SendMessageR
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -35,10 +36,9 @@ public class NotificationPublishService {
             if (responseDto.isOk())
             {
                 notification.setNotified(true);
+                notification.setNotifiedAt(ZonedDateTime.now());
             }
             notificationRepository.save(notification);
-            //TODO Как корректно сохранять признак отправки ?
-            // TODO Как ретраить, если возникла ошибка записи в БД ?
      }
         log.info("Sent {} notifications", notificationEntityList.size());
     }

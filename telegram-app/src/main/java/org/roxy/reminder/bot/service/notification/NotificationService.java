@@ -30,7 +30,7 @@ public class NotificationService {
     private final AddressFormatterService addressFormatterService;
     private final DateTimeFormatter DATE_TIME_FORMATTER_FIRST_DATE = DateTimeFormatter.ofPattern("dd MMMM (EEEE) HH:mm");
     private final DateTimeFormatter DATE_TIME_FORMATER_SECOND_DATE = DateTimeFormatter.ofPattern("HH:mm");
-    private final String NEW_PARAGRAPH_SYMBOL = "\uD83D\uDCA1";
+    private final String LAMP_SYMBOL = "\uD83D\uDCA1";
 
     public NotificationService(NotificationRepository notificationRepository,
                                PowerOutageSourceMessageRepository messageRepository,
@@ -60,13 +60,13 @@ public class NotificationService {
             for (UserCartEntity userCartEntity : userCartEntities) {
                 NotificationEntity notificationEntity = new NotificationEntity();
                 for (PowerOutageSourceMessageEntity sourceMessage : sourceMessages) {
-                    boolean isNotificationForMessageIsCreated =
+                    boolean isNotificationForMessageCreated =
                             userCartEntity.getNotifications().stream()
                                     .map(NotificationEntity::getMessageHashCodes)
                                     .flatMap(List::stream)
                                     .anyMatch(messageHashCode ->
                                             Objects.equals(messageHashCode, sourceMessage.getMessageHashCode()));
-                    if (!isNotificationForMessageIsCreated) {
+                    if (!isNotificationForMessageCreated) {
                         for (UserAddressEntity userAddress: userCartEntity.getAddresses())
                         {
                             if (userAddress.getStreetEntity().getFiasId().equals(sourceMessage.getStreetFiasId()))
@@ -77,7 +77,6 @@ public class NotificationService {
                                 notificationEntity.setNotificationText(notificationText);
                                 notificationEntity.setUserCart(userCartEntity);
                             }
-
                         }
                     }
                 }
@@ -92,7 +91,7 @@ public class NotificationService {
 
     private String appendAddressToNotificationText(String existingNotificationText, PowerOutageSourceMessageEntity sourceMessage) {
         if (existingNotificationText == null || existingNotificationText.isEmpty()) {
-            existingNotificationText = NEW_PARAGRAPH_SYMBOL + "Планируется отключение света \n в " + sourceMessage.getCity() + " по адресам ";
+            existingNotificationText = LAMP_SYMBOL + "Планируется отключение света \n в " + sourceMessage.getCity() + " по адресам ";
         }
         StringBuilder notificationTextBuilder = new StringBuilder(existingNotificationText);
         String address =

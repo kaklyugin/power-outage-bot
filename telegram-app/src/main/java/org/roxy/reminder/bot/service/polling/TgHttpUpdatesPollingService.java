@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
-public class UpdatesPollingService {
+public class TgHttpUpdatesPollingService {
 
     private final HttpBotClientService httpBotClientService;
     private final ChatStore chatStore;
@@ -30,11 +30,11 @@ public class UpdatesPollingService {
     private final int MAX_THREAD_COUNT = 1;
     private final int SLEEP_BEFORE_NEXT_UPDATE_REQUEST_MS = 1_000;
 
-    public UpdatesPollingService(HttpBotClientService httpBotClientService,
-                                 ChatStore chatStore,
-                                 UpdateMessageProducer updateMessageProducer,
-                                 ObjectMapper objectMapper,
-                                 UpdateResponseMapper mapper) {
+    public TgHttpUpdatesPollingService(HttpBotClientService httpBotClientService,
+                                       ChatStore chatStore,
+                                       UpdateMessageProducer updateMessageProducer,
+                                       ObjectMapper objectMapper,
+                                       UpdateResponseMapper mapper) {
         this.httpBotClientService = httpBotClientService;
         this.chatStore = chatStore;
         this.updateMessageProducer = updateMessageProducer;
@@ -68,7 +68,8 @@ public class UpdatesPollingService {
                         }
                     }
             );
-            // Чистим апдейты на сервере TG
+
+            /* Чистим апдейты на сервере TG */
             Optional<Long> maxUpdatedId = updates.getResult().stream()
                     .map(UpdateResponseDto::getUpdateId)
                     .max(Long::compareTo);
