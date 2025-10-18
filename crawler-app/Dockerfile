@@ -2,7 +2,7 @@
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 
 ARG IMAGE_VERSION=0.1
-ARG APP_NAME=bot
+ARG APP_NAME=crawler
 ARG SPRING_PROFILES_ACTIVE=dev
 
 LABEL version="${IMAGE_VERSION}"
