@@ -14,7 +14,7 @@ COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
 COPY src ./src
-RUN mvn clean package -DskipTests -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} \
+RUN mvn clean package -DskipTests -Dspring.profiles.active=${APP_ENV} \
     && rm -rf /root/.m2
 
 # Stage 2: Create custom JRE

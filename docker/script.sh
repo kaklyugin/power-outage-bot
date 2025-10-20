@@ -6,14 +6,13 @@ if [ -f .env ]; then
 fi
 
 # Configuration from environment variables with defaults
-DB_NAME="${DB_NAME:-my_database}"
 DB_USER="${DB_USER:-postgres}"
-DB_PASSWORD="${DB_PASSWORD:-}"
-DB_HOST="${DB_HOST:-localhost}"
+POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
+DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-5432}"
 
 # Set password for psql commands
-export PGPASSWORD="$DB_PASSWORD"
+export PGPASSWORD="$POSTGRES_PASSWORD"
 
 # Function to display usage
 usage() {
@@ -22,7 +21,7 @@ usage() {
     echo "  DB_NAME_BOT     - Database name (default: my_database)"
     echo "  DB_NAME_CRAWLER - Database name (default: my_database)"
     echo "  DB_USER     - Database user (default: postgres)"
-    echo "  DB_PASSWORD - Database password (required)"
+    echo "  POSTGRES_PASSWORD - Database password (required)"
     echo "  DB_HOST     - Database host (default: localhost)"
     echo "  DB_PORT     - Database port (default: 5432)"
     echo ""
@@ -30,8 +29,8 @@ usage() {
 }
 
 # Check if password is provided
-if [ -z "$DB_PASSWORD" ]; then
-    echo "Error: DB_PASSWORD environment variable is required"
+if [ -z "$POSTGRES_PASSWORD" ]; then
+    echo "Error: POSTGRES_PASSWORD environment variable is required"
     usage
     exit 1
 fi
