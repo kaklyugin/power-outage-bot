@@ -6,13 +6,13 @@ if [ -f .env ]; then
 fi
 
 # Configuration from environment variables with defaults
-DB_USER="${DB_USER:-postgres}"
-POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
-DB_HOST="${DB_HOST:-127.0.0.1}"
-DB_PORT="${DB_PORT:-5432}"
+PG_USER="${PG_USER:-postgres}"
+PG_PASSWORD="${PG_PASSWORD:-postgres}"
+PG_HOST="localhost"
+PG_PORT="${PG_PORT:-5432}"
 
 # Set password for psql commands
-export PGPASSWORD="$POSTGRES_PASSWORD"
+export PGPASSWORD="$PG_PASSWORD"
 
 # Function to display usage
 usage() {
@@ -20,39 +20,39 @@ usage() {
     echo "Set the following environment variables:"
     echo "  DB_NAME_BOT     - Database name (default: my_database)"
     echo "  DB_NAME_CRAWLER - Database name (default: my_database)"
-    echo "  DB_USER     - Database user (default: postgres)"
-    echo "  POSTGRES_PASSWORD - Database password (required)"
-    echo "  DB_HOST     - Database host (default: localhost)"
-    echo "  DB_PORT     - Database port (default: 5432)"
+    echo "  PG_USER     - Database user (default: postgres)"
+    echo "  PG_PASSWORD - Database password (required)"
+    echo "  PG_HOST     - Database host (default: localhost)"
+    echo "  PG_PORT     - Database port (default: 5432)"
     echo ""
     echo "Alternatively, create a .env file with these variables"
 }
 
 # Check if password is provided
-if [ -z "$POSTGRES_PASSWORD" ]; then
-    echo "Error: POSTGRES_PASSWORD environment variable is required"
+if [ -z "$PG_PASSWORD" ]; then
+    echo "Error: PG_PASSWORD environment variable is required"
     usage
     exit 1
 fi
 
-echo "Creating database bot: $DB_NAME_BOT on $DB_HOST:$DB_PORT"
+echo "Creating database bot: $DB_NAME_BOT on $PG_HOST:$PG_PORT"
 
 # Create the database
-createdb -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DB_NAME_BOT" || {
+createdb -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" "$DB_NAME_BOT" || {
     echo "Error: Failed to create database $DB_NAME_BOT"
     exit 1
 }
 
-echo "Creating database crawler: $DB_NAME_CRAWLER on $DB_HOST:$DB_PORT"
+echo "Creating database crawler: $DB_NAME_CRAWLER on $PG_HOST:$PG_PORT"
 
 # Create the database
-createdb -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DB_NAME_CRAWLER" || {
+createdb -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" "$DB_NAME_CRAWLER" || {
     echo "Error: Failed to create database $DB_NAME_CRAWLER"
     exit 1
 }
 
 echo "Installing pg_trgm extension to DB $DB_NAME_BOT ..."
-psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME_BOT" << EOF
+psql -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" -d "$DB_NAME_BOT" << EOF
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 SELECT 'Extension pg_trgm installed successfully' AS status;
 EOF

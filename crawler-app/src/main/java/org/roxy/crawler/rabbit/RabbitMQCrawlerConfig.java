@@ -44,7 +44,7 @@ public class RabbitMQCrawlerConfig {
 
     @Bean
     public DirectExchange crawlerUpdatesMessageExchange() {
-        return new DirectExchange(crawlerExchangeName);
+        return new DirectExchange(crawlerExchangeName,true,false);
     }
 
     @Bean
