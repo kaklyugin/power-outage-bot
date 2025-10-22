@@ -2,10 +2,8 @@ package org.roxy.crawler.rabbit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -24,13 +22,13 @@ public class RabbitMQCrawlerConfig {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Value("${rabbitmq.crawler.power.outage.queue.name}")
+    @Value("${rabbitmq.queue.power-outage.name}")
     private String powerOutageQueueName;
 
-    @Value("${rabbitmq.crawler.power.outage.routing.key}")
+    @Value("${rabbitmq.routing-key.power-outage}")
     private String powerOutageRoutingKey;
 
-    @Value("${rabbitmq.crawler.exchange.name}")
+    @Value("${rabbitmq.exchange.crawler.name}")
     private String crawlerExchangeName;
 
     private final Integer POWER_OUTAGE_QUEUE_SIZE = 5_000;
@@ -49,7 +47,9 @@ public class RabbitMQCrawlerConfig {
 
     @Bean
     public Queue powerOutageMessageQueue() {
-        return new Queue(powerOutageQueueName, true, false, false, POWER_OUTAGE_QUEUE_ARGS);
+        return new Queue(powerOutageQueueName, true, false, false
+                , POWER_OUTAGE_QUEUE_ARGS
+        );
     }
 
     @Bean

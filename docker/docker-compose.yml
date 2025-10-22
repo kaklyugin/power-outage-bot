@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:17.5
-    container_name: postgres-17.5
+    container_name: pg
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-    - app-network
+      - app-network
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -22,7 +22,7 @@ services:
   rabbitmq:
     image: rabbitmq:3.10.7-management
     hostname: rabbitmq
-    container_name: rabbitmq
+    container_name: mq
     restart: always
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBIT_MQ_USER}
@@ -47,7 +47,7 @@ services:
       rabbitmq:
         condition: service_healthy
     image: bot:latest
-    container_name: svet_bot
+    container_name: bot
     hostname: bot
     restart: always
     environment:
@@ -74,7 +74,7 @@ services:
       rabbitmq:
         condition: service_healthy
     image: crawler:latest
-    container_name: svet_crawler
+    container_name: crawler
     hostname: crawler
     restart: always
     environment:
@@ -92,7 +92,7 @@ services:
       - 8180:8180
     networks:
       - app-network
-
+    
 volumes:
   postgres_data:
   rabbit_mq_data:
