@@ -25,11 +25,8 @@ public class PowerOutageTimetableLoader {
     private final PowerOutageBrokerService powerOutageBrokerService;
     private final PowerOutageSourceRepository powerOutagePageRepository;
 
-    @Value("${feature.send.all.saved.items}")
-    private boolean SEND_ALL_SAVED_ITEMS;
-
-    private int SLEEP_BETWEEN_REQUESTS_MS = 2000;
-
+    @Value("${feature.send-all-saved-items}")
+    private boolean FEATURE_TOGGLE_SEND_ALL_SAVED_ITEMS;
 
     public PowerOutageTimetableLoader(DonEnergoHttpClient donEnergoHttpClient, PowerOutageRepository powerOutageRepository, PowerOutageBrokerService powerOutageBrokerService, PowerOutageSourceRepository powerOutagePageRepository) {
         this.donEnergoHttpClient = donEnergoHttpClient;
@@ -40,7 +37,9 @@ public class PowerOutageTimetableLoader {
 
     @Transactional
     public void loadPowerOutageTimetable() {
-        List<PowerOutagePageUrlEntity> powerOutagePageUrlEntities = powerOutagePageRepository.findAll();
+        int SLEEP_BETWEEN_REQUESTS_MS = 2_000;
+
+        List<PowerOutagePageUrlEntity> powerOutagePageUrlEntities = powerOutagePageRepository.findAllWhereEnabledIsTrue();
         for (PowerOutagePageUrlEntity powerOutagePageUrl : powerOutagePageUrlEntities) {
             try {
                 final String PAGE_URL = powerOutagePageUrl.getPageUrl();
@@ -49,8 +48,8 @@ public class PowerOutageTimetableLoader {
                         .thenApplyAsync(DonEnergoHtmlParser::parsePage)
                         .get();
                 log.info("Page {} is parsed", PAGE_URL);
-                List<PowerOutageEntity> newPowerOutages = savePowerOutageTimetable(powerOutageParsedItems,PAGE_URL);
-                if (SEND_ALL_SAVED_ITEMS) {
+                List<PowerOutageEntity> newPowerOutages = saveNewPowerOutageParsedItems(powerOutageParsedItems, PAGE_URL);
+                if (FEATURE_TOGGLE_SEND_ALL_SAVED_ITEMS) {
                     newPowerOutages = powerOutageRepository.findAll();
                 }
                 powerOutageBrokerService.sendPowerOutageMessage(newPowerOutages);
@@ -59,17 +58,16 @@ public class PowerOutageTimetableLoader {
                 log.error("Failed to get or parse page {}", powerOutagePageUrl.getPageUrl(), e);
             }
         }
-        log.info("Power Outage Timetable loaded");
     }
 
-    private List<PowerOutageEntity> savePowerOutageTimetable(List<PowerOutageParsedItem> items, String url) {
+    private List<PowerOutageEntity> saveNewPowerOutageParsedItems(List<PowerOutageParsedItem> items, String url) {
         List<PowerOutageEntity> entitiesToSave = new ArrayList<>();
-        List<PowerOutageEntity> existingEntities = powerOutageRepository.findAll(); //TODO Ограничить
+        List<PowerOutageEntity> existingEntities = powerOutageRepository.findAll();
         for (PowerOutageParsedItem item : items) {
-            {  //TODO add mapstruct
-                boolean newItemAlreadyExists = existingEntities.stream().
-                        anyMatch(p -> p.getMessageHashCode().equals(item.getMessageHashCode()));
-                if (!newItemAlreadyExists) {
+            {
+                boolean isNew = existingEntities.stream().
+                        noneMatch(p -> p.getMessageHashCode().equals(item.getMessageHashCode()));
+                if (!isNew) {
                     PowerOutageEntity entity = PowerOutageEntity.builder()
                             .city(item.getCity())
                             .address(item.getAddress())

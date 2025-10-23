@@ -22,7 +22,7 @@ public class RabbitMQPowerOutageMessageProducer {
 
     public void sendPowerOutageMessage(PowerOutageEntity powerOutage) {
         log.info("Sending new power outage message: {}", powerOutage.toString());
-        //FIXME send as DTO
+        //TODO send as DTO
         rabbitTemplate.convertAndSend(
                 rabbitMQCrawlerConfig.getCrawlerExchangeName(),
                 rabbitMQCrawlerConfig.getPowerOutageRoutingKey(),

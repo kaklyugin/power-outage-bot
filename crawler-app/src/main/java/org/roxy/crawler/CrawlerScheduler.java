@@ -22,7 +22,7 @@ public class CrawlerScheduler {
         this.powerOutageTimeTableLoader = powerOutageTimeTableLoader;
     }
 
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     private void crawl() throws ExecutionException, InterruptedException {
         log.info("Started crawling data from Don Energo");
         powerOutageTimeTableLoader.loadPowerOutageTimetable();

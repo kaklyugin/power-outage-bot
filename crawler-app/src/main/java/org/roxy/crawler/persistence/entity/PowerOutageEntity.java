@@ -47,6 +47,9 @@ public class PowerOutageEntity {
     @Column (name = "comment")
     private String comment;
 
+    @Column (name = "queue_sent_at")
+    private ZonedDateTime queue_sent_at;
+
     @Version
     private LocalDateTime lastUpdatedAt;
 

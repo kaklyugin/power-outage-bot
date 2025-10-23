@@ -45,7 +45,6 @@ public class OutageMessageService {
         return entity.get();
     }
 
-
     private String findStreetFiasId(String city, AddressComponents addressComponents ) {
         String text  = "Ростовская область, " + city + " " + addressComponents.getStreetType() + " " + addressComponents.getStreetName();
         StreetDto streetDto = suggestionService.getStreetSuggestions(text).getFirst();
