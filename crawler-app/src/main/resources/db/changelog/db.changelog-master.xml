@@ -8,6 +8,6 @@
         http://www.liquibase.org/xml/ns/pro
         http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.23.xsd">
 
-    <include file="changesets/001-initial-schema.sql" relativeToChangelogFile="true"/>
+    <include file="changesets/001-initial-schema.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @Configuration
 @Getter
+@Slf4j
 public class RabbitMQCrawlerConfig {
 
     @Autowired
@@ -34,30 +36,33 @@ public class RabbitMQCrawlerConfig {
     private final Integer POWER_OUTAGE_QUEUE_SIZE = 5_000;
     private final Integer POWER_OUTAGE_QUEUE_TTL_MILLISECONDS = 30_000;
 
-    private final Map<String, Object> POWER_OUTAGE_QUEUE_ARGS = new HashMap<>() {{
-        put("x-max-length", POWER_OUTAGE_QUEUE_SIZE);
-        put("ttl", POWER_OUTAGE_QUEUE_TTL_MILLISECONDS);
-    }};
-
-
     @Bean
-    public DirectExchange crawlerUpdatesMessageExchange() {
-        return new DirectExchange(crawlerExchangeName,true,false);
+    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        RabbitAdmin admin = new RabbitAdmin(connectionFactory);
+        admin.setAutoStartup(true);
+        admin.setIgnoreDeclarationExceptions(false);
+        return admin;
     }
 
     @Bean
-    public Queue powerOutageMessageQueue() {
-        return new Queue(powerOutageQueueName, true, false, false
-                , POWER_OUTAGE_QUEUE_ARGS
-        );
-    }
+    public Declarables crawlerDeclarables() {
+        log.info("Creating RabbitMQ resources at startup: exchange={}, queue={}, routingKey={}",
+                crawlerExchangeName, powerOutageQueueName, powerOutageRoutingKey);
+        DirectExchange exchange = new DirectExchange(crawlerExchangeName, true, false);
 
-    @Bean
-    public Binding powerOutageMessageBinding() {
-        return BindingBuilder.bind(powerOutageMessageQueue())
-                .to(crawlerUpdatesMessageExchange())
+        Map<String, Object> queueArgs = new HashMap<>();
+        queueArgs.put("x-max-length", POWER_OUTAGE_QUEUE_SIZE);
+        queueArgs.put("x-message-ttl", POWER_OUTAGE_QUEUE_TTL_MILLISECONDS);
+
+        Queue queue = new Queue(powerOutageQueueName, true, false, false, queueArgs);
+
+        Binding binding = BindingBuilder.bind(queue)
+                .to(exchange)
                 .with(powerOutageRoutingKey);
+
+        return new Declarables(exchange, queue, binding);
     }
+
 
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {

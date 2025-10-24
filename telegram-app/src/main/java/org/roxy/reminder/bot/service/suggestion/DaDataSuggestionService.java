@@ -56,8 +56,8 @@ public class DaDataSuggestionService implements SuggestionService {
                         .locations(
                                 List.of(location)
                         ).count(MAX_SUGGESTIONS_COUNT)
-                        .fromBound(new DaDataSearchRequest.Bound("street"))
-                        .toBound(new DaDataSearchRequest.Bound("street"))
+                        //.fromBound(new DaDataSearchRequest.Bound("street"))
+                        //.toBound(new DaDataSearchRequest.Bound("street"))
                         .restrictValue(true)
                         .build()
         ).getSuggestions();
@@ -66,7 +66,7 @@ public class DaDataSuggestionService implements SuggestionService {
         }
         saveSuggestedAddresses(suggestions);
         return suggestions.stream()
-                .map(r -> new StreetDto(r.getValue(), r.getData().getFiasId()))
+                .map(r -> new StreetDto(r.getValue(), r.getData().getStreetFiasId()))
                 .collect(Collectors.toList());
     }
 
@@ -75,8 +75,8 @@ public class DaDataSuggestionService implements SuggestionService {
                 DaDataSearchRequest.builder()
                         .query(userInput)
                         .count(MAX_SUGGESTIONS_COUNT)
-                        .fromBound(new DaDataSearchRequest.Bound("street"))
-                        .toBound(new DaDataSearchRequest.Bound("street"))
+                        // .fromBound(new DaDataSearchRequest.Bound("street"))
+                        //.toBound(new DaDataSearchRequest.Bound("street"))
                         .restrictValue(true)
                         .build()
         ).getSuggestions();

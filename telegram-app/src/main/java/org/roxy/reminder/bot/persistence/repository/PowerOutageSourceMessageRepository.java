@@ -10,9 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PowerOutageSourceMessageRepository extends JpaRepository<PowerOutageSourceMessageEntity, Long> {
+
     @Query("select m.messageHashCode from PowerOutageSourceMessageEntity m where m.dateTimeOff > :dateTimeOff")
     List<Integer> findActualForDateTime(@Param("dateTimeOff") ZonedDateTime dateTimeOff );
 
     List<PowerOutageSourceMessageEntity> findAllByMessageHashCodeIn(List<Integer> messageHashCodes);
+
     Optional<PowerOutageSourceMessageEntity> findByMessageHashCode(Integer messageHashCode);
+
+    List<PowerOutageSourceMessageEntity> findByIsStreetFiasRequestedFalse();
 }

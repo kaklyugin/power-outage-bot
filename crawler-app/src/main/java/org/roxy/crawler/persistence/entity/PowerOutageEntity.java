@@ -1,14 +1,12 @@
 package org.roxy.crawler.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
@@ -21,7 +19,7 @@ public class PowerOutageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column (name = "city")
     private String city;
@@ -48,7 +46,7 @@ public class PowerOutageEntity {
     private String comment;
 
     @Column (name = "queue_sent_at")
-    private ZonedDateTime queue_sent_at;
+    private ZonedDateTime queueSentAt;
 
     @Version
     private LocalDateTime lastUpdatedAt;

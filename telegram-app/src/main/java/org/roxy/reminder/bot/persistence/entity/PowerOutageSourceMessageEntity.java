@@ -53,6 +53,10 @@ public class PowerOutageSourceMessageEntity {
     @Column(name = "message_hash_code", unique = true)
     private Integer messageHashCode;
 
+    @Column(name = "is_street_fias_requested")
+    private boolean isStreetFiasRequested;
+
+
     @Version
     private LocalDateTime lastUpdatedAt;
 }

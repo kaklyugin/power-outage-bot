@@ -12,7 +12,6 @@ import org.roxy.reminder.bot.service.webclient.dto.message.request.keyboard.Inli
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +57,7 @@ public class StreetInputActionResolver extends ActionResolver {
 
         InlineKeyboardDto.KeyboardBuilder keyboardStreetsBuilder = new InlineKeyboardDto.KeyboardBuilder();
         for (StreetDto streetDto : streets) {
-            keyboardStreetsBuilder.addRow().addButton(streetDto.getStreetFullName(), streetDto.getFiasId());
+            keyboardStreetsBuilder.addRow().addButton(streetDto.getStreetFullName(), streetDto.getStreetFiasId());
         }
         InlineKeyboardDto keyboardStreets = keyboardStreetsBuilder.build();
 

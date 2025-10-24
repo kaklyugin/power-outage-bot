@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="001-001" author="anton.kaklyugin">
+        <createTable tableName="power_outage_addresses" schemaName="public">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="message_hash_code" type="INTEGER"/>
+            <column name="created_at" type="TIMESTAMP(6)"/>
+            <column name="last_updated_at" type="TIMESTAMP(6)"/>
+            <column name="time_off" type="TIMESTAMP(6)"/>
+            <column name="time_on" type="TIMESTAMP(6)"/>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="comment" type="VARCHAR(255)"/>
+            <column name="queue_sent_at" type="TIMESTAMP(6)"/>
+            <column name="reason" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>
+        </createTable>
+
+
+        <createTable tableName="source_page_urls" schemaName="public">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="page_url" type="VARCHAR(255)"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="last_updated_at" type="TIMESTAMP(6)"/>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="source_page_urls"
+                columnNames="page_url"
+                constraintName="uk_source_page_urls"/>
+        <loadData
+                tableName="source_page_urls"
+                schemaName="public"
+                file="db/data/source_page_urls.csv"
+                separator=",">
+            <column name="page_url" type="STRING"/>
+            <column name="enabled" type="BOOLEAN"/>
+            <column name="last_updated_at" type="TIMESTAMP" defaultValueComputed="now()"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>

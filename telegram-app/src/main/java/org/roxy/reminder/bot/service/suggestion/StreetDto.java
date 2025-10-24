@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class StreetDto {
     private  String streetFullName;
-    private  String fiasId;
+    private  String streetFiasId;
 }
