@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +20,6 @@ public interface PowerOutageSourceMessageRepository extends JpaRepository<PowerO
     Optional<PowerOutageSourceMessageEntity> findByMessageHashCode(Integer messageHashCode);
 
     List<PowerOutageSourceMessageEntity> findByIsStreetFiasRequestedFalse();
+
+    List<PowerOutageSourceMessageEntity> findAllByMessageHashCodeInOrderByDateTimeOffAsc(Collection<Integer> messageHashCodes);
 }

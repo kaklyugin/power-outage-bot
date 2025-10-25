@@ -1,13 +1,11 @@
 package org.roxy.reminder.bot.service.suggestion;
 
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.mapper.SuggestedAddressMapper;
 import org.roxy.reminder.bot.persistence.entity.CityEntity;
 import org.roxy.reminder.bot.persistence.entity.StreetEntity;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
 import org.roxy.reminder.bot.service.suggestion.client.*;
-import org.roxy.reminder.bot.persistence.repository.StreetRepository;
 import org.roxy.reminder.bot.service.suggestion.dto.DaDataSuggestionResponseDto;
 import org.springframework.stereotype.Service;
 
@@ -33,17 +31,17 @@ public class DaDataSuggestionService implements SuggestionService {
     }
 
     @Override
-    public List<StreetDto> getStreetSuggestions(String locationRestrictionFiasId, String text) {
+    public List<LocationDto> getStreetSuggestions(String locationRestrictionFiasId, String text) {
         String cityType = getCityType(locationRestrictionFiasId);
         return getStreets(locationRestrictionFiasId, cityType, text);
     }
 
     @Override
-    public List<StreetDto> getStreetSuggestions(String text) {
+    public List<LocationDto> getStreetSuggestions(String text) {
         return getStreets(text);
     }
 
-    private List<StreetDto> getStreets(String locationRestrictionFiasId, String type, String text) {
+    private List<LocationDto> getStreets(String locationRestrictionFiasId, String type, String text) {
         HashMap<String, String> location = new HashMap<>();
         if (type.equalsIgnoreCase("город")) {
             location.put("city_fias_id", locationRestrictionFiasId);
@@ -66,11 +64,11 @@ public class DaDataSuggestionService implements SuggestionService {
         }
         saveSuggestedAddresses(suggestions);
         return suggestions.stream()
-                .map(r -> new StreetDto(r.getValue(), r.getData().getStreetFiasId()))
+                .map(this::mapResponseToLocationDto)
                 .collect(Collectors.toList());
     }
 
-    private List<StreetDto> getStreets(String userInput) {
+    private List<LocationDto> getStreets(String userInput) {
         List<DaDataSuggestionResponseDto> suggestions = daDataWebClient.getSuggestions(
                 DaDataSearchRequest.builder()
                         .query(userInput)
@@ -81,11 +79,12 @@ public class DaDataSuggestionService implements SuggestionService {
                         .build()
         ).getSuggestions();
         if (suggestions.isEmpty()) {
+            log.warn("Could not find suggestions for {}", userInput);
             return Collections.emptyList();
         }
         saveSuggestedAddresses(suggestions);
         return suggestions.stream()
-                .map(r -> new StreetDto(r.getValue(), r.getData().getFiasId()))
+                .map(this::mapResponseToLocationDto)
                 .collect(Collectors.toList());
     }
 
@@ -104,5 +103,13 @@ public class DaDataSuggestionService implements SuggestionService {
         return cityRepository.findById(fiasId)
                 .map(CityEntity::getType)
                 .orElseThrow(() -> new IllegalArgumentException("City not found for ID: " + fiasId));
+    }
+    private LocationDto mapResponseToLocationDto(DaDataSuggestionResponseDto responseDto)
+    {
+        String locationFiasId = responseDto.getData().getStreetFiasId() != null ? responseDto.getData().getStreetFiasId() :
+                responseDto.getData().getSettlementType();
+        String locationType =  responseDto.getData().getStreetType() != null ? responseDto.getData().getStreetType() :
+                responseDto.getData().getSettlementType();
+        return new LocationDto(responseDto.getValue(), locationFiasId,locationType);
     }
 }

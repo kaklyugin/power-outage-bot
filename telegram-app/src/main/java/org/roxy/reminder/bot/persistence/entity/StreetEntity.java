@@ -45,7 +45,7 @@ public class StreetEntity {
     @Column(name = "settlement")
     private String settlement;
 
-    @Column(name = "street_fias_id")
+    @Column(name = "location_fias_id")
     private String streetFiasId;
 
     @Column(name = "street_with_type")

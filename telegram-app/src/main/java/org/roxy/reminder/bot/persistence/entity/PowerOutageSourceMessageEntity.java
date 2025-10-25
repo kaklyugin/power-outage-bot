@@ -2,9 +2,7 @@ package org.roxy.reminder.bot.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
@@ -25,8 +23,11 @@ public class PowerOutageSourceMessageEntity {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "street_fias_id")
-    private String streetFiasId;
+    @Column(name = "location_fias_id")
+    private String locationFiasId;
+
+    @Column(name = "location_type")
+    private String locationType;
 
     @Column(name = "street_type")
     private String streetType;

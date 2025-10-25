@@ -7,9 +7,10 @@ import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
 import org.roxy.reminder.bot.service.formatter.AddressFormatterService;
 import org.roxy.reminder.bot.service.broker.dto.PowerOutageDto;
-import org.roxy.reminder.bot.service.suggestion.StreetDto;
+import org.roxy.reminder.bot.service.suggestion.LocationDto;
 import org.roxy.reminder.bot.service.suggestion.SuggestionService;
 import org.roxy.reminder.bot.util.AddressComponents;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -43,33 +44,5 @@ public class OutageMessageService {
             return repository.save(newEntity);
         }
         return entity.get();
-    }
-
-    @Transactional
-    @Scheduled(fixedDelay = 5000)
-    public void enrichWithFiasId()
-    {
-        List<PowerOutageSourceMessageEntity> recordsForEnriching = repository.findByIsStreetFiasRequestedFalse();
-        for (PowerOutageSourceMessageEntity record : recordsForEnriching) {
-            String streetFiasId = findStreetFiasId(record.getCity(), record.getStreetType(), record.getStreetName());
-            record.setStreetFiasId(streetFiasId);
-            record.setStreetFiasRequested(true);
-        }
-        repository.saveAll(recordsForEnriching);
-    }
-
-    private String findStreetFiasId(String city, String streetType, String streetName) {
-        String text  = "Ростовская область, " + city + " " + streetType + " " + streetName;
-
-        List<StreetDto> suggestions = suggestionService.getStreetSuggestions(text);
-
-        if( suggestions.isEmpty())
-         {
-             /*Пробуем без типа улицы потому что Донэнерго иногда переулки называет улицами*/
-             text  = "Ростовская область, " + city + " " + streetName;
-             suggestions = suggestionService.getStreetSuggestions(text);
-         }
-
-        return !suggestions.isEmpty()  ? suggestions.getFirst().getStreetFiasId() : null;
     }
 }

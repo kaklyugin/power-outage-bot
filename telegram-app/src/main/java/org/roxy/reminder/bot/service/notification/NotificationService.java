@@ -11,6 +11,7 @@ import org.roxy.reminder.bot.persistence.repository.NotificationRepository;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.service.formatter.AddressFormatterService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,8 @@ public class NotificationService {
         this.addressFormatterService = addressFormatterService;
     }
 
-    @Scheduled(fixedRate = 10_000)
+    @Async
+    @Scheduled(fixedRate = 60_000)
     public void creteNotificationsBySchedule() {
         log.info("Started scheduled  function creteNotificationsBySchedule()");
         createNotificationsForAllUsers();
@@ -56,10 +58,10 @@ public class NotificationService {
         try {
             List<UserCartEntity> userCartEntities = userCartRepository.findAll();
             List<Integer> actualMessagesHashCodes = messageRepository.findActualForDateTime(ZonedDateTime.now());
-            List<PowerOutageSourceMessageEntity> sourceMessages = messageRepository.findAllByMessageHashCodeIn(actualMessagesHashCodes);
+            List<PowerOutageSourceMessageEntity> providerMessages = messageRepository.findAllByMessageHashCodeInOrderByDateTimeOffAsc(actualMessagesHashCodes);
             for (UserCartEntity userCartEntity : userCartEntities) {
                 NotificationEntity notificationEntity = new NotificationEntity();
-                for (PowerOutageSourceMessageEntity sourceMessage : sourceMessages) {
+                for (PowerOutageSourceMessageEntity sourceMessage : providerMessages) {
                     boolean isNotificationForMessageCreated =
                             userCartEntity.getNotifications().stream()
                                     .map(NotificationEntity::getMessageHashCodes)
@@ -69,7 +71,10 @@ public class NotificationService {
                     if (!isNotificationForMessageCreated) {
                         for (UserAddressEntity userAddress: userCartEntity.getAddresses())
                         {
-                            if (userAddress.getStreetEntity().getFiasId().equals(sourceMessage.getStreetFiasId()))
+                            if (
+                                    userAddress.getStreetEntity().getFiasId().equals(sourceMessage.getLocationFiasId())
+
+                            )
                             {
                                 notificationEntity.setUserCart(userCartEntity);
                                 notificationEntity.getMessageHashCodes().add(sourceMessage.getMessageHashCode());

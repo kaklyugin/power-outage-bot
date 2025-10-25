@@ -5,8 +5,8 @@ import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
-import org.roxy.reminder.bot.service.suggestion.DaDataSuggestionService;
-import org.roxy.reminder.bot.service.suggestion.StreetDto;
+import org.roxy.reminder.bot.service.suggestion.LocationDto;
+import org.roxy.reminder.bot.service.suggestion.SuggestionService;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.MessageDto;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.keyboard.InlineKeyboardDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class StreetInputActionResolver extends ActionResolver {
 
     @Autowired
-    private DaDataSuggestionService suggestionService;
+    private SuggestionService suggestionService;
     @Autowired
     private UserCartRepository userCartRepository;
 
@@ -33,7 +33,7 @@ public class StreetInputActionResolver extends ActionResolver {
             throw new RuntimeException("User cart is empty for update = " + update);
         }
 
-        List<StreetDto> streets = suggestionService.getStreetSuggestions(
+        List<LocationDto> streets = suggestionService.getStreetSuggestions(
                 userCart.get().getAddresses().getLast().getCityEntity().getFiasId(),
                 update.getUserResponse());
 
@@ -56,8 +56,8 @@ public class StreetInputActionResolver extends ActionResolver {
         }
 
         InlineKeyboardDto.KeyboardBuilder keyboardStreetsBuilder = new InlineKeyboardDto.KeyboardBuilder();
-        for (StreetDto streetDto : streets) {
-            keyboardStreetsBuilder.addRow().addButton(streetDto.getStreetFullName(), streetDto.getStreetFiasId());
+        for (LocationDto locationDto : streets) {
+            keyboardStreetsBuilder.addRow().addButton(locationDto.getLocationFullName(), locationDto.getLocationFiasId());
         }
         InlineKeyboardDto keyboardStreets = keyboardStreetsBuilder.build();
 

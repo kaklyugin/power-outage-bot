@@ -123,7 +123,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="chat_id" type="BIGINT">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="username" type="TEXT">
                 <constraints nullable="true"/>
@@ -148,7 +148,10 @@
             <column name="city_fias_id" type="VARCHAR(36)">
                 <constraints nullable="true"/>
             </column>
-            <column name="street_fias_id" type="VARCHAR(36)">
+            <column name="location_fias_id" type="VARCHAR(36)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="location_type" type="VARCHAR(50)">
                 <constraints nullable="true"/>
             </column>
             <column name="last_updated_at" type="TIMESTAMP">
@@ -161,8 +164,8 @@
             <column name="user_cart_id"/>
         </createIndex>
 
-        <createIndex indexName="idx_user_addresses_street_fias_id" tableName="user_addresses">
-            <column name="street_fias_id"/>
+        <createIndex indexName="idx_user_addresses_location_fias_id" tableName="user_addresses">
+            <column name="location_fias_id"/>
         </createIndex>
 
         <createIndex indexName="idx_user_addresses_city_fias_id" tableName="user_addresses">
@@ -223,7 +226,10 @@
             <column name="address" type="TEXT">
                 <constraints nullable="true"/>
             </column>
-            <column name="street_fias_id" type="VARCHAR(36)">
+            <column name="location_fias_id" type="VARCHAR(36)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="location_type" type="TEXT">
                 <constraints nullable="true"/>
             </column>
             <column name="street_type" type="TEXT">
@@ -260,8 +266,8 @@
         <createIndex tableName="power_outage_inbound_messages" indexName="idx_power_outage_inbound_message_hash_code">
             <column name="message_hash_code"/>
         </createIndex>
-        <createIndex tableName="power_outage_inbound_messages" indexName="idx_power_outage_inbound_message_street_fias_id">
-            <column name="street_fias_id"/>
+        <createIndex tableName="power_outage_inbound_messages" indexName="idx_power_outage_inbound_message_location_fias_id">
+            <column name="location_fias_id"/>
         </createIndex>
 
         <!-- Create state_machines table -->

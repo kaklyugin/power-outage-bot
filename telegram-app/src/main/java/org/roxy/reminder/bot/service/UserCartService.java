@@ -7,7 +7,6 @@ import org.roxy.reminder.bot.persistence.entity.StreetEntity;
 import org.roxy.reminder.bot.persistence.entity.UserAddressEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
-import org.roxy.reminder.bot.persistence.repository.StreetRepository;
 import org.roxy.reminder.bot.persistence.repository.UserAddressesRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.springframework.stereotype.Service;

@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync
-//@EnableJpaAuditing
 public class TgClientApplication {
 
     public static void main(String[] args) {
