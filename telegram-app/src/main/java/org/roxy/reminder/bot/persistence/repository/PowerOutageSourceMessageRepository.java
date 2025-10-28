@@ -19,7 +19,7 @@ public interface PowerOutageSourceMessageRepository extends JpaRepository<PowerO
 
     Optional<PowerOutageSourceMessageEntity> findByMessageHashCode(Integer messageHashCode);
 
-    List<PowerOutageSourceMessageEntity> findByIsStreetFiasRequestedFalse();
-
     List<PowerOutageSourceMessageEntity> findAllByMessageHashCodeInOrderByDateTimeOffAsc(Collection<Integer> messageHashCodes);
+
+    List<PowerOutageSourceMessageEntity> findByIsStreetFiasRequestedFalseAndIsArchivedFalse();
 }

@@ -72,7 +72,7 @@ public class NotificationService {
                         for (UserAddressEntity userAddress: userCartEntity.getAddresses())
                         {
                             if (
-                                    userAddress.getStreetEntity().getFiasId().equals(sourceMessage.getLocationFiasId())
+                                    userAddress.getLocationEntity().getLocationFiasId().equals(sourceMessage.getLocationFiasId())
 
                             )
                             {

@@ -1,6 +1,7 @@
 package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
+import org.roxy.reminder.bot.ButtonCallbackConstants;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
@@ -33,6 +34,10 @@ public class StreetInputActionResolver extends ActionResolver {
             throw new RuntimeException("User cart is empty for update = " + update);
         }
 
+        if(update.getUserResponse().equals(ButtonCallbackConstants.BACK.name())) {
+            return Event.BACK;
+        }
+
         List<LocationDto> streets = suggestionService.getStreetSuggestions(
                 userCart.get().getAddresses().getLast().getCityEntity().getFiasId(),
                 update.getUserResponse());
@@ -41,7 +46,7 @@ public class StreetInputActionResolver extends ActionResolver {
             super.botClient.sendMessage(
                     MessageDto.builder()
                             .chatId(String.valueOf(update.getChatId()))
-                            .text("Не удалось найти улицу. Может быть Вы ошиблись или у нас устаревший справочник :(")
+                            .text("❗Не удалось найти улицу. Попробуйте, пожалуйста, ввести имя улицы ещё раз")
                             .build());
             return Event.RETRY;
 
@@ -50,7 +55,7 @@ public class StreetInputActionResolver extends ActionResolver {
             super.botClient.sendMessage(
                     MessageDto.builder()
                             .chatId(String.valueOf(update.getChatId()))
-                            .text(String.format("Мы нашли более 10 улиц с текстом %s. Пожалуйста, уточните имя улицы", update.getUserResponse()))
+                            .text(String.format("❗Мы нашли более 10 улиц с текстом %s. Пожалуйста, уточните имя улицы", update.getUserResponse()))
                             .build());
             return Event.RETRY;
         }
@@ -59,12 +64,13 @@ public class StreetInputActionResolver extends ActionResolver {
         for (LocationDto locationDto : streets) {
             keyboardStreetsBuilder.addRow().addButton(locationDto.getLocationFullName(), locationDto.getLocationFiasId());
         }
+        keyboardStreetsBuilder.addRow().addButton("Назад", ButtonCallbackConstants.BACK.name());
         InlineKeyboardDto keyboardStreets = keyboardStreetsBuilder.build();
 
         super.botClient.sendMessage(
                 MessageDto.builder()
                         .chatId(String.valueOf(update.getChatId()))
-                        .text("Выберите улицу")
+                        .text("✅ Пожалуйста, выберите улицу из списка")
                         .replyMarkup(keyboardStreets)
                         .build());
 

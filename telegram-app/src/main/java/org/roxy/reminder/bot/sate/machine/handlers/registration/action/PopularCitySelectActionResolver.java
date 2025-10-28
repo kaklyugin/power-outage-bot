@@ -1,21 +1,20 @@
 package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.Constantst;
+import org.roxy.reminder.bot.ButtonCallbackConstants;
 import org.roxy.reminder.bot.persistence.entity.CityEntity;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.service.UserCartService;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
-import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.MessageDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class CitySelectActionResolver extends ActionResolver {
+public class PopularCitySelectActionResolver extends ActionResolver {
 
     @Autowired
     private UserCartService userCartService;
@@ -26,7 +25,11 @@ public class CitySelectActionResolver extends ActionResolver {
     @Override
     public Event resolveAction(UpdateDto update) {
 
-        if (update.getUserResponse().equals(Constantst.OTHER_CITY))
+        if(update.getUserResponse().equals(ButtonCallbackConstants.BACK.name())) {
+            return Event.BACK;
+        }
+
+        if (update.getUserResponse().equals(ButtonCallbackConstants.OTHER_CITY.name()))
         {
             super.botClient.sendMessage(MessageDto.builder()
                     .chatId(String.valueOf(update.getChatId()))
@@ -44,7 +47,7 @@ public class CitySelectActionResolver extends ActionResolver {
         userCartService.save(userCart);
         super.botClient.sendMessage(MessageDto.builder()
                 .chatId(String.valueOf(update.getChatId()))
-                .text("✅Введите улицу")
+                .text("✅Введите имя улицы")
                 .build());
         return Event.REPLY_RECEIVED;
     }

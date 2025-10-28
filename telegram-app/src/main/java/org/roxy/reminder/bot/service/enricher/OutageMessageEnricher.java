@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.service;
+package org.roxy.reminder.bot.service.enricher;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class OutageMessageEnricher {
     @Async
     public void enrichWithFiasId()
     {
-        List<PowerOutageSourceMessageEntity> recordsForEnriching = repository.findByIsStreetFiasRequestedFalse();
+        List<PowerOutageSourceMessageEntity> recordsForEnriching = repository.findByIsStreetFiasRequestedFalseAndIsArchivedFalse();
         for (PowerOutageSourceMessageEntity record : recordsForEnriching) {
             LocationDto location = findLocationFiasId(record.getCity(), record.getStreetType(), record.getStreetName());
             record.setLocationFiasId(location.getLocationFiasId());

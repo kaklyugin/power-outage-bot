@@ -39,10 +39,10 @@ public class PowerOutageSourceMessageEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> buildingsNumbers;
 
-    @Column
+    @Column(name = "date_time_off")
     private ZonedDateTime dateTimeOff;
 
-    @Column
+    @Column(name = "date_time_on")
     private ZonedDateTime dateTimeOn;
 
     @Column(name = "power_outage_reason")
@@ -51,13 +51,16 @@ public class PowerOutageSourceMessageEntity {
     @Column (name = "url")
     private String url;
 
-    @Column(name = "message_hash_code", unique = true)
+    @Column(name = "message_hash_code")
     private Integer messageHashCode;
 
     @Column(name = "is_street_fias_requested")
-    private boolean isStreetFiasRequested;
+    private boolean isStreetFiasRequested = false;
 
+    @Column(name = "is_archived")
+    private boolean isArchived = false;
 
     @Version
+    @Column(name = "last_updated_at")
     private LocalDateTime lastUpdatedAt;
 }

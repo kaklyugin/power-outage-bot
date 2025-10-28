@@ -3,10 +3,8 @@ package org.roxy.reminder.bot.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Data
@@ -28,8 +26,8 @@ public class UserAddressEntity {
     private CityEntity cityEntity;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "street_fias_id")
-    private StreetEntity streetEntity;
+    @JoinColumn(name = "location_fias_id")
+    private LocationEntity locationEntity;
 
     @Version
     private LocalDateTime lastUpdatedAt;

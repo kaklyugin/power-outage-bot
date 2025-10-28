@@ -39,9 +39,9 @@
         </createIndex>
 
         <!-- Create streets table -->
-        <createTable tableName="streets">
-            <column name="fias_id" type="VARCHAR(36)">
-                <constraints primaryKey="true" nullable="false"/>
+        <createTable tableName="locations">
+            <column name="location_fias_id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
             <column name="city_fias_id" type="VARCHAR(36)">
                 <constraints nullable="true"/>
@@ -93,28 +93,8 @@
             </column>
         </createTable>
 
-        <createIndex tableName="streets" indexName="idx_streets_city_fias_id">
-            <column name="city_fias_id"/>
-        </createIndex>
-
-        <createIndex tableName="streets" indexName="idx_streets_settlement_fias_id">
-            <column name="settlement_fias_id"/>
-        </createIndex>
-
-        <createIndex tableName="streets" indexName="idx_streets_street_fias_id">
-            <column name="street_fias_id"/>
-        </createIndex>
-
-        <createIndex tableName="streets" indexName="idx_streets_city">
-            <column name="city"/>
-        </createIndex>
-
-        <createIndex tableName="streets" indexName="idx_streets_settlement">
-            <column name="settlement"/>
-        </createIndex>
-
-        <createIndex tableName="streets" indexName="idx_streets_street">
-            <column name="street"/>
+        <createIndex tableName="locations" indexName="idx_locations_location_fias_id">
+            <column name="location_fias_id"/>
         </createIndex>
 
         <!-- Create user_cart table -->
@@ -256,7 +236,10 @@
             <column name="message_hash_code" type="INTEGER">
                 <constraints nullable="true" unique="true"/>
             </column>
-            <column name="is_street_fias_requested" type="boolean">
+            <column name="is_street_fias_requested" type="boolean" defaultValue="false">
+            </column>
+            <column name="is_archived" type="boolean" defaultValue="false" >
+                <constraints nullable="false" />
             </column>
             <column name="last_updated_at" type="TIMESTAMP(6)">
                 <constraints nullable="true"/>

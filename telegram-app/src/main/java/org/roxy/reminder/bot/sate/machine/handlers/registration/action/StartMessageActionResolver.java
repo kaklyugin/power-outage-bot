@@ -1,11 +1,10 @@
 package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.reminder.bot.Constantst;
+import org.roxy.reminder.bot.ButtonCallbackConstants;
 import org.roxy.reminder.bot.persistence.entity.CityEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
-import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.service.UserCartService;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
@@ -57,7 +56,7 @@ public class StartMessageActionResolver extends ActionResolver {
         for (CityEntity city : cities) {
             keyboardBuilder.addRow().addButton(city.getName(), city.getFiasId());
         }
-        keyboardBuilder.addRow().addButton("Другой...", Constantst.OTHER_CITY);
+        keyboardBuilder.addRow().addButton("Другой...", ButtonCallbackConstants.OTHER_CITY.name());
         var citiesKeyboard = keyboardBuilder.build();
 
         MessageDto citySelectMessage =

@@ -3,10 +3,11 @@ package org.roxy.reminder.bot.service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.persistence.entity.CityEntity;
-import org.roxy.reminder.bot.persistence.entity.StreetEntity;
+import org.roxy.reminder.bot.persistence.entity.LocationEntity;
 import org.roxy.reminder.bot.persistence.entity.UserAddressEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
+import org.roxy.reminder.bot.persistence.repository.LocationRepository;
 import org.roxy.reminder.bot.persistence.repository.UserAddressesRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,13 @@ import org.springframework.stereotype.Service;
 public class UserCartService {
     private final UserCartRepository userCartRepository;
     private final CityRepository cityRepository;
-    private final StreetRepository streetRepository;
+    private final LocationRepository locationRepository;
     private final UserAddressesRepository userAddressesRepository;
 
-    public UserCartService(UserCartRepository userCartRepository, CityRepository cityRepository, StreetRepository streetRepository, UserAddressesRepository userAddressesRepository) {
+    public UserCartService(UserCartRepository userCartRepository, CityRepository cityRepository, LocationRepository locationRepository, UserAddressesRepository userAddressesRepository) {
         this.userCartRepository = userCartRepository;
         this.cityRepository = cityRepository;
-        this.streetRepository = streetRepository;
+        this.locationRepository = locationRepository;
         this.userAddressesRepository = userAddressesRepository;
     }
 
@@ -39,14 +40,19 @@ public class UserCartService {
     }
 
     @Transactional
-    public void addStreet(Long userCartId, String streetFiasId)
+    public void addLocation(Long userCartId, String streetFiasId)
     {
         UserCartEntity userCart = userCartRepository.findById(userCartId).orElseThrow();
         UserAddressEntity userAddressEntity = userCart.getAddresses().getLast();
-        StreetEntity streetEntity = streetRepository.getReferenceById(streetFiasId);
-        userAddressEntity.setStreetEntity(streetEntity);
+        LocationEntity locationEntity = locationRepository.getReferenceById(streetFiasId);
+        userAddressEntity.setLocationEntity(locationEntity);
         userAddressesRepository.save(userAddressEntity);
         userCartRepository.save(userCart);
+    }
+
+    public boolean checkLocationExists(String locationFiasId)
+    {
+         return locationRepository.findByLocationFiasId(locationFiasId).isPresent();
     }
 
     public UserCartEntity getUserCartByChatId(Long chatId)

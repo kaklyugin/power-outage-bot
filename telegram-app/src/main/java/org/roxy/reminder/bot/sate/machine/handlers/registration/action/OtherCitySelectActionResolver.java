@@ -1,6 +1,7 @@
 package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
+import org.roxy.reminder.bot.ButtonCallbackConstants;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.dto.CityDto;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class SpecificCitySelectActionResolver extends ActionResolver {
+public class OtherCitySelectActionResolver extends ActionResolver {
 
     @Autowired
     private CityRepository cityRepository;
@@ -48,6 +49,7 @@ public class SpecificCitySelectActionResolver extends ActionResolver {
         for (CityDto city : cities) {
             keyboardCitiesBuilder.addRow().addButton(city.getName(), city.getFiasId());
         }
+        keyboardCitiesBuilder.addRow().addButton("Назад", ButtonCallbackConstants.BACK.name());
         InlineKeyboardDto keyboardCities = keyboardCitiesBuilder.build();
 
         super.botClient.sendMessage(

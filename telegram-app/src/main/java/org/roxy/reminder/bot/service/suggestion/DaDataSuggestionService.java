@@ -3,8 +3,9 @@ package org.roxy.reminder.bot.service.suggestion;
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.mapper.SuggestedAddressMapper;
 import org.roxy.reminder.bot.persistence.entity.CityEntity;
-import org.roxy.reminder.bot.persistence.entity.StreetEntity;
+import org.roxy.reminder.bot.persistence.entity.LocationEntity;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
+import org.roxy.reminder.bot.persistence.repository.LocationRepository;
 import org.roxy.reminder.bot.service.suggestion.client.*;
 import org.roxy.reminder.bot.service.suggestion.dto.DaDataSuggestionResponseDto;
 import org.springframework.stereotype.Service;
@@ -16,15 +17,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DaDataSuggestionService implements SuggestionService {
 
-    private final StreetRepository streetRepository;
+    private final LocationRepository locationRepository;
     private final CityRepository cityRepository;
     private final DaDataWebClient daDataWebClient;
     private final SuggestedAddressMapper mapper;
     private final int MAX_SUGGESTIONS_COUNT = 10;
 
-    public DaDataSuggestionService(StreetRepository streetRepository, CityRepository cityRepository,
+    public DaDataSuggestionService(LocationRepository locationRepository, CityRepository cityRepository,
                                    DaDataWebClient daDataWebClient, SuggestedAddressMapper mapper) {
-        this.streetRepository = streetRepository;
+        this.locationRepository = locationRepository;
         this.cityRepository = cityRepository;
         this.daDataWebClient = daDataWebClient;
         this.mapper = mapper;
@@ -91,8 +92,8 @@ public class DaDataSuggestionService implements SuggestionService {
     private void saveSuggestedAddresses(List<DaDataSuggestionResponseDto> suggestions) {
         for (DaDataSuggestionResponseDto suggestion : suggestions) {
             try {
-                StreetEntity streetEntity = mapper.mapStreetDtoToEntity(suggestion.getData());
-                streetRepository.findById(streetEntity.getFiasId()).orElseGet(() -> streetRepository.save(streetEntity));
+                LocationEntity locationEntity = mapper.mapStreetDtoToEntity(suggestion.getData());
+                locationRepository.findById(locationEntity.getLocationFiasId()).orElseGet(() -> locationRepository.save(locationEntity));
             } catch (Exception e) {
                 log.warn("Failed to save street {}. Error : {} ", suggestion.getData(), e.getMessage());
             }

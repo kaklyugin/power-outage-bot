@@ -1,4 +1,4 @@
-package org.roxy.reminder.bot.service.polling;
+package org.roxy.reminder.bot.service.tgpolling;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;

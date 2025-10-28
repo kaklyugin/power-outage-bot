@@ -2,18 +2,17 @@ package org.roxy.reminder.bot.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "streets")
+@Table(name = "locations")
 @Data
-public class StreetEntity {
+public class LocationEntity {
 
     @Id
-    @Column(name = "fias_id")
-    private String fiasId;
+    @Column(name = "location_fias_id")
+    private String locationFiasId;
 
     @Column(name = "city_fias_id")
     private String cityFiasId;
@@ -45,7 +44,7 @@ public class StreetEntity {
     @Column(name = "settlement")
     private String settlement;
 
-    @Column(name = "location_fias_id")
+    @Column(name = "street_fias_id")
     private String streetFiasId;
 
     @Column(name = "street_with_type")
