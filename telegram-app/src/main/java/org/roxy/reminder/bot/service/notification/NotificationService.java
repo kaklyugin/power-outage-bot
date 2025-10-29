@@ -30,7 +30,6 @@ public class NotificationService {
     private final PowerOutageMessageMapper mapper;
     private final DateTimeFormatter DATE_TIME_FORMATTER_FIRST_DATE = DateTimeFormatter.ofPattern("dd MMMM (EEEE) HH:mm");
     private final DateTimeFormatter DATE_TIME_FORMATER_SECOND_DATE = DateTimeFormatter.ofPattern("HH:mm");
-    private final String LAMP_SYMBOL = "\uD83D\uDCA1";
 
     public NotificationService(NotificationRepository notificationRepository,
                                PowerOutageSourceMessageRepository messageRepository,
@@ -88,13 +87,13 @@ public class NotificationService {
 
     private String appendAddressToNotificationText(String existingNotificationText, PowerOutageSourceMessageEntity sourceMessage) {
         if (existingNotificationText == null || existingNotificationText.isEmpty()) {
-            existingNotificationText = LAMP_SYMBOL + "Планируется отключение света \n в " + sourceMessage.getCity() + " по адресам ";
+            existingNotificationText =  "💡Планируется отключение света в " + sourceMessage.getCity();
         }
         StringBuilder notificationTextBuilder = new StringBuilder(existingNotificationText);
         String address =
-                "\n\n " + sourceMessage.getAddress() + " " +
-                        "\n " + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
-                        "\n\n " + "Причина : " + sourceMessage.getPowerOutageReason();
+                "\n\n \uD83D\uDCCD " + sourceMessage.getAddress() +
+                        "\n ⏱\uFE0F" + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
+                        "\n" + "Причина : " + sourceMessage.getPowerOutageReason();
         notificationTextBuilder.append(address);
         return notificationTextBuilder.toString();
     }
