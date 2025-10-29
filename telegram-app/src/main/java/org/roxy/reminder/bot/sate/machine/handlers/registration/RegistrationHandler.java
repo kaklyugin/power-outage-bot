@@ -58,6 +58,7 @@ public class RegistrationHandler implements UpdateHandler {
         Event event = actionResolver.resolveAction(update);
         State nextState = stateMachine.getNextState(stateMachineEntity.getState(), event);
         stateMachineEntity.setState(nextState);
+        stateMachine.getActionResolver(nextState).sendActionWelcomeMessage(update.getChatId());
         stateMachineRepository.save(stateMachineEntity);
     }
 

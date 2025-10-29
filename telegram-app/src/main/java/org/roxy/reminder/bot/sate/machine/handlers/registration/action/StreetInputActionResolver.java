@@ -5,6 +5,7 @@ import org.roxy.reminder.bot.ButtonCallbackConstants;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
+import org.roxy.reminder.bot.service.UserSessionCacheService;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.roxy.reminder.bot.service.suggestion.LocationDto;
 import org.roxy.reminder.bot.service.suggestion.SuggestionService;
@@ -23,23 +24,19 @@ public class StreetInputActionResolver extends ActionResolver {
     @Autowired
     private SuggestionService suggestionService;
     @Autowired
-    private UserCartRepository userCartRepository;
+    private UserSessionCacheService userSessionCacheService;
 
 
     @Override
     public Event resolveAction(UpdateDto update) {
         log.info("Handling message = {}", update);
-        Optional<UserCartEntity> userCart = userCartRepository.findByChatId(update.getChatId());
-        if (userCart.isEmpty()) {
-            throw new RuntimeException("User cart is empty for update = " + update);
-        }
 
         if(update.getUserResponse().equals(ButtonCallbackConstants.BACK.name())) {
             return Event.BACK;
         }
 
         List<LocationDto> streets = suggestionService.getStreetSuggestions(
-                userCart.get().getAddresses().getLast().getCityEntity().getFiasId(),
+                userSessionCacheService.findByChatId(update.getChatId()).getUserSessionData().getCityFiasId(),
                 update.getUserResponse());
 
         if (streets.isEmpty()) {
@@ -75,5 +72,14 @@ public class StreetInputActionResolver extends ActionResolver {
                         .build());
 
         return Event.REPLY_RECEIVED;
+    }
+
+    @Override
+    public void sendActionWelcomeMessage(Long chatId) {
+        super.botClient.sendMessage(
+                MessageDto.builder()
+                        .chatId(String.valueOf(chatId))
+                        .text("✅ Пожалуйста, введите имя  улицы")
+                        .build());
     }
 }

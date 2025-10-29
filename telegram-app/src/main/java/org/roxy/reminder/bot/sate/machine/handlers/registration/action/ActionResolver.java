@@ -10,4 +10,5 @@ public abstract class ActionResolver {
     @Autowired
     protected BotClient botClient;
     public abstract Event resolveAction(UpdateDto update);
+    public abstract void sendActionWelcomeMessage(Long chatId);
 }

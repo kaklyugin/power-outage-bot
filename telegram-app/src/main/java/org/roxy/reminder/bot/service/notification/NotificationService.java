@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.entity.NotificationEntity;
 import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
-import org.roxy.reminder.bot.persistence.entity.UserAddressEntity;
+import org.roxy.reminder.bot.persistence.entity.UserLocationEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.NotificationRepository;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
@@ -28,7 +28,6 @@ public class NotificationService {
     private final PowerOutageSourceMessageRepository messageRepository;
     private final UserCartRepository userCartRepository;
     private final PowerOutageMessageMapper mapper;
-    private final AddressFormatterService addressFormatterService;
     private final DateTimeFormatter DATE_TIME_FORMATTER_FIRST_DATE = DateTimeFormatter.ofPattern("dd MMMM (EEEE) HH:mm");
     private final DateTimeFormatter DATE_TIME_FORMATER_SECOND_DATE = DateTimeFormatter.ofPattern("HH:mm");
     private final String LAMP_SYMBOL = "\uD83D\uDCA1";
@@ -36,13 +35,11 @@ public class NotificationService {
     public NotificationService(NotificationRepository notificationRepository,
                                PowerOutageSourceMessageRepository messageRepository,
                                UserCartRepository userCartRepository,
-                               PowerOutageMessageMapper mapper,
-                               AddressFormatterService addressFormatterService) {
+                               PowerOutageMessageMapper mapper) {
         this.notificationRepository = notificationRepository;
         this.messageRepository = messageRepository;
         this.userCartRepository = userCartRepository;
         this.mapper = mapper;
-        this.addressFormatterService = addressFormatterService;
     }
 
     @Async
@@ -69,13 +66,8 @@ public class NotificationService {
                                     .anyMatch(messageHashCode ->
                                             Objects.equals(messageHashCode, sourceMessage.getMessageHashCode()));
                     if (!isNotificationForMessageCreated) {
-                        for (UserAddressEntity userAddress: userCartEntity.getAddresses())
-                        {
-                            if (
-                                    userAddress.getLocationEntity().getLocationFiasId().equals(sourceMessage.getLocationFiasId())
-
-                            )
-                            {
+                        for (UserLocationEntity userAddress : userCartEntity.getLocations()) {
+                            if (userAddress.getLocationEntity().getLocationFiasId().equals(sourceMessage.getLocationFiasId())) {
                                 notificationEntity.setUserCart(userCartEntity);
                                 notificationEntity.getMessageHashCodes().add(sourceMessage.getMessageHashCode());
                                 String notificationText = appendAddressToNotificationText(notificationEntity.getNotificationText(), sourceMessage);
@@ -101,8 +93,8 @@ public class NotificationService {
         StringBuilder notificationTextBuilder = new StringBuilder(existingNotificationText);
         String address =
                 "\n\n " + sourceMessage.getAddress() + " " +
-                "\n " + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
-                "\n\n " + "Причина : " + sourceMessage.getPowerOutageReason();
+                        "\n " + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
+                        "\n\n " + "Причина : " + sourceMessage.getPowerOutageReason();
         notificationTextBuilder.append(address);
         return notificationTextBuilder.toString();
     }

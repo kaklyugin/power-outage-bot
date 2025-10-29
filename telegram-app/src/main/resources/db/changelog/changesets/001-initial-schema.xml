@@ -8,7 +8,6 @@
     <changeSet id="001-001" author="anton.kaklyugin">
         <comment>Create all application tables in a single transaction</comment>
 
-        <!-- Create cities table -->
         <createTable tableName="cities">
             <column name="fias_id" type="VARCHAR(36)">
                 <constraints primaryKey="true" nullable="false"/>
@@ -38,7 +37,6 @@
             <column name="last_updated_at"/>
         </createIndex>
 
-        <!-- Create streets table -->
         <createTable tableName="locations">
             <column name="location_fias_id" type="VARCHAR(36)">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
@@ -97,16 +95,12 @@
             <column name="location_fias_id"/>
         </createIndex>
 
-        <!-- Create user_cart table -->
         <createTable tableName="user_carts">
             <column name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="chat_id" type="BIGINT">
                 <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="username" type="TEXT">
-                <constraints nullable="true"/>
             </column>
             <column name="last_updated_at" type="TIMESTAMP(6)">
                 <constraints nullable="true"/>
@@ -117,21 +111,29 @@
             <column name="chat_id"/>
         </createIndex>
 
+        <createTable tableName="user_sessions_cache">
+            <column name="chat_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
 
-        <createTable tableName="user_addresses">
+            <column name="session_data" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="last_updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+
+        <createTable tableName="user_locations">
             <column name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
             <column name="user_cart_id" type="BIGINT">
                 <constraints nullable="true" foreignKeyName="fk_user_addresses_user_cart" references="user_carts(id)"/>
             </column>
-            <column name="city_fias_id" type="VARCHAR(36)">
-                <constraints nullable="true"/>
-            </column>
             <column name="location_fias_id" type="VARCHAR(36)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="location_type" type="VARCHAR(50)">
                 <constraints nullable="true"/>
             </column>
             <column name="last_updated_at" type="TIMESTAMP">
@@ -140,20 +142,16 @@
         </createTable>
 
         <!-- Single column indexes -->
-        <createIndex indexName="idx_user_addresses_user_cart_id" tableName="user_addresses">
+        <createIndex indexName="idx_user_addresses_user_cart_id" tableName="user_locations">
             <column name="user_cart_id"/>
         </createIndex>
 
-        <createIndex indexName="idx_user_addresses_location_fias_id" tableName="user_addresses">
+        <createIndex indexName="idx_user_addresses_location_fias_id" tableName="user_locations">
             <column name="location_fias_id"/>
         </createIndex>
 
-        <createIndex indexName="idx_user_addresses_city_fias_id" tableName="user_addresses">
-            <column name="city_fias_id"/>
-        </createIndex>
-
         <addForeignKeyConstraint
-                baseTableName="user_addresses"
+                baseTableName="user_locations"
                 constraintName="fk_user_cart_id"
                 baseColumnNames="user_cart_id"
                 referencedTableName="user_carts"

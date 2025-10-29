@@ -2,6 +2,7 @@ package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.ButtonCallbackConstants;
+import org.roxy.reminder.bot.service.UserSessionCacheService;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
 import org.roxy.reminder.bot.persistence.dto.CityDto;
 import org.roxy.reminder.bot.persistence.repository.CityRepository;
@@ -15,16 +16,18 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class OtherCitySelectActionResolver extends ActionResolver {
+public class OtherCitySearchResolver extends ActionResolver {
 
     @Autowired
     private CityRepository cityRepository;
+    @Autowired
+    private UserSessionCacheService userSessionCacheService;
 
     @Override
     public Event resolveAction(UpdateDto update) {
 
+        userSessionCacheService.clearCity(update.getChatId());
         String proposedCityName = update.getUserResponse();
-
         List<CityDto> cities = cityRepository.findWithFuzzySearchByName(proposedCityName);
 
         if (cities.isEmpty()) {
@@ -55,11 +58,19 @@ public class OtherCitySelectActionResolver extends ActionResolver {
         super.botClient.sendMessage(
                 MessageDto.builder()
                         .chatId(String.valueOf(update.getChatId()))
-                        .text("Выберите населенный пункт из списка")
+                        .text("✅Выберите населенный пункт из списка")
                         .replyMarkup(keyboardCities)
                         .build());
 
         return Event.REPLY_RECEIVED;
+    }
 
+    @Override
+    public void sendActionWelcomeMessage(Long chatId) {
+        super.botClient.sendMessage(
+                MessageDto.builder()
+                        .chatId(String.valueOf(chatId   ))
+                        .text("Пожалуйста, введите имя населённого пункта")
+                        .build());
     }
 }

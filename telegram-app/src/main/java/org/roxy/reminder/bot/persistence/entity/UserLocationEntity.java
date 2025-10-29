@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "user_addresses")
-public class UserAddressEntity {
+@Table(name = "user_locations")
+public class UserLocationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,10 +20,6 @@ public class UserAddressEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_cart_id")
     private UserCartEntity userCart;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "city_fias_id")
-    private CityEntity cityEntity;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "location_fias_id")

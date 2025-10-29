@@ -24,14 +24,11 @@ public class UserCartEntity {
     @Column(name = "chat_id")
     private Long chatId;
 
-    @Column(name = "username")
-    private String username;
-
-    @OneToMany(mappedBy = "userCart", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER,orphanRemoval = true)
+    @OneToMany(mappedBy = "userCart", cascade = {CascadeType.MERGE,CascadeType.PERSIST}, fetch = FetchType.EAGER,orphanRemoval = true)
     private List<NotificationEntity> notifications;
 
-    @OneToMany(mappedBy = "userCart", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER ,orphanRemoval = true)
-    private List<UserAddressEntity> addresses = new ArrayList<>();
+    @OneToMany(mappedBy = "userCart", cascade = {CascadeType.MERGE,CascadeType.PERSIST}, fetch = FetchType.EAGER ,orphanRemoval = true)
+    private List<UserLocationEntity> locations = new ArrayList<>();
 
     @Version
     private LocalDateTime lastUpdatedAt;
