@@ -92,8 +92,8 @@ public class NotificationService {
         StringBuilder notificationTextBuilder = new StringBuilder(existingNotificationText);
         String address =
                 "\n\n \uD83D\uDCCD " + sourceMessage.getAddress() +
-                        "\n ⏱\uFE0F" + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
-                        "\n" + "Причина : " + sourceMessage.getPowerOutageReason();
+                        "\n⏱ " + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
+                        "\nПричина: " + sourceMessage.getPowerOutageReason();
         notificationTextBuilder.append(address);
         return notificationTextBuilder.toString();
     }
