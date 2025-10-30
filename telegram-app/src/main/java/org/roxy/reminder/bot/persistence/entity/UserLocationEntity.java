@@ -3,16 +3,14 @@ package org.roxy.reminder.bot.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "user_addresses")
-public class UserAddressEntity {
+@Table(name = "user_locations")
+public class UserLocationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,12 +22,8 @@ public class UserAddressEntity {
     private UserCartEntity userCart;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "city_fias_id")
-    private CityEntity cityEntity;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "street_fias_id")
-    private StreetEntity streetEntity;
+    @JoinColumn(name = "location_fias_id")
+    private LocationEntity locationEntity;
 
     @Version
     private LocalDateTime lastUpdatedAt;

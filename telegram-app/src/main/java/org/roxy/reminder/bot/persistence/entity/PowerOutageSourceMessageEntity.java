@@ -2,9 +2,7 @@ package org.roxy.reminder.bot.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
@@ -25,8 +23,11 @@ public class PowerOutageSourceMessageEntity {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "street_fias_id")
-    private String streetFiasId;
+    @Column(name = "location_fias_id")
+    private String locationFiasId;
+
+    @Column(name = "location_type")
+    private String locationType;
 
     @Column(name = "street_type")
     private String streetType;
@@ -38,10 +39,10 @@ public class PowerOutageSourceMessageEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> buildingsNumbers;
 
-    @Column
+    @Column(name = "date_time_off")
     private ZonedDateTime dateTimeOff;
 
-    @Column
+    @Column(name = "date_time_on")
     private ZonedDateTime dateTimeOn;
 
     @Column(name = "power_outage_reason")
@@ -50,13 +51,16 @@ public class PowerOutageSourceMessageEntity {
     @Column (name = "url")
     private String url;
 
-    @Column(name = "message_hash_code", unique = true)
+    @Column(name = "message_hash_code")
     private Integer messageHashCode;
 
     @Column(name = "is_street_fias_requested")
-    private boolean isStreetFiasRequested;
+    private boolean isStreetFiasRequested = false;
 
+    @Column(name = "is_archived")
+    private boolean isArchived = false;
 
     @Version
+    @Column(name = "last_updated_at")
     private LocalDateTime lastUpdatedAt;
 }

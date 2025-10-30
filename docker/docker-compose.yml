@@ -62,6 +62,7 @@ services:
       - RABBIT_MQ_PORT=${RABBIT_MQ_PORT}
       - RABBIT_MQ_USER=${RABBIT_MQ_USER}
       - RABBIT_MQ_PASSWORD=${RABBIT_MQ_PASSWORD}    
+      - LOG_LEVEL=${LOG_LEVEL}    
     volumes:
       - bot_data:/data
     ports:
@@ -86,6 +87,7 @@ services:
       - RABBIT_MQ_PORT=${RABBIT_MQ_PORT}
       - RABBIT_MQ_USER=${RABBIT_MQ_USER}
       - RABBIT_MQ_PASSWORD=${RABBIT_MQ_PASSWORD}
+      - LOG_LEVEL=${LOG_LEVEL}
     volumes:
       - crawler_data:/data
     ports:

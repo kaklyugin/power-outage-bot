@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.entity.NotificationEntity;
 import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
-import org.roxy.reminder.bot.persistence.entity.UserAddressEntity;
+import org.roxy.reminder.bot.persistence.entity.UserLocationEntity;
 import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
 import org.roxy.reminder.bot.persistence.repository.NotificationRepository;
 import org.roxy.reminder.bot.persistence.repository.PowerOutageSourceMessageRepository;
 import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.service.formatter.AddressFormatterService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -27,24 +28,21 @@ public class NotificationService {
     private final PowerOutageSourceMessageRepository messageRepository;
     private final UserCartRepository userCartRepository;
     private final PowerOutageMessageMapper mapper;
-    private final AddressFormatterService addressFormatterService;
     private final DateTimeFormatter DATE_TIME_FORMATTER_FIRST_DATE = DateTimeFormatter.ofPattern("dd MMMM (EEEE) HH:mm");
     private final DateTimeFormatter DATE_TIME_FORMATER_SECOND_DATE = DateTimeFormatter.ofPattern("HH:mm");
-    private final String LAMP_SYMBOL = "\uD83D\uDCA1";
 
     public NotificationService(NotificationRepository notificationRepository,
                                PowerOutageSourceMessageRepository messageRepository,
                                UserCartRepository userCartRepository,
-                               PowerOutageMessageMapper mapper,
-                               AddressFormatterService addressFormatterService) {
+                               PowerOutageMessageMapper mapper) {
         this.notificationRepository = notificationRepository;
         this.messageRepository = messageRepository;
         this.userCartRepository = userCartRepository;
         this.mapper = mapper;
-        this.addressFormatterService = addressFormatterService;
     }
 
-    @Scheduled(fixedRate = 10_000)
+    @Async
+    @Scheduled(fixedRate = 60_000)
     public void creteNotificationsBySchedule() {
         log.info("Started scheduled  function creteNotificationsBySchedule()");
         createNotificationsForAllUsers();
@@ -56,10 +54,10 @@ public class NotificationService {
         try {
             List<UserCartEntity> userCartEntities = userCartRepository.findAll();
             List<Integer> actualMessagesHashCodes = messageRepository.findActualForDateTime(ZonedDateTime.now());
-            List<PowerOutageSourceMessageEntity> sourceMessages = messageRepository.findAllByMessageHashCodeIn(actualMessagesHashCodes);
+            List<PowerOutageSourceMessageEntity> providerMessages = messageRepository.findAllByMessageHashCodeInOrderByDateTimeOffAsc(actualMessagesHashCodes);
             for (UserCartEntity userCartEntity : userCartEntities) {
                 NotificationEntity notificationEntity = new NotificationEntity();
-                for (PowerOutageSourceMessageEntity sourceMessage : sourceMessages) {
+                for (PowerOutageSourceMessageEntity sourceMessage : providerMessages) {
                     boolean isNotificationForMessageCreated =
                             userCartEntity.getNotifications().stream()
                                     .map(NotificationEntity::getMessageHashCodes)
@@ -67,10 +65,8 @@ public class NotificationService {
                                     .anyMatch(messageHashCode ->
                                             Objects.equals(messageHashCode, sourceMessage.getMessageHashCode()));
                     if (!isNotificationForMessageCreated) {
-                        for (UserAddressEntity userAddress: userCartEntity.getAddresses())
-                        {
-                            if (userAddress.getStreetEntity().getFiasId().equals(sourceMessage.getStreetFiasId()))
-                            {
+                        for (UserLocationEntity userAddress : userCartEntity.getLocations()) {
+                            if (userAddress.getLocationEntity().getLocationFiasId().equals(sourceMessage.getLocationFiasId())) {
                                 notificationEntity.setUserCart(userCartEntity);
                                 notificationEntity.getMessageHashCodes().add(sourceMessage.getMessageHashCode());
                                 String notificationText = appendAddressToNotificationText(notificationEntity.getNotificationText(), sourceMessage);
@@ -91,13 +87,13 @@ public class NotificationService {
 
     private String appendAddressToNotificationText(String existingNotificationText, PowerOutageSourceMessageEntity sourceMessage) {
         if (existingNotificationText == null || existingNotificationText.isEmpty()) {
-            existingNotificationText = LAMP_SYMBOL + "Планируется отключение света \n в " + sourceMessage.getCity() + " по адресам ";
+            existingNotificationText =  "💡Планируется отключение света в " + sourceMessage.getCity();
         }
         StringBuilder notificationTextBuilder = new StringBuilder(existingNotificationText);
         String address =
-                "\n\n " + sourceMessage.getAddress() + " " +
-                "\n " + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
-                "\n\n " + "Причина : " + sourceMessage.getPowerOutageReason();
+                "\n\n \uD83D\uDCCD " + sourceMessage.getAddress() +
+                        "\n⏱ " + sourceMessage.getDateTimeOff().format(DATE_TIME_FORMATTER_FIRST_DATE) + " - " + sourceMessage.getDateTimeOn().format(DATE_TIME_FORMATER_SECOND_DATE) + ". " +
+                        "\nПричина: " + sourceMessage.getPowerOutageReason();
         notificationTextBuilder.append(address);
         return notificationTextBuilder.toString();
     }

@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 @Getter
 public class RabbitMQConfig {
@@ -38,7 +41,11 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue updatesMessageQueue() {
-        return new Queue(updatesQueueName);
+        Map<String, Object> queueArgs = new HashMap<>();
+        queueArgs.put("x-max-length", 1_000);
+        queueArgs.put("x-message-ttl", 3600_000);
+
+      return new Queue(updatesQueueName, true, false, false, queueArgs);
     }
 
     @Bean

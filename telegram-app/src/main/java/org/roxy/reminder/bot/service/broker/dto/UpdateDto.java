@@ -14,7 +14,6 @@ public class UpdateDto {
     private String callbackQueryId;
     private Long fromId;
     private Long chatId;
-    private String username;
     private Long date;
     private String userResponse;
     private Long sourceMessageId;
