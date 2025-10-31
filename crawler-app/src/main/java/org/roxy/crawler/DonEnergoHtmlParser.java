@@ -21,7 +21,7 @@ public class DonEnergoHtmlParser {
     private static final ZoneId zoneId = ZoneId.of("Europe/Moscow");
 
     public static List<PowerOutageParsedItem> parsePage(String html) {
-        System.out.println("Started parsing " + Thread.currentThread().getName());
+        log.info("Started parsing page");
         List<PowerOutageParsedItem> items = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements tbodyAll = doc.select("table.table_site1 tr:gt(1)");
@@ -45,27 +45,27 @@ public class DonEnergoHtmlParser {
 
                 for (String address : addresses) {
                     String trimmedAddress = address.trim();
-                    items.add(new PowerOutageParsedItem(
-                            id,
-                            city,
-                            trimmedAddress,
-                            powerOffDate,
-                            powerOnDate,
-                            powerOffTime,
-                            powerOnTime,
-                            reason,
-                            zoneId,
-                            comment));
+                    try {
+                        items.add(new PowerOutageParsedItem(
+                                id,
+                                city,
+                                trimmedAddress,
+                                powerOffDate,
+                                powerOnDate,
+                                powerOffTime,
+                                powerOnTime,
+                                reason,
+                                zoneId,
+                                comment));
+                    }
+                    catch (Exception e) {
+                        log.error("Failed to create PowerOutageParsedItem from row = {}", row.html());
+                    }
                 }
             } catch (Exception e) {
                 log.error("Failed to parse row =  {} ", row);
-                e.printStackTrace();
             }
         }
         return items;
-    }
-
-    private static List<String> getStreets(String items) {
-        return List.of(items.split(";"));
     }
 }

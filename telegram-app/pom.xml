@@ -85,9 +85,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.21.1</version>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-spring</artifactId>
+            <version>6.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>

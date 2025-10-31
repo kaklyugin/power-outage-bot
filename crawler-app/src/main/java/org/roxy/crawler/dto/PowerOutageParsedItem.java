@@ -63,9 +63,9 @@ public class PowerOutageParsedItem {
         }
         catch (Exception e)
         {
-            log.error("Failed to parse date/time from string: time = {} date = {} Error message : {}", time, date, e.getMessage());
-            throw new RuntimeException(e) ;
+            log.error("Failed to convert to DateTime from string: time = {} date = {} Error message : {}", time, date, e.getMessage());
         }
+        return null;
     }
 
     public static LocalDate parseDate(String dateString) {

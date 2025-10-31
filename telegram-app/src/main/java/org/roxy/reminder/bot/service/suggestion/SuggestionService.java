@@ -1,5 +1,7 @@
 package org.roxy.reminder.bot.service.suggestion;
 
+import org.roxy.reminder.bot.service.suggestion.dto.LocationDto;
+
 import java.util.List;
 
 public interface SuggestionService {
