@@ -124,8 +124,6 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-
-
         <createTable tableName="user_locations">
             <column name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
@@ -234,7 +232,7 @@
             <column name="message_hash_code" type="INTEGER">
                 <constraints nullable="true" unique="true"/>
             </column>
-            <column name="is_street_fias_requested" type="boolean" defaultValue="false">
+            <column name="is_location_fias_requested" type="boolean" defaultValue="false">
             </column>
             <column name="is_archived" type="boolean" defaultValue="false" >
                 <constraints nullable="false" />

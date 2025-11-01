@@ -1,6 +1,5 @@
 package org.roxy.reminder.bot.service.enricher;
 
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
@@ -25,27 +24,29 @@ public class OutageMessageEnricher {
         this.suggestionService = suggestionService;
     }
 
-    @Transactional
+
     @Scheduled(cron = "0/10 * * * * *")
-    @SchedulerLock(name = "enrichWithFiasId", lockAtMostFor = "9s")
+    @Async
+    @SchedulerLock(name = "MessageEnricherLock", lockAtMostFor = "9s", lockAtLeastFor = "8s")
     public void enrichWithFiasId() {
-        List<PowerOutageSourceMessageEntity> recordsForEnriching = repository.findByIsStreetFiasRequestedFalseAndIsArchivedFalse();
+        List<PowerOutageSourceMessageEntity> recordsForEnriching = repository.findMessagesForEnrichment(50);
+        log.info("Enriching records batch size = {}" , recordsForEnriching.size());
         try {
             for (PowerOutageSourceMessageEntity record : recordsForEnriching) {
                 try {
                     LocationDto location = findLocationFiasId(record.getCity(), record.getStreetType(), record.getStreetName());
                     record.setLocationFiasId(location.getLocationFiasId());
                     record.setLocationType(location.getLocationType());
-                    record.setStreetFiasRequested(true);
+                    record.setLocationFiasRequested(true);
                 } catch (Exception e) {
                     log.error("Failed to add locationFiasId via suggestion service: {}", e.getMessage());
-                } finally {
-                    record.setStreetFiasRequested(true);
+                    record.setLocationFiasRequested(true);
                 }
             }
         } catch (Exception e) {
-            log.error("Procedure enrichWithFiasId faile: {}", e.getMessage());
-        } finally {
+            log.error("Enriching of batch of power outage message failed: {}", e.getMessage());
+        }
+        finally {
             repository.saveAll(recordsForEnriching);
         }
     }

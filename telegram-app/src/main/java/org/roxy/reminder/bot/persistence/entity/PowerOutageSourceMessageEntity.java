@@ -54,8 +54,8 @@ public class PowerOutageSourceMessageEntity {
     @Column(name = "message_hash_code")
     private Integer messageHashCode;
 
-    @Column(name = "is_street_fias_requested")
-    private boolean isStreetFiasRequested = false;
+    @Column(name = "is_location_fias_requested")
+    private boolean isLocationFiasRequested = false;
 
     @Column(name = "is_archived")
     private boolean isArchived = false;

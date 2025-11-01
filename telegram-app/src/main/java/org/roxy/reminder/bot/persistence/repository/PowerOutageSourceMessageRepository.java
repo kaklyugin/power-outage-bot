@@ -21,5 +21,6 @@ public interface PowerOutageSourceMessageRepository extends JpaRepository<PowerO
 
     List<PowerOutageSourceMessageEntity> findAllByMessageHashCodeInOrderByDateTimeOffAsc(Collection<Integer> messageHashCodes);
 
-    List<PowerOutageSourceMessageEntity> findByIsStreetFiasRequestedFalseAndIsArchivedFalse();
+    @Query("SELECT p FROM PowerOutageSourceMessageEntity p WHERE p.isLocationFiasRequested = false AND p.isArchived = false ORDER BY p.id LIMIT :limit")
+    List<PowerOutageSourceMessageEntity> findMessagesForEnrichment(@Param("limit") int limit);
 }
