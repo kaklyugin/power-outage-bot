@@ -41,7 +41,7 @@ public class StreetSelectActionResolver extends ActionResolver {
         if (!checkLocationExists(locationFiasId)) {
             String ERROR_MESSAGE_TEXT = """
                     ❗ Похоже, что вы ввели неправильный адрес.
-                    Пожалуйста, попробуйте ещё раз ввести имя улицы.""";
+                    Пожалуйста, попробуйте ещё раз ввести название улицы.""";
             super.botClient.sendMessage(MessageDto.builder()
                     .chatId(String.valueOf(chatId))
                     .text(ERROR_MESSAGE_TEXT)

@@ -40,7 +40,7 @@ public class StreetInputActionResolver extends ActionResolver {
             super.botClient.sendMessage(
                     MessageDto.builder()
                             .chatId(String.valueOf(update.getChatId()))
-                            .text("❗Не удалось найти улицу. Попробуйте, пожалуйста, ввести имя улицы ещё раз")
+                            .text("❗Не удалось найти улицу. Попробуйте, пожалуйста, ввести название улицы ещё раз")
                             .build());
             return Event.RETRY;
 
@@ -49,7 +49,7 @@ public class StreetInputActionResolver extends ActionResolver {
             super.botClient.sendMessage(
                     MessageDto.builder()
                             .chatId(String.valueOf(update.getChatId()))
-                            .text(String.format("❗Мы нашли более 10 улиц с текстом %s. Пожалуйста, уточните имя улицы", update.getUserResponse()))
+                            .text(String.format("❗Мы нашли более 10 улиц с текстом %s. Пожалуйста, уточните название улицы", update.getUserResponse()))
                             .build());
             return Event.RETRY;
         }
