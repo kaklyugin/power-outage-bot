@@ -24,7 +24,6 @@ public class PowerOutageMessageConsumer {
     ) {
         this.objectMapper = objectMapper;
         this.outageMessageService = outageMessageService;
-
     }
 
     @RabbitListener(queues = "${rabbitmq.crawler.power.outage.queue.name}", containerFactory = "rabbitListenerContainerFactory")

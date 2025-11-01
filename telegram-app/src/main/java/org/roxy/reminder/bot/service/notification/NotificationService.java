@@ -2,6 +2,7 @@ package org.roxy.reminder.bot.service.notification;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.roxy.reminder.bot.mapper.PowerOutageMessageMapper;
 import org.roxy.reminder.bot.persistence.entity.NotificationEntity;
 import org.roxy.reminder.bot.persistence.entity.PowerOutageSourceMessageEntity;
@@ -42,15 +43,20 @@ public class NotificationService {
     }
 
     @Async
-    @Scheduled(fixedRate = 60_000)
+    @Scheduled(cron = "0 0/1 * * * *")
+    @SchedulerLock(name = "creteNotificationsBySchedule",lockAtLeastFor = "10s", lockAtMostFor = "59s")
     public void creteNotificationsBySchedule() {
         log.info("Started scheduled  function creteNotificationsBySchedule()");
         createNotificationsForAllUsers();
     }
 
-    //TODO REFACTOR
-    @Transactional
     public void createNotificationsForAllUsers() {
+        int notEnrichedMessages = messageRepository.countNotEnrichedActiveMessages();
+        if (notEnrichedMessages>0)
+        {
+            log.warn("Notification creation skipped.Not enriched active messages found. Count of messages = {} ", notEnrichedMessages);
+            return;
+        }
         try {
             List<UserCartEntity> userCartEntities = userCartRepository.findAll();
             List<Integer> actualMessagesHashCodes = messageRepository.findActualForDateTime(ZonedDateTime.now());
@@ -81,7 +87,7 @@ public class NotificationService {
                 }
             }
         } catch (Exception ex) {
-            log.error(ex.getMessage());
+            log.error("Failed to create notification {}", ex.getMessage());
         }
     }
 

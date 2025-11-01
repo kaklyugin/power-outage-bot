@@ -23,4 +23,7 @@ public interface PowerOutageSourceMessageRepository extends JpaRepository<PowerO
 
     @Query("SELECT p FROM PowerOutageSourceMessageEntity p WHERE p.isLocationFiasRequested = false AND p.isArchived = false ORDER BY p.id LIMIT :limit")
     List<PowerOutageSourceMessageEntity> findMessagesForEnrichment(@Param("limit") int limit);
+
+    @Query("SELECT count(p) FROM PowerOutageSourceMessageEntity p WHERE p.isLocationFiasRequested = false AND p.isArchived = false")
+    Integer countNotEnrichedActiveMessages();
 }
