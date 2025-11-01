@@ -25,6 +25,7 @@ public class OtherCitySearchResolver extends ActionResolver {
 
     @Override
     public Event resolveAction(UpdateDto update) {
+        final int MAX_CITIES_COUNT = 10;
 
         userSessionCacheService.clearCity(update.getChatId());
         String proposedCityName = update.getUserResponse();
@@ -40,20 +41,23 @@ public class OtherCitySearchResolver extends ActionResolver {
                             """)
                             .build());
             return Event.RETRY;
-
         }
-        if (cities.size() > 10) {
-            super.botClient.sendMessage(
-                    MessageDto.builder()
-                            .chatId(String.valueOf(update.getChatId()))
-                            .text("""
-                                    ✅Мы нашли более 10 населенных пунктов. Если вашего населенного пункта нет в списке, уточните запрос
-                                    """)
-                            .build());
+
+        String messageText;
+        List<CityDto> citiesToDisplay = cities;
+        if (cities.size() > MAX_CITIES_COUNT) {
+            citiesToDisplay = cities.subList(0, MAX_CITIES_COUNT);
+            messageText = """
+                    ✅Мы нашли более 10 населенных пунктов. Показаны первые 10 результатов.
+                    Если вашего населенного пункта нет в списке, уточните запрос.
+                    
+                    Пожалуйста, выберите населенный пункт из списка:""";
+        } else {
+            messageText = "✅Пожалуйста, выберите населенный пункт из списка";
         }
 
         InlineKeyboardDto.KeyboardBuilder keyboardCitiesBuilder = new InlineKeyboardDto.KeyboardBuilder();
-        for (CityDto city : cities) {
+        for (CityDto city : citiesToDisplay) {
             keyboardCitiesBuilder.addRow().addButton(city.getFullName(), city.getFiasId());
         }
         keyboardCitiesBuilder.addRow().addButton("Назад", ButtonCallbackConstants.BACK.name());
@@ -62,7 +66,7 @@ public class OtherCitySearchResolver extends ActionResolver {
         super.botClient.sendMessage(
                 MessageDto.builder()
                         .chatId(String.valueOf(update.getChatId()))
-                        .text("✅Пожалуйста, выберите населенный пункт из списка")
+                        .text(messageText)
                         .replyMarkup(keyboardCities)
                         .build());
 
