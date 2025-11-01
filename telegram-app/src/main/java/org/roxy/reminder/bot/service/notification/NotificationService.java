@@ -44,7 +44,7 @@ public class NotificationService {
 
     @Async
     @Scheduled(cron = "0 0/1 * * * *")
-    @SchedulerLock(name = "creteNotificationsBySchedule",lockAtLeastFor = "10s", lockAtMostFor = "59s")
+    @SchedulerLock(name = "creteNotificationsBySchedule", lockAtMostFor = "59s")
     public void creteNotificationsBySchedule() {
         log.info("Started scheduled  function creteNotificationsBySchedule()");
         createNotificationsForAllUsers();
