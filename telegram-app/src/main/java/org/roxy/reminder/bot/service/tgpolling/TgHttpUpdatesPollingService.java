@@ -11,6 +11,8 @@ import org.roxy.reminder.bot.service.webclient.dto.updates.UpdateResponseDto;
 import org.roxy.reminder.bot.service.webclient.dto.updates.UpdatesResponseDto;
 import org.roxy.reminder.bot.service.webclient.HttpBotClientService;
 import org.roxy.reminder.bot.cache.ChatStore;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,10 +27,7 @@ public class TgHttpUpdatesPollingService {
     private final ChatStore chatStore;
     private final UpdateMessageProducer updateMessageProducer;
     private final ObjectMapper objectMapper;
-    private final ExecutorService executor;
     private final UpdateResponseMapper mapper;
-    private final int MAX_THREAD_COUNT = 1;
-    private final int SLEEP_BEFORE_NEXT_UPDATE_REQUEST_MS = 1_000;
 
     public TgHttpUpdatesPollingService(HttpBotClientService httpBotClientService,
                                        ChatStore chatStore,
@@ -40,21 +39,15 @@ public class TgHttpUpdatesPollingService {
         this.updateMessageProducer = updateMessageProducer;
         this.objectMapper = objectMapper;
         this.mapper = mapper;
-        executor = Executors.newFixedThreadPool(MAX_THREAD_COUNT);
     }
 
-    @PostConstruct
-    void runPolling() {
-        executor.submit(this::poll);
-    }
-
-    @SneakyThrows
+    @Async
+    @Scheduled(fixedRate = 1000)
     public void poll() {
-        while (true) {
+        try {
             log.info("Polling");
             String json = httpBotClientService.getUpdates();
             log.info("Updates received from tg =  {}", json);
-
             UpdatesResponseDto updates = objectMapper.readValue(json, UpdatesResponseDto.class);
             if (!updates.isOk()) {
                 throw new RuntimeException("No updates found." + json);
@@ -68,7 +61,6 @@ public class TgHttpUpdatesPollingService {
                         }
                     }
             );
-
             /* Чистим апдейты на сервере TG */
             Optional<Long> maxUpdatedId = updates.getResult().stream()
                     .map(UpdateResponseDto::getUpdateId)
@@ -79,7 +71,8 @@ public class TgHttpUpdatesPollingService {
             } else {
                 log.info("No updates found");
             }
-            Thread.sleep(SLEEP_BEFORE_NEXT_UPDATE_REQUEST_MS);
+        } catch (Exception e) {
+            log.error("Polling failed. {}", e.getMessage());
         }
     }
 }

@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ChatCaffeineStore implements ChatStore {
     private final Cache<Long, HashMap<Long, UpdateResponseDto>> cache = Caffeine.newBuilder()
-            .expireAfterWrite(36, TimeUnit.HOURS)
+            .expireAfterWrite(1, TimeUnit.HOURS)
             .build();
 
     @Override

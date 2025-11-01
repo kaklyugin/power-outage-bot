@@ -25,9 +25,9 @@ public class OutageMessageEnricher {
     }
 
 
-    @Scheduled(cron = "0/10 * * * * *")
+    @Scheduled(cron = "0 0/1 * * * *")
     @Async
-    @SchedulerLock(name = "MessageEnricherLock", lockAtMostFor = "9s", lockAtLeastFor = "8s")
+    @SchedulerLock(name = "MessageEnricherLock", lockAtMostFor = "10s", lockAtLeastFor = "8s")
     public void enrichWithFiasId() {
         List<PowerOutageSourceMessageEntity> recordsForEnriching = repository.findMessagesForEnrichment(50);
         log.info("Enriching records batch size = {}" , recordsForEnriching.size());
