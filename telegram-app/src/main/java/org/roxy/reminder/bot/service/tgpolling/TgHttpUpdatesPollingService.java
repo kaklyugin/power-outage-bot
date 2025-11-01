@@ -41,7 +41,6 @@ public class TgHttpUpdatesPollingService {
         this.mapper = mapper;
     }
 
-    @Async
     @Scheduled(fixedRate = 1000)
     public void poll() {
         try {
