@@ -8,6 +8,7 @@ import org.roxy.reminder.bot.persistence.repository.CityRepository;
 import org.roxy.reminder.bot.persistence.repository.LocationRepository;
 import org.roxy.reminder.bot.service.suggestion.client.*;
 import org.roxy.reminder.bot.service.suggestion.dto.DaDataSuggestionResponseDto;
+import org.roxy.reminder.bot.service.suggestion.dto.LocationDto;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

@@ -2,12 +2,10 @@ package org.roxy.reminder.bot.sate.machine.handlers.registration.action;
 
 import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.ButtonCallbackConstants;
-import org.roxy.reminder.bot.persistence.entity.UserCartEntity;
-import org.roxy.reminder.bot.persistence.repository.UserCartRepository;
 import org.roxy.reminder.bot.sate.machine.enums.Event;
 import org.roxy.reminder.bot.service.UserSessionCacheService;
 import org.roxy.reminder.bot.service.broker.dto.UpdateDto;
-import org.roxy.reminder.bot.service.suggestion.LocationDto;
+import org.roxy.reminder.bot.service.suggestion.dto.LocationDto;
 import org.roxy.reminder.bot.service.suggestion.SuggestionService;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.MessageDto;
 import org.roxy.reminder.bot.service.webclient.dto.message.request.keyboard.InlineKeyboardDto;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Component

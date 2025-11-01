@@ -34,7 +34,10 @@ public class OtherCitySearchResolver extends ActionResolver {
             super.botClient.sendMessage(
                     MessageDto.builder()
                             .chatId(String.valueOf(update.getChatId()))
-                            .text("Не удалось найти населенный пункт. Может быть Вы ошиблись или у нас устаревший справочник :(")
+                            .text("""
+                            ❗Не удалось найти населенный пункт.
+                             Пожалуйста, попробуйте ещё раз ❤️️️
+                            """)
                             .build());
             return Event.RETRY;
 
@@ -43,14 +46,15 @@ public class OtherCitySearchResolver extends ActionResolver {
             super.botClient.sendMessage(
                     MessageDto.builder()
                             .chatId(String.valueOf(update.getChatId()))
-                            .text(String.format("Мы нашли более 10 населенных пунктов с текстом %s. Пожалуйста, уточните наименование", update.getUserResponse()))
+                            .text("""
+                                    ✅Мы нашли более 10 населенных пунктов. Если вашего населенного пункта нет в списке, уточните запрос
+                                    """)
                             .build());
-            return Event.RETRY;
         }
 
         InlineKeyboardDto.KeyboardBuilder keyboardCitiesBuilder = new InlineKeyboardDto.KeyboardBuilder();
         for (CityDto city : cities) {
-            keyboardCitiesBuilder.addRow().addButton(city.getName(), city.getFiasId());
+            keyboardCitiesBuilder.addRow().addButton(city.getFullName(), city.getFiasId());
         }
         keyboardCitiesBuilder.addRow().addButton("Назад", ButtonCallbackConstants.BACK.name());
         InlineKeyboardDto keyboardCities = keyboardCitiesBuilder.build();
@@ -58,7 +62,7 @@ public class OtherCitySearchResolver extends ActionResolver {
         super.botClient.sendMessage(
                 MessageDto.builder()
                         .chatId(String.valueOf(update.getChatId()))
-                        .text("✅Выберите населенный пункт из списка")
+                        .text("✅Пожалуйста, выберите населенный пункт из списка")
                         .replyMarkup(keyboardCities)
                         .build());
 
@@ -69,7 +73,7 @@ public class OtherCitySearchResolver extends ActionResolver {
     public void sendActionWelcomeMessage(Long chatId) {
         super.botClient.sendMessage(
                 MessageDto.builder()
-                        .chatId(String.valueOf(chatId   ))
+                        .chatId(String.valueOf(chatId))
                         .text("Пожалуйста, введите имя населённого пункта")
                         .build());
     }

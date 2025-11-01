@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -25,25 +26,32 @@ public class OutageMessageService {
     public OutageMessageService(PowerOutageSourceMessageRepository repository,
                                 AddressFormatterService addressFormatterService,
                                 PowerOutageMessageMapper messageMapper
-                               ) {
+    ) {
         this.repository = repository;
         this.addressFormatterService = addressFormatterService;
         this.messageMapper = messageMapper;
     }
 
     @Transactional
-    public PowerOutageSourceMessageEntity saveMessage(PowerOutageDto powerOutageDto) {
-        Optional<PowerOutageSourceMessageEntity> entity = repository.findByMessageHashCode(powerOutageDto.getMessageHashCode());
-        if (entity.isEmpty()) {
-            PowerOutageSourceMessageEntity newEntity = messageMapper.mapDtoToEntity(powerOutageDto);
-            AddressComponents addressComponents = addressFormatterService.extractAddressComponents(newEntity.getAddress());
-            newEntity.setStreetType(addressComponents.getStreetType());
-            newEntity.setStreetName(addressComponents.getStreetName());
-            newEntity.setBuildingsNumbers(addressComponents.getBuildingsNumbers());
-            boolean isMessageOutOfDate = powerOutageDto.getDateTimeOff().isBefore(ZonedDateTime.now(ZoneId.of("Europe/Moscow")).with(LocalTime.MIDNIGHT));
-            newEntity.setArchived(isMessageOutOfDate);
-            return repository.save(newEntity);
+    public void saveMessage(PowerOutageDto powerOutageDto) {
+        Optional<PowerOutageSourceMessageEntity> existingPowerMessage = repository.findByMessageHashCode(powerOutageDto.getMessageHashCode());
+        try {
+            if (existingPowerMessage.isEmpty()) {
+                Objects.requireNonNull(powerOutageDto.getDateTimeOff());
+                Objects.requireNonNull(powerOutageDto.getDateTimeOn());
+
+                PowerOutageSourceMessageEntity newEntity = messageMapper.mapDtoToEntity(powerOutageDto);
+                AddressComponents addressComponents = addressFormatterService.extractAddressComponents(newEntity.getAddress());
+                newEntity.setStreetType(addressComponents.getStreetType());
+                newEntity.setStreetName(addressComponents.getStreetName());
+                newEntity.setBuildingsNumbers(addressComponents.getBuildingsNumbers());
+                boolean isMessageOutOfDate = powerOutageDto.getDateTimeOff().isBefore(ZonedDateTime.now(ZoneId.of("Europe/Moscow")).with(LocalTime.MIDNIGHT));
+                newEntity.setArchived(isMessageOutOfDate);
+
+                repository.save(newEntity);
+            }
+        } catch (Exception e) {
+            log.error("Failed to save message = {}. Reason = {}", powerOutageDto, e.getMessage());
         }
-        return entity.get();
     }
 }

@@ -16,11 +16,15 @@ public interface CityRepository extends JpaRepository<CityEntity, String> {
     @Query("SELECT c FROM CityEntity c WHERE c.fiasId = :fiasId")
     Optional<CityEntity> findById(@Param("fiasId") String fiasId);
 
-    @Query(nativeQuery = true, value =
-            "Select fias_id as fiasId," +
-                    " name as name ," +
-                    " district || ' ' || name as fullName " +
-                    "from cities c " +
-                    "where :cityName % name")
+    @Query(value = """
+            SELECT 
+                fias_id as fiasId,
+                name as name,
+                district || ' ' || name as fullName
+            FROM cities c
+            WHERE :cityName % name 
+            ORDER BY similarity(:cityName, name) DESC  """,
+            nativeQuery = true
+           )
     List<CityDto> findWithFuzzySearchByName(@Param("cityName") String cityName);
 }
