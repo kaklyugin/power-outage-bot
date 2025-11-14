@@ -1,30 +1,24 @@
-# Stage 1: Build the application
-FROM maven:3.9-eclipse-temurin-21 AS build
+# Stage 1: Build
+FROM maven:3.9-eclipse-temurin-21-alpine AS build
 WORKDIR /app
-ENV LOGGING_LEVEL_ROOT=INFO
-ENV LOGGING_PATTERN_CONSOLE="%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-
-# Copy Maven/Gradle project files
 COPY pom.xml .
+
+RUN mvn dependency:resolve
 COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Build the application with the 'dev' profile
-# For Maven:
-RUN mvn clean package -DskipTests -Dspring.profiles.active=${APP_ENV}
-
-# For Gradle (if using Gradle, uncomment and adjust):
-# COPY build.gradle settings.gradle ./
-# RUN gradle clean build -x test -Pdev
-
-# Stage 2: Create the runtime image
-FROM eclipse-temurin:21-jre-jammy
+# Stage 2: Ultra-lightweight runtime
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Copy the built JAR from the build stage
-COPY --from=build /app/target/*.jar app.jar
+# Create non-root user
+RUN addgroup -S spring && adduser -S spring -G spring
 
-# Expose the port your application listens on (e.g., 8080)
-EXPOSE 8080
+# Copy JAR only
+COPY --from=build --chown=spring:spring /app/target/*.jar app.jar
 
-# Run the application with the 'dev' profile activated
-ENTRYPOINT ["sh", "-c", "java -jar app.jar --spring.profiles.active=${APP_ENV}"]
+USER spring
+
+EXPOSE 8180
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.roxy.crawler.dto.ParsingStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -20,6 +21,13 @@ public class PowerOutageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @Column (name = "line_num")
+    private Integer lineNum;
+
+    @Enumerated(EnumType.STRING)
+    @Column (name = "parsing_status")
+    private ParsingStatus parsingStatus;
 
     @Column (name = "city")
     private String city;
@@ -38,6 +46,9 @@ public class PowerOutageEntity {
 
     @Column (name = "url")
     private String url;
+
+    @Column (name = "line_html")
+    private String lineHtml;
 
     @Column (name = "message_hash_code")
     private Integer messageHashCode;

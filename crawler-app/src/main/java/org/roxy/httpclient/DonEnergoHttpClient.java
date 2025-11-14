@@ -1,4 +1,4 @@
-package org.roxy.crawler;
+package org.roxy.httpclient;
 
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
