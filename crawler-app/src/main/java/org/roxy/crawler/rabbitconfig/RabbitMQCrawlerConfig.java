@@ -1,4 +1,4 @@
-package org.roxy.crawler.rabbit;
+package org.roxy.crawler.rabbitconfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;

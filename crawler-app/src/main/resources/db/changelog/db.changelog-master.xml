@@ -9,5 +9,6 @@
         http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.23.xsd">
 
     <include file="changesets/001-initial-schema.xml" relativeToChangelogFile="true"/>
+    <include file="changesets/002-alter-power-outage-addresses.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

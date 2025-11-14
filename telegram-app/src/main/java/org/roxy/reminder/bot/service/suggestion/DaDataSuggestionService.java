@@ -66,7 +66,8 @@ public class DaDataSuggestionService implements SuggestionService {
         }
         saveSuggestedAddresses(suggestions);
         return suggestions.stream()
-                .map(this::mapResponseToLocationDto)
+                .map(DaDataSuggestionResponseDto::getData)
+                .map(mapper::mapDaDataResponseItemToLocationDto)
                 .collect(Collectors.toList());
     }
 
@@ -86,14 +87,15 @@ public class DaDataSuggestionService implements SuggestionService {
         }
         saveSuggestedAddresses(suggestions);
         return suggestions.stream()
-                .map(this::mapResponseToLocationDto)
+                .map(DaDataSuggestionResponseDto::getData)
+                .map(mapper::mapDaDataResponseItemToLocationDto)
                 .collect(Collectors.toList());
     }
 
     private void saveSuggestedAddresses(List<DaDataSuggestionResponseDto> suggestions) {
         for (DaDataSuggestionResponseDto suggestion : suggestions) {
             try {
-                LocationEntity locationEntity = mapper.mapStreetDtoToEntity(suggestion.getData());
+                LocationEntity locationEntity = mapper.mapDaDataResponseItemToEntity(suggestion.getData());
                 locationRepository.findById(locationEntity.getLocationFiasId()).orElseGet(() -> locationRepository.save(locationEntity));
             } catch (Exception e) {
                 log.warn("Failed to save street {}. Error : {} ", suggestion.getData(), e.getMessage());
@@ -105,13 +107,5 @@ public class DaDataSuggestionService implements SuggestionService {
         return cityRepository.findById(fiasId)
                 .map(CityEntity::getType)
                 .orElseThrow(() -> new IllegalArgumentException("City not found for ID: " + fiasId));
-    }
-    private LocationDto mapResponseToLocationDto(DaDataSuggestionResponseDto responseDto)
-    {
-        String locationFiasId = responseDto.getData().getStreetFiasId() != null ? responseDto.getData().getStreetFiasId() :
-                responseDto.getData().getSettlementType();
-        String locationType =  responseDto.getData().getStreetType() != null ? responseDto.getData().getStreetType() :
-                responseDto.getData().getSettlementType();
-        return new LocationDto(responseDto.getValue(), locationFiasId,locationType);
     }
 }
