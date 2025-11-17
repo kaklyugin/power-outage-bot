@@ -5,13 +5,15 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.roxy.reminder.bot.service.webclient.dto.updates.UpdateResponseDto;
 import org.roxy.reminder.bot.service.webclient.dto.updates.UpdateType;
 
 import java.io.IOException;
 import java.util.stream.StreamSupport;
 
-
+@Slf4j
 public class UpdateResponseDtoDeserializer extends StdDeserializer<UpdateResponseDto> {
     //FIXME
     public UpdateResponseDtoDeserializer() {
@@ -50,10 +52,8 @@ public class UpdateResponseDtoDeserializer extends StdDeserializer<UpdateRespons
                 resultUpdateResponseDto.setChatId(node.at("/message/chat/id").asLong());
                 resultUpdateResponseDto.setDate(node.at("/message/date").asLong());
                 resultUpdateResponseDto.setUserResponse(node.at("/message/text").asText());
-
             }
         } else if (node.has("callback_query")) {
-
             resultUpdateResponseDto.setUpdateType(UpdateType.CALLBACK);
             resultUpdateResponseDto.setFromId(node.at("/callback_query/message/from/id").asLong());
             resultUpdateResponseDto.setChatId(node.at("/callback_query/message/chat/id").asLong());
@@ -62,8 +62,17 @@ public class UpdateResponseDtoDeserializer extends StdDeserializer<UpdateRespons
             resultUpdateResponseDto.setSourceMessageId(node.at("/callback_query/message/message_id").asLong());
             resultUpdateResponseDto.setCallbackQueryId(node.at("/callback_query/id").asText());
 
-        } else
-            throw new JsonParseException("Cannot define update type");
+        } else if (node.has("my_chat_member")) // user deleted and blocked bot
+        {
+            resultUpdateResponseDto.setUpdateType(UpdateType.BLOCK);
+            resultUpdateResponseDto.setFromId(node.at("/my_chat_member/from/id").asLong());
+            resultUpdateResponseDto.setChatId(node.at("/my_chat_member/chat/id").asLong());
+            resultUpdateResponseDto.setDate(node.at("/my_chat_member/date").asLong());
+        }
+        else
+        {
+            log.error("Unrecognized update response = {}", node);
+        }
         return resultUpdateResponseDto;
     }
 }

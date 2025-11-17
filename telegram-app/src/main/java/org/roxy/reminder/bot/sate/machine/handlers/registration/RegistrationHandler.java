@@ -35,7 +35,13 @@ public class RegistrationHandler implements UpdateHandler {
     public boolean canHandle(UpdateDto update) {
         if (update.getUpdateType().equals(UpdateType.COMMAND)) {
             return true;
-        } else {
+        }
+        if (update.getUpdateType().equals(UpdateType.BLOCK)) {
+            //TODO HANDLE-REMOVE user
+            log.warn("User blocked the bot");
+            return false;
+        }
+        else {
             if (getStateMachineEntity(update).getState().equals(State.COMPLETED)) {
                 return false;
             }
