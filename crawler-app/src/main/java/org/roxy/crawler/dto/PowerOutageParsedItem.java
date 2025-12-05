@@ -72,8 +72,7 @@ public class PowerOutageParsedItem {
         for (DateTimeFormatter dtf : dateFormatters) {
             try {
                 return LocalDate.parse(dateString,dtf);
-            } catch (DateTimeParseException e) {
-                log.info("Retry parse date: date = {} with other formatter", dateString);
+            } catch (DateTimeParseException ignored) {
             }
         }
         return null;

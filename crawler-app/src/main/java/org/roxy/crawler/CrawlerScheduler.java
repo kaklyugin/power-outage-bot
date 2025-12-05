@@ -24,7 +24,7 @@ public class CrawlerScheduler {
         this.brokerService = brokerService;
     }
 
-    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 0 */1 * * ?")
     private void crawl() {
         log.info("Scheduled start of crawling data from Donenergo");
         powerOutageTimeTableLoader.loadPowerOutageTimetable();
