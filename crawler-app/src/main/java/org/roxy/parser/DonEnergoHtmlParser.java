@@ -1,4 +1,4 @@
-package org.roxy.crawler;
+package org.roxy.parser;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,6 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.roxy.crawler.dto.ParsingStatus;
 import org.roxy.crawler.dto.PowerOutageParsedItem;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +26,10 @@ public class DonEnergoHtmlParser {
         List<PowerOutageParsedItem> items = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements tbodyAll = doc.select("table.table_site1 tr:gt(1)");
+        String lineNum = "0";
         for (Element row : tbodyAll) {
             try {
-                String id = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(0).text().trim();
+                lineNum = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(0).text().trim();
                 String city = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(1).text().trim();
                 String[] addresses = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(2).text().split(";");
                 String powerOffDate = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(3).text().trim();
@@ -37,9 +39,9 @@ public class DonEnergoHtmlParser {
                 String reason = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(7).text().trim();
                 String comment = row.getElementsByTag("tr").getFirst().getElementsByTag("td").get(8).text().trim();
 
-                if (powerOffDate.equals("") || powerOnDate.equals("") || powerOffTime.equals("") || powerOnTime.equals(""))
+                if (powerOffDate.isEmpty() || powerOnDate.isEmpty() || powerOffTime.isEmpty() || powerOnTime.isEmpty())
                 {
-                    log.warn("Power outage time interval is empty in row =  {} and will be skipped", row);
+                    log.warn("Power outage time interval is empty in row number =  {} for city = {} and will be skipped", lineNum, city);
                     continue;
                 }
 
@@ -47,7 +49,8 @@ public class DonEnergoHtmlParser {
                     String trimmedAddress = address.trim();
                     try {
                         items.add(new PowerOutageParsedItem(
-                                id,
+                                lineNum,
+                                ParsingStatus.SUCCESS,
                                 city,
                                 trimmedAddress,
                                 powerOffDate,
@@ -56,7 +59,8 @@ public class DonEnergoHtmlParser {
                                 powerOnTime,
                                 reason,
                                 zoneId,
-                                comment));
+                                comment,
+                                null));
                     }
                     catch (Exception e) {
                         log.error("Failed to create PowerOutageParsedItem from row = {}", row.html());
@@ -64,6 +68,7 @@ public class DonEnergoHtmlParser {
                 }
             } catch (Exception e) {
                 log.error("Failed to parse row =  {} ", row);
+                items.add(new PowerOutageParsedItem(lineNum,ParsingStatus.FAILED,row.html()));
             }
         }
         return items;

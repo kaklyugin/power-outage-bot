@@ -2,8 +2,8 @@ package org.roxy.crawler.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.roxy.crawler.DonEnergoHtmlParser;
-import org.roxy.crawler.DonEnergoHttpClient;
+import org.roxy.parser.DonEnergoHtmlParser;
+import org.roxy.httpclient.DonEnergoHttpClient;
 import org.roxy.crawler.dto.PowerOutageParsedItem;
 import org.roxy.crawler.persistence.entity.PowerOutageEntity;
 import org.roxy.crawler.persistence.entity.PowerOutagePageUrlEntity;
@@ -17,16 +17,16 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class PowerOutageTimetableLoader {
+public class PowerOutageCrawlService {
 
     private final DonEnergoHttpClient donEnergoHttpClient;
     private final PowerOutageRepository powerOutageRepository;
     private final PowerOutageSourceRepository powerOutagePageRepository;
 
 
-    public PowerOutageTimetableLoader(DonEnergoHttpClient donEnergoHttpClient,
-                                      PowerOutageRepository powerOutageRepository,
-                                      PowerOutageSourceRepository powerOutagePageRepository
+    public PowerOutageCrawlService(DonEnergoHttpClient donEnergoHttpClient,
+                                   PowerOutageRepository powerOutageRepository,
+                                   PowerOutageSourceRepository powerOutagePageRepository
                                       ) {
         this.donEnergoHttpClient = donEnergoHttpClient;
         this.powerOutageRepository = powerOutageRepository;
@@ -35,7 +35,7 @@ public class PowerOutageTimetableLoader {
     }
 
     @Transactional
-    public void loadPowerOutageTimetable() {
+    public void crawlPowerOutageTimetable() {
         int SLEEP_BETWEEN_REQUESTS_MS = 1_000;
 
         List<PowerOutagePageUrlEntity> powerOutagePageUrlEntities = powerOutagePageRepository.findByEnabledTrue();
@@ -64,11 +64,14 @@ public class PowerOutageTimetableLoader {
                         noneMatch(p -> p.getMessageHashCode().equals(item.getMessageHashCode()));
                 if (isNew) {
                     PowerOutageEntity entity = PowerOutageEntity.builder()
+                            .lineNum(item.getLineNum())
+                            .parsingStatus(item.getParsingStatus())
                             .city(item.getCity())
                             .address(item.getAddress())
                             .dateTimeOff(item.getDateTimeOff())
                             .dateTimeOn(item.getDateTimeOn())
                             .powerOutageReason(item.getPowerOutageReason())
+                            .lineHtml(item.getLineHtml())
                             .url(url)
                             .messageHashCode(item.getMessageHashCode())
                             .comment(item.getComment())

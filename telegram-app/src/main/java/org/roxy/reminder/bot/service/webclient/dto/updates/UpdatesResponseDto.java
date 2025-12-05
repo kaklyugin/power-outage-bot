@@ -7,8 +7,6 @@ import java.util.List;
 
 @Getter
 public class UpdatesResponseDto {
-
     private boolean ok;
     private List<UpdateResponseDto> result;
-
 }

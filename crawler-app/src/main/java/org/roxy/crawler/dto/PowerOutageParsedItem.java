@@ -14,14 +14,16 @@ import java.util.Objects;
 @ToString
 @Slf4j
 public class PowerOutageParsedItem {
-    private final int id;
-    private final String city;
-    private final String address;
-    private final ZonedDateTime dateTimeOff;
-    private final ZonedDateTime dateTimeOn;
-    private final String powerOutageReason;
-    private final Integer messageHashCode;
-    private final String comment;
+    private final int lineNum;
+    private final ParsingStatus parsingStatus;
+    private String city;
+    private String address;
+    private ZonedDateTime dateTimeOff;
+    private ZonedDateTime dateTimeOn;
+    private String powerOutageReason;
+    private Integer messageHashCode;
+    private String comment;
+    private String lineHtml;
 
     private static final List<DateTimeFormatter> dateFormatters = List.of(
             DateTimeFormatter.ofPattern("dd.MM.yy"),
@@ -31,8 +33,8 @@ public class PowerOutageParsedItem {
     );
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H[=][-]mm");
 
-
-    public PowerOutageParsedItem(String id,
+    public PowerOutageParsedItem(String lineNum,
+                                 ParsingStatus parsingStatus,
                                  String city,
                                  String address,
                                  String startDate,
@@ -41,9 +43,11 @@ public class PowerOutageParsedItem {
                                  String endTime,
                                  String powerOutageReason,
                                  ZoneId zoneId,
-                                 String comment
+                                 String comment,
+                                 String lineHtml
     ) {
-        this.id = Integer.parseInt(id);
+        this.lineNum = Integer.parseInt(lineNum);
+        this.parsingStatus = parsingStatus;
         this.city = city;
         this.address = address;
         this.dateTimeOff = convertDateTime(startDate, startTime, zoneId);
@@ -51,8 +55,15 @@ public class PowerOutageParsedItem {
         this.messageHashCode = calculateHashForPowerOutageRecord(city,address,dateTimeOff,dateTimeOn);
         this.powerOutageReason = powerOutageReason;
         this.comment = comment;
+        this.lineHtml = lineHtml;
     }
-    //TODO Вынести Zone в настройки бота
+
+    public PowerOutageParsedItem(String lineNum, ParsingStatus parsingStatus, String lineHtml) {
+        this.lineNum = Integer.parseInt(lineNum);
+        this.parsingStatus = parsingStatus;
+        this.lineHtml = lineHtml;
+    }
+
     private ZonedDateTime convertDateTime(String date, String time, ZoneId zoneId) throws RuntimeException {
         LocalDateTime ldt;
         try {
