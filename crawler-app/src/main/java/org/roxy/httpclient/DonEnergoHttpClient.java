@@ -1,6 +1,7 @@
 package org.roxy.httpclient;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
@@ -17,6 +18,7 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 @Component
+@Slf4j
 public class DonEnergoHttpClient {
 
     private static final String SSL_PROTOCOL = "TLS";
@@ -38,11 +40,10 @@ public class DonEnergoHttpClient {
                 .thenApply(
                         response -> {
                             int statusCode = response.statusCode();
-                            System.out.println("HTTP Status Code: " + statusCode);
                             if (statusCode == 200) {
                                 return response.body();
                             } else {
-                                System.out.println("Request failed with status code: " + statusCode);
+                                log.error("Failed to get URL {},Status code = {} ", uri.getPath(), statusCode);
                                 return "";
                             }
                         }).exceptionally(ex -> {

@@ -55,7 +55,7 @@ public class PowerOutageCrawlService {
         }
     }
 
-    private List<PowerOutageEntity> saveNewPowerOutageParsedItems(List<PowerOutageParsedItem> items, String url) {
+    private void saveNewPowerOutageParsedItems(List<PowerOutageParsedItem> items, String url) {
         List<PowerOutageEntity> entitiesToSave = new ArrayList<>();
         List<PowerOutageEntity> existingEntities = powerOutageRepository.findAll();
         for (PowerOutageParsedItem item : items) {
@@ -80,6 +80,6 @@ public class PowerOutageCrawlService {
                 }
             }
         }
-        return powerOutageRepository.saveAll(entitiesToSave);
+        powerOutageRepository.saveAll(entitiesToSave);
     }
 }
