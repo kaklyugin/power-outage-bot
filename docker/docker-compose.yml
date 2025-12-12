@@ -2,9 +2,10 @@ services:
   postgres:
     image: postgres:17.5
     container_name: pg
+    hostname: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
@@ -12,29 +13,44 @@ services:
       - app-network
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # - ./postgres-config/postgresql.conf:/etc/postgresql/postgresql.conf
+      #     command: >
+      #       postgres 
+      #       -c config_file=/etc/postgresql/postgresql.conf    restart: unless-stopped
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER}"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
 
   rabbitmq:
     image: rabbitmq:3.10.7-management
-    hostname: rabbitmq
+    hostname: ${RABBIT_MQ_HOST}
     container_name: mq
-    restart: always
+    restart: unless-stopped
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBIT_MQ_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBIT_MQ_PASSWORD}
       - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648
     volumes:
-      - rabbit_mq_data:/var/lib/rabbitmq
+      - rabbit_mq_data:/var/lib/${RABBIT_MQ_HOST}
     ports:
       - 15672:15672
       - 5672:5672
     networks:
       - app-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_running"]
       interval: 5s
@@ -43,19 +59,21 @@ services:
       start_period: 30s
 
   bot:
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
     image: bot:latest
     container_name: bot
     hostname: bot
+    depends_on:
+      postgres:
+          condition: service_healthy
+      rabbitmq:
+        condition: service_healthy    
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s   
-    restart: always
+    restart: unless-stopped
     environment:
       - SPRING_PROFILES_ACTIVE=${APP_ENV}
       - BOT_URL=${BOT_URL}
@@ -65,6 +83,7 @@ services:
       - PG_PORT=${PG_PORT}
       - PG_USER=${PG_USER}
       - PG_PASSWORD=${PG_PASSWORD}
+      - DB_NAME_BOT=${DB_NAME_BOT}
       - RABBIT_MQ_HOST=${RABBIT_MQ_HOST}
       - RABBIT_MQ_PORT=${RABBIT_MQ_PORT}
       - RABBIT_MQ_USER=${RABBIT_MQ_USER}
@@ -77,9 +96,16 @@ services:
       - 8080:8080
     networks:
       - app-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
   crawler:
     depends_on:
+      postgres:
+          condition: service_healthy
       rabbitmq:
         condition: service_healthy
     image: crawler:latest
@@ -91,13 +117,14 @@ services:
         timeout: 10s
         retries: 3
         start_period: 40s
-    restart: always
+    restart: unless-stopped
     environment:
       - SPRING_PROFILES_ACTIVE=${APP_ENV}
       - PG_HOST=${PG_HOST}
       - PG_PORT=${PG_PORT}
       - PG_USER=${PG_USER}
       - PG_PASSWORD=${PG_PASSWORD}
+      - DB_NAME_CRAWLER=${DB_NAME_CRAWLER}
       - RABBIT_MQ_HOST=${RABBIT_MQ_HOST}
       - RABBIT_MQ_PORT=${RABBIT_MQ_PORT}
       - RABBIT_MQ_USER=${RABBIT_MQ_USER}
@@ -110,6 +137,11 @@ services:
       - 8180:8180
     networks:
       - app-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
     
 volumes:
   postgres_data:

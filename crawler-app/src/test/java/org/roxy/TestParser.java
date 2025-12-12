@@ -1,8 +1,8 @@
 package org.roxy;
 
 import org.junit.jupiter.api.Test;
-import org.roxy.crawler.DonEnergoHtmlParser;
 import org.roxy.crawler.dto.PowerOutageParsedItem;
+import org.roxy.parser.DonEnergoHtmlParser;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
