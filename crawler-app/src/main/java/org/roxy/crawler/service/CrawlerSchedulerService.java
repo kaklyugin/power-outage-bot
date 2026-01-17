@@ -1,6 +1,7 @@
 package org.roxy.crawler.service;
 
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -22,7 +23,8 @@ public class CrawlerSchedulerService {
         this.brokerService = brokerService;
     }
 
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ?")
+    @SchedulerLock(name = "CrawlDonEnergoTask", lockAtMostFor = "10m", lockAtLeastFor = "5m")
     private void crawl() {
         log.info("Scheduled start of crawling data from Donenergo");
         powerOutageTimeTableLoaderService.crawlPowerOutageTimetable();
