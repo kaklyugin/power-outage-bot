@@ -23,7 +23,7 @@ public class CrawlerSchedulerService {
         this.brokerService = brokerService;
     }
 
-    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 1 0/1 * * ?")
     @SchedulerLock(name = "CrawlDonEnergoTask", lockAtMostFor = "10m", lockAtLeastFor = "5m")
     private void crawl() {
         log.info("Scheduled start of crawling data from Donenergo");
