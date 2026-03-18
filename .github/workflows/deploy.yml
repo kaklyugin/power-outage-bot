@@ -21,4 +21,4 @@ jobs:
           docker compose \
             -f /home/deploy-user/.bot_config/docker-compose.yml \
             --env-file /home/deploy-user/.bot_config/.env \
-            up -d --build      
+            up -d --build --remove-orphans
