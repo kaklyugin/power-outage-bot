@@ -1,4 +1,4 @@
-name: Local Build and Deploy
+name: Build and Deploy Bot and Crawler
 on:
   push:
     branches: [ main ]
