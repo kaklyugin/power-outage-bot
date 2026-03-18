@@ -1,0 +1,24 @@
+name: Local Build and Deploy
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted  # This ensures it runs on YOUR VPS
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Bot Docker Image
+        run: docker build -t bot .
+
+      - name: Build Crawler Docker Image
+        run: docker build -t crawler .
+      
+      - name: Deploy with local config
+        run: |
+          docker compose \
+            -f /home/deploy-user/.bot_config/docker-compose.yml \
+            --env-file /home/deploy-user/.bot_config/.env \
+            up -d --build      
