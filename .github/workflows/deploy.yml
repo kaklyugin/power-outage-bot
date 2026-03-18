@@ -5,16 +5,16 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # This ensures it runs on YOUR VPS
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build Bot Docker Image
-        run: docker build -t bot .
+        run: docker build -t bot ./telegram-app
 
       - name: Build Crawler Docker Image
-        run: docker build -t crawler .
+        run: docker build -t crawler ./crawler-app
       
       - name: Deploy with local config
         run: |
