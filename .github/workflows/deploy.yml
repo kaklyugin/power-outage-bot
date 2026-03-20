@@ -1,4 +1,4 @@
-name: Build and Deploy Tg Svet Bot
+name: Build and Deploy Tg Svet
 on:
   push:
     branches: [ main ]
