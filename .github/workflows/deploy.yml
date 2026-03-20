@@ -19,6 +19,6 @@ jobs:
       - name: Deploy with local config
         run: |
           docker compose \
-          -f /home/deploy-user/.bot_config/docker-compose.yml \
-          --env-file /home/deploy-user/.bot_config/.env \
+          -f /home/deploy-user/svet/docker-compose.yml \
+          --env-file /home/deploy-user/svet/.env \
           up -d --build --remove-orphans
